@@ -92,14 +92,23 @@
     <div id="app-container" class="flex-grow flex flex-col w-full max-w-5xl mx-auto p-2 md:p-6 relative z-10">
 
         <!-- VIEW: LOGIN -->
-        <div id="view-login" class="flex-grow flex flex-col items-center justify-center fade-in w-full max-w-md mx-auto relative z-10 pt-4">
-            <img src="https://lh3.googleusercontent.com/d/1psvEKR4OwW81rTJEJByMpxvuU1xqSoc1" alt="Logo Sekolah" class="w-20 h-20 md:w-24 md:h-24 object-contain mb-3 drop-shadow-md relative z-10">
-            <div class="text-center mb-6 relative z-10">
-                <h1 class="text-[4.5rem] md:text-[5.5rem] font-tegas font-black tracking-tighter leading-none transform hover:scale-105 transition duration-500 flex justify-center items-center uppercase">
+        <div id="view-login" class="flex-grow flex flex-col items-center justify-start fade-in w-full max-w-md mx-auto relative z-10 pt-2 md:pt-6">
+            <img src="https://lh3.googleusercontent.com/d/1psvEKR4OwW81rTJEJByMpxvuU1xqSoc1" alt="Logo Sekolah" class="w-16 h-16 md:w-20 md:h-20 object-contain mb-1 drop-shadow-md relative z-10">
+            <div class="text-center mb-4 relative z-10">
+                <h1 class="text-[3.5rem] md:text-[4.5rem] font-tegas font-black tracking-tighter leading-none transform hover:scale-105 transition duration-500 flex justify-center items-center uppercase">
                     <span class="text-transparent bg-clip-text bg-gradient-to-br from-blue-700 to-blue-500">E</span>
                     <span class="text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-yellow-400">LINA</span>
                 </h1>
-                <p class="text-[9px] md:text-[10px] font-bold text-gray-500 tracking-[0.2em] mt-2 uppercase">Elektronik Infaq Al Kautsar</p>
+                <p class="text-[9px] md:text-[10px] font-bold text-gray-500 tracking-[0.2em] mt-1 uppercase">Elektronik Infaq Al Kautsar</p>
+            </div>
+
+            <!-- PANTUN SHAPE -->
+            <div class="relative w-full max-w-sm mx-auto text-center mb-5 fade-in z-20">
+                <span class="absolute -top-3 -left-2 text-2xl bounce-emoji z-10 select-none drop-shadow-sm">😸</span>
+                <span class="absolute -bottom-2 -right-2 text-xl float-emoji z-10 select-none drop-shadow-sm" style="animation-delay: 1s">✨</span>
+                <div class="glass py-2.5 px-4 relative overflow-hidden text-center">
+                    <p id="pantun-text" class="italic text-gray-700 text-[10px] md:text-[11px] font-medium leading-relaxed z-0 relative"></p>
+                </div>
             </div>
 
             <div class="glass w-full p-5 relative overflow-hidden z-20">
@@ -419,14 +428,23 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             initClock(); 
-            // PERBAIKAN: Fungsi initPantun dihapus pemanggilannya karena elemen HTML 'pantun-text' sudah dibuang demi UI yang kompak.
+            initPantun(); 
             await loadDB();
+            
             if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-                const btnInstall = document.getElementById('btn-install'); if (btnInstall) btnInstall.style.display = 'none';
+                const btnInstall = document.getElementById('btn-install');
+                if (btnInstall) btnInstall.style.display = 'none';
             }
+
             const savedSession = sessionStorage.getItem('elina_session');
-            if (savedSession) { session = JSON.parse(savedSession); routeView(); } 
-            else { setLoginRole('admin'); routeView(); }
+            if (savedSession) {
+                session = JSON.parse(savedSession);
+                if (!Array.isArray(session.selectedMonths)) session.selectedMonths = [getLocalMonthStr()];
+                routeView();
+            } else { 
+                setLoginRole('admin'); 
+                routeView(); 
+            }
         });
 
         function initClock() {
@@ -434,6 +452,11 @@
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
             setInterval(() => { clockEl.textContent = new Date().toLocaleDateString('id-ID', options) + " WIB"; }, 60000);
             clockEl.textContent = new Date().toLocaleDateString('id-ID', options) + " WIB";
+        }
+
+        function initPantun() { 
+            const el = document.getElementById('pantun-text');
+            if(el) el.innerHTML = PANTUN_LIST[Math.floor(Math.random() * PANTUN_LIST.length)]; 
         }
 
         async function loadDB() {
