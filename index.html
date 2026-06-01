@@ -510,6 +510,7 @@
     <script>
         // =======================================================
         // DYNAMIC PWA SETUP (MANIFEST & SERVICE WORKER)
+        // Ini yang membuat tombol "Install App" berfungsi seperti aplikasi asli
         // =======================================================
         (function setupPWA() {
             const manifestJSON = {
@@ -520,19 +521,32 @@
                 "background_color": "#f8fafc",
                 "theme_color": "#3B82F6",
                 "icons": [
-                    { "src": "ELINA.png", "sizes": "192x192", "type": "image/png" },
-                    { "src": "ELINA.png", "sizes": "512x512", "type": "image/png" }
+                    {
+                        "src": "ELINA.png",
+                        "sizes": "192x192",
+                        "type": "image/png"
+                    },
+                    {
+                        "src": "ELINA.png",
+                        "sizes": "512x512",
+                        "type": "image/png"
+                    }
                 ]
             };
+            
+            // Menggunakan Data URI lebih aman daripada Blob URL untuk Manifest
             const manifestData = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(manifestJSON));
             document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestData}">`);
 
+            // Menghindari Blob URL untuk Service Worker karena diblokir keamanan browser.
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js').catch(() => {
                     console.log("Info PWA: Menjalankan mode Fallback Install UI (Tanpa service worker lokal).");
                 });
             }
         })();
+        // =======================================================
+
 
         // =======================================================
         // 1. PASTE URL APLIKASI WEB GOOGLE APPS SCRIPT ANDA DI SINI
@@ -540,11 +554,12 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTyyFCAm6geCLJpxfiDZHVD5eMgqLTUZ_pqbaId0Zae-aQRkDkltjrLZtPnxqbgb2_mw/exec"; 
         
         // =======================================================
-        // 2. LINK GAMBAR KOP LOKAL (Ganti nama file jika perlu)
+        // 2. LINK GAMBAR KOP ANDA
         // =======================================================
         const LINK_KOP_ATAS = "KOP ELINA ATAS PUTIH.jpg"; 
         const LINK_KOP_BAWAH = "KOP ELINA BAWAH.png"; 
         
+        // CACHE GAMBAR AGAR DOWNLOAD PDF SANGAT CEPAT (TIDAK LOADING ULANG)
         let cachedKopAtas = null;
         let cachedKopBawah = null;
         // =======================================================
@@ -563,7 +578,11 @@
             return `${y}-${m}`;
         }
 
-        let session = { role: null, user: null, selectedMonths: [getLocalMonthStr()] };
+        let session = { 
+            role: null, 
+            user: null, 
+            selectedMonths: [getLocalMonthStr()] 
+        };
 
         const PANTUN_LIST = [
             `"Jalan-jalan ke kota tua, Jangan lupa beli pepaya.<br><span class="text-blue-600 font-bold">Walau uang saku tak seberapa, Infaq jumat wajib dijaga ya!</span>"`,
@@ -583,38 +602,85 @@
             "Panggilan kepada Admin! Ada Wali Kelas kece mau ngomong nih! 📞✨"
         ];
 
+        // --- PWA INSTALLATION LOGIC ---
         let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
-        window.addEventListener('appinstalled', () => { deferredPrompt = null; document.getElementById('btn-install').style.display = 'none'; });
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            document.getElementById('btn-install').style.display = 'none';
+        });
 
         function showInstallPopup() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') document.getElementById('btn-install').style.display = 'none';
+                    if (choiceResult.outcome === 'accepted') {
+                        document.getElementById('btn-install').style.display = 'none';
+                    }
                     deferredPrompt = null;
                 });
             } else {
                 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-                    Swal.fire({ icon: 'info', title: 'Aplikasi Terinstal', text: 'Aplikasi ELINA sudah berjalan dari layar utama HP Anda.', customClass: { popup: 'rounded-3xl w-[85%] max-w-sm' }}); return;
+                    Swal.fire({
+                        icon: 'info', title: 'Aplikasi Terinstal', text: 'Aplikasi ELINA sudah berjalan dari layar utama HP Anda.',
+                        customClass: { popup: 'rounded-3xl w-[85%] max-w-sm' }
+                    });
+                    return;
                 }
+
                 Swal.fire({
                     title: '<span class="text-base font-black">Install Aplikasi</span>',
-                    html: `<div class="text-left text-sm text-gray-600 mt-2 space-y-3"><p class="text-[11px] font-medium leading-relaxed text-center">Tambahkan aplikasi ini ke Layar Utama (Home Screen) agar lebih cepat diakses seperti aplikasi biasa.</p><div class="bg-white p-3 rounded-xl border border-green-100 shadow-sm"><p class="font-bold text-gray-700 mb-1.5 text-[11px]"><i class="fab fa-android text-green-500 text-sm w-4"></i> Android (Chrome/Web)</p><ol class="list-decimal ml-5 text-[10px] space-y-1"><li>Ketuk ikon titik tiga <i class="fas fa-ellipsis-v mx-1 text-gray-400"></i> di pojok kanan atas browser.</li><li>Pilih <b>"Tambahkan ke layar utama"</b> atau <b>"Install Aplikasi"</b>.</li></ol></div><div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm"><p class="font-bold text-gray-700 mb-1.5 text-[11px]"><i class="fab fa-apple text-gray-800 text-sm w-4"></i> iPhone (Safari)</p><ol class="list-decimal ml-5 text-[10px] space-y-1"><li>Ketuk ikon Share (bagikan) <i class="fas fa-external-link-alt mx-1 text-blue-500"></i> di bar bawah layar.</li><li>Gulir ke bawah, lalu pilih <b>"Tambah ke Layar Utama"</b> (Add to Home Screen).</li></ol></div></div>`,
+                    html: `
+                        <div class="text-left text-sm text-gray-600 mt-2 space-y-3">
+                            <p class="text-[11px] font-medium leading-relaxed text-center">Tambahkan aplikasi ini ke Layar Utama (Home Screen) agar lebih cepat diakses seperti aplikasi biasa.</p>
+                            
+                            <div class="bg-white p-3 rounded-xl border border-green-100 shadow-sm">
+                                <p class="font-bold text-gray-700 mb-1.5 text-[11px]"><i class="fab fa-android text-green-500 text-sm w-4"></i> Android (Chrome/Web)</p>
+                                <ol class="list-decimal ml-5 text-[10px] space-y-1">
+                                    <li>Ketuk ikon titik tiga <i class="fas fa-ellipsis-v mx-1 text-gray-400"></i> di pojok kanan atas browser.</li>
+                                    <li>Pilih <b>"Tambahkan ke layar utama"</b> atau <b>"Install Aplikasi"</b>.</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                                <p class="font-bold text-gray-700 mb-1.5 text-[11px]"><i class="fab fa-apple text-gray-800 text-sm w-4"></i> iPhone (Safari)</p>
+                                <ol class="list-decimal ml-5 text-[10px] space-y-1">
+                                    <li>Ketuk ikon Share (bagikan) <i class="fas fa-external-link-alt mx-1 text-blue-500"></i> di bar bawah layar.</li>
+                                    <li>Gulir ke bawah, lalu pilih <b>"Tambah ke Layar Utama"</b> (Add to Home Screen).</li>
+                                </ol>
+                            </div>
+                        </div>
+                    `,
                     showConfirmButton: true, confirmButtonText: 'Tutup', customClass: { popup: 'rounded-3xl w-[90%] max-w-sm p-5 bg-slate-50', confirmButton: 'btn-click bg-blue-600 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md' }, buttonsStyling: false
                 });
             }
         }
+        // ------------------------------
 
         document.addEventListener('DOMContentLoaded', async () => {
-            initClock(); initPantun(); await loadDB();
+            initClock(); 
+            initPantun(); 
+            await loadDB();
+            
             if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-                const btnInstall = document.getElementById('btn-install'); if (btnInstall) btnInstall.style.display = 'none';
+                const btnInstall = document.getElementById('btn-install');
+                if (btnInstall) btnInstall.style.display = 'none';
             }
+
             const savedSession = sessionStorage.getItem('elina_session');
             if (savedSession) {
-                session = JSON.parse(savedSession); if (!Array.isArray(session.selectedMonths)) session.selectedMonths = [getLocalMonthStr()]; routeView();
-            } else { setLoginRole('admin'); routeView(); }
+                session = JSON.parse(savedSession);
+                if (!Array.isArray(session.selectedMonths)) session.selectedMonths = [getLocalMonthStr()];
+                routeView();
+            } else { 
+                setLoginRole('admin'); 
+                routeView(); 
+            }
         });
 
         function initClock() {
@@ -624,7 +690,9 @@
             clockEl.textContent = new Date().toLocaleDateString('id-ID', options) + " WIB";
         }
 
-        function initPantun() { document.getElementById('pantun-text').innerHTML = PANTUN_LIST[Math.floor(Math.random() * PANTUN_LIST.length)]; }
+        function initPantun() { 
+            document.getElementById('pantun-text').innerHTML = PANTUN_LIST[Math.floor(Math.random() * PANTUN_LIST.length)]; 
+        }
 
         async function loadDB() {
             if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
@@ -638,7 +706,8 @@
                     if (cloudDB && cloudDB.users) { db = cloudDB; localStorage.setItem('elina_db', JSON.stringify(db)); }
                     Swal.close();
                 } catch (error) {
-                    console.warn("Info Cloud:", error.message); loadLocalFallback();
+                    console.warn("Info Cloud:", error.message);
+                    loadLocalFallback();
                     Swal.fire({ icon: 'warning', title: 'Mode Offline Aktif', text: 'Tidak dapat sinkron dengan Cloud saat ini. Data diambil dari perangkat Anda.', timer: 3500, toast: true, position: 'top-end', showConfirmButton: false });
                 }
             } else { loadLocalFallback(); }
@@ -646,27 +715,38 @@
 
         function loadLocalFallback() {
             const local = localStorage.getItem('elina_db');
-            if (local) { db = JSON.parse(local); if (!db.users.admin[0]?.foto) db.users.admin[0].foto = "";
+            if (local) { 
+                db = JSON.parse(local); 
+                if (!db.users.admin[0]?.foto) db.users.admin[0].foto = "";
             } else {
                 db.users.wali.push({ kelas: '1A', nama: 'Ust. Budi', kode: '123', nominal: 2000, foto: "" });
                 db.users.murid.push({ kelas: '1A', presensi: '01', nama: 'Ahmad', kode: '01', foto: "" });
                 db.users.murid.push({ kelas: '1A', presensi: '02', nama: 'Fatimah', kode: '02', foto: "" });
-                db.config.defaultNominal['1A'] = 2000; saveDB();
+                db.config.defaultNominal['1A'] = 2000; 
+                saveDB();
             }
         }
 
         function showSyncingUI() {
             let el = document.getElementById('sync-indicator');
-            if(!el) { el = document.createElement('div'); el.id = 'sync-indicator'; document.body.appendChild(el); }
+            if(!el) {
+                el = document.createElement('div');
+                el.id = 'sync-indicator';
+                document.body.appendChild(el);
+            }
             el.innerHTML = '<i class="fas fa-sync fa-spin"></i> Menyimpan ke Cloud...';
             el.className = 'fixed bottom-4 right-4 bg-white/90 glass px-4 py-2 rounded-full shadow-lg text-[10px] font-bold text-blue-600 flex items-center z-[100] gap-2 fade-in';
             el.style.display = 'flex';
         }
 
-        function hideSyncingUI() { let el = document.getElementById('sync-indicator'); if(el) el.style.display = 'none'; }
+        function hideSyncingUI() {
+            let el = document.getElementById('sync-indicator');
+            if(el) el.style.display = 'none';
+        }
 
         async function saveDB() { 
             localStorage.setItem('elina_db', JSON.stringify(db)); 
+            
             if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
                 showSyncingUI();
                 try {
@@ -684,10 +764,24 @@
         function routeView() {
             ['view-login', 'view-admin', 'view-walikelas', 'view-walimurid'].forEach(id => { document.getElementById(id).classList.add('hidden'); });
             const bgBubbles = document.getElementById('bg-bubbles');
-            if (!session.user) { document.getElementById('view-login').classList.remove('hidden'); if (bgBubbles) bgBubbles.classList.add('hidden'); updateLoginDropdowns(); } 
-            else if (session.role === 'admin') { document.getElementById('view-admin').classList.remove('hidden'); if (bgBubbles) bgBubbles.classList.remove('hidden'); setupAdminView(); } 
-            else if (session.role === 'wali') { document.getElementById('view-walikelas').classList.remove('hidden'); if (bgBubbles) bgBubbles.classList.remove('hidden'); setupWaliView(); } 
-            else if (session.role === 'murid') { document.getElementById('view-walimurid').classList.remove('hidden'); if (bgBubbles) bgBubbles.classList.remove('hidden'); setupMuridView(); }
+
+            if (!session.user) { 
+                document.getElementById('view-login').classList.remove('hidden'); 
+                if (bgBubbles) bgBubbles.classList.add('hidden');
+                updateLoginDropdowns(); 
+            } else if (session.role === 'admin') { 
+                document.getElementById('view-admin').classList.remove('hidden'); 
+                if (bgBubbles) bgBubbles.classList.remove('hidden');
+                setupAdminView(); 
+            } else if (session.role === 'wali') { 
+                document.getElementById('view-walikelas').classList.remove('hidden'); 
+                if (bgBubbles) bgBubbles.classList.remove('hidden');
+                setupWaliView(); 
+            } else if (session.role === 'murid') { 
+                document.getElementById('view-walimurid').classList.remove('hidden'); 
+                if (bgBubbles) bgBubbles.classList.remove('hidden');
+                setupMuridView(); 
+            }
         }
 
         let currentLoginTab = 'admin';
@@ -698,20 +792,27 @@
                 if (r === role) { btn.classList.add('bg-white', 'shadow-sm', 'text-blue-600'); btn.classList.remove('text-gray-500', 'hover:text-gray-800'); } 
                 else { btn.classList.remove('bg-white', 'shadow-sm', 'text-blue-600'); btn.classList.add('text-gray-500', 'hover:text-gray-800'); }
             });
+
             ['form-group-admin', 'form-group-wali', 'form-group-murid'].forEach(id => { document.getElementById(id).classList.add('hidden'); });
             document.getElementById(`form-group-${role}`).classList.remove('hidden');
+            
             const lblKode = document.getElementById('label-kode');
             if (role === 'murid') lblKode.textContent = "KODE SISWA"; else if (role === 'wali') lblKode.textContent = "KODE GURU"; else lblKode.textContent = "PASSWORD ADMIN";
+            
             updateLoginDropdowns(); checkSavedCreds();
         }
 
         function updateLoginDropdowns() {
             if (currentLoginTab === 'wali') {
-                const kelasSel = document.getElementById('wali-kelas'); const classes = [...new Set(db.users.wali.map(w => w.kelas))].sort();
-                kelasSel.innerHTML = '<option value="">--</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('wali-nama').innerHTML = '<option value="">Pilih Wali Kelas</option>';
+                const kelasSel = document.getElementById('wali-kelas');
+                const classes = [...new Set(db.users.wali.map(w => w.kelas))].sort();
+                kelasSel.innerHTML = '<option value="">--</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
+                document.getElementById('wali-nama').innerHTML = '<option value="">Pilih Wali Kelas</option>';
             } else if (currentLoginTab === 'murid') {
-                const kelasSel = document.getElementById('murid-kelas'); const classes = [...new Set(db.users.murid.map(m => m.kelas))].sort();
-                kelasSel.innerHTML = '<option value="">--</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join(''); document.getElementById('murid-nama').innerHTML = '<option value="">Pilih Siswa</option>';
+                const kelasSel = document.getElementById('murid-kelas');
+                const classes = [...new Set(db.users.murid.map(m => m.kelas))].sort();
+                kelasSel.innerHTML = '<option value="">--</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
+                document.getElementById('murid-nama').innerHTML = '<option value="">Pilih Siswa</option>';
             }
         }
 
@@ -720,7 +821,8 @@
             if (!kls) { namaSel.innerHTML = '<option value="">Pilih Wali Kelas</option>'; checkSavedCreds(); return; }
             const walis = db.users.wali.filter(w => w.kelas === kls);
             namaSel.innerHTML = '<option value="">Pilih Wali Kelas</option>' + walis.map(w => `<option value="${w.nama}">${w.nama}</option>`).join('');
-            if (walis.length === 1) namaSel.value = walis[0].nama; checkSavedCreds();
+            if (walis.length === 1) namaSel.value = walis[0].nama;
+            checkSavedCreds();
         }
 
         function populateMuridNames() {
@@ -728,7 +830,8 @@
             if (!kls) { namaSel.innerHTML = '<option value="">Pilih Siswa</option>'; checkSavedCreds(); return; }
             const murids = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
             namaSel.innerHTML = '<option value="">Pilih Siswa</option>' + murids.map(m => `<option value="${m.presensi}">${m.presensi} - ${m.nama}</option>`).join('');
-            if (murids.length === 1) namaSel.value = murids[0].presensi; checkSavedCreds();
+            if (murids.length === 1) namaSel.value = murids[0].presensi;
+            checkSavedCreds();
         }
 
         function togglePassword(id) {
@@ -739,33 +842,59 @@
 
         function checkSavedCreds() {
             const saved = JSON.parse(localStorage.getItem('elina_saved_creds')) || { admin: {}, wali: {}, murid: {} };
-            const kodeInput = document.getElementById('login-kode'); const rememberChk = document.getElementById('remember-me'); let pass = null;
+            const kodeInput = document.getElementById('login-kode'); const rememberChk = document.getElementById('remember-me');
+            let pass = null;
 
-            if (currentLoginTab === 'admin') { const user = document.getElementById('admin-user').value; pass = saved.admin[user]; } 
-            else if (currentLoginTab === 'wali') { const kls = document.getElementById('wali-kelas').value; const nm = document.getElementById('wali-nama').value; if (kls && nm) pass = saved.wali[kls + '_' + nm]; } 
-            else if (currentLoginTab === 'murid') { const kls = document.getElementById('murid-kelas').value; const nm = document.getElementById('murid-nama').value; if (kls && nm) pass = saved.murid[kls + '_' + nm]; }
+            if (currentLoginTab === 'admin') {
+                const user = document.getElementById('admin-user').value; pass = saved.admin[user];
+            } else if (currentLoginTab === 'wali') {
+                const kls = document.getElementById('wali-kelas').value; const nm = document.getElementById('wali-nama').value;
+                if (kls && nm) pass = saved.wali[kls + '_' + nm];
+            } else if (currentLoginTab === 'murid') {
+                const kls = document.getElementById('murid-kelas').value; const nm = document.getElementById('murid-nama').value;
+                if (kls && nm) pass = saved.murid[kls + '_' + nm];
+            }
 
             if (pass) { kodeInput.value = pass; rememberChk.checked = true; } else { kodeInput.value = ''; rememberChk.checked = false; }
         }
 
         function handleLogin(e) {
-            e.preventDefault(); const kode = document.getElementById('login-kode').value;
+            e.preventDefault(); 
+            const kode = document.getElementById('login-kode').value;
             let loggedInRole = null; let loggedInUser = null;
 
-            if (currentLoginTab === 'admin') { const user = document.getElementById('admin-user').value; const match = db.users.admin.find(a => a.username === user && a.kode === kode); if (match) { loggedInRole = 'admin'; loggedInUser = match; } } 
-            else if (currentLoginTab === 'wali') { const kls = document.getElementById('wali-kelas').value; const nm = document.getElementById('wali-nama').value; const match = db.users.wali.find(w => w.kelas === kls && w.nama === nm && w.kode === kode); if (match) { loggedInRole = 'wali'; loggedInUser = match; } } 
-            else if (currentLoginTab === 'murid') { const kls = document.getElementById('murid-kelas').value; const pres = document.getElementById('murid-nama').value; const match = db.users.murid.find(m => m.kelas === kls && m.presensi === pres && m.kode === kode); if (match) { loggedInRole = 'murid'; loggedInUser = match; } }
+            if (currentLoginTab === 'admin') {
+                const user = document.getElementById('admin-user').value;
+                const match = db.users.admin.find(a => a.username === user && a.kode === kode);
+                if (match) { loggedInRole = 'admin'; loggedInUser = match; }
+            } else if (currentLoginTab === 'wali') {
+                const kls = document.getElementById('wali-kelas').value; const nm = document.getElementById('wali-nama').value;
+                const match = db.users.wali.find(w => w.kelas === kls && w.nama === nm && w.kode === kode);
+                if (match) { loggedInRole = 'wali'; loggedInUser = match; }
+            } else if (currentLoginTab === 'murid') {
+                const kls = document.getElementById('murid-kelas').value; const pres = document.getElementById('murid-nama').value;
+                const match = db.users.murid.find(m => m.kelas === kls && m.presensi === pres && m.kode === kode);
+                if (match) { loggedInRole = 'murid'; loggedInUser = match; }
+            }
 
             if (loggedInUser) { 
                 session.role = loggedInRole; session.user = loggedInUser; sessionStorage.setItem('elina_session', JSON.stringify(session));
+                
                 let saved = JSON.parse(localStorage.getItem('elina_saved_creds')) || { admin: {}, wali: {}, murid: {} };
                 const isRemember = document.getElementById('remember-me').checked;
                 
-                if (currentLoginTab === 'admin') { const user = document.getElementById('admin-user').value; if (isRemember) saved.admin[user] = kode; else delete saved.admin[user]; } 
-                else if (currentLoginTab === 'wali') { const kls = document.getElementById('wali-kelas').value; const nm = document.getElementById('wali-nama').value; if (isRemember) saved.wali[kls + '_' + nm] = kode; else delete saved.wali[kls + '_' + nm]; } 
-                else if (currentLoginTab === 'murid') { const kls = document.getElementById('murid-kelas').value; const nm = document.getElementById('murid-nama').value; if (isRemember) saved.murid[kls + '_' + nm] = kode; else delete saved.murid[kls + '_' + nm]; }
+                if (currentLoginTab === 'admin') {
+                    const user = document.getElementById('admin-user').value; if (isRemember) saved.admin[user] = kode; else delete saved.admin[user];
+                } else if (currentLoginTab === 'wali') {
+                    const kls = document.getElementById('wali-kelas').value; const nm = document.getElementById('wali-nama').value;
+                    if (isRemember) saved.wali[kls + '_' + nm] = kode; else delete saved.wali[kls + '_' + nm];
+                } else if (currentLoginTab === 'murid') {
+                    const kls = document.getElementById('murid-kelas').value; const nm = document.getElementById('murid-nama').value;
+                    if (isRemember) saved.murid[kls + '_' + nm] = kode; else delete saved.murid[kls + '_' + nm];
+                }
                 
                 localStorage.setItem('elina_saved_creds', JSON.stringify(saved)); document.getElementById('login-kode').value = ''; 
+                
                 let namaTampil = loggedInUser.nama || loggedInUser.username || "";
                 
                 Swal.fire({
@@ -909,35 +1038,11 @@
 
         function updateWallet(kelas, totalMasuk) {
             const p = db.pengeluaran[kelas] || []; 
-            // PERBAIKAN BUG TYPO SEBELUMNYA DI SINI
+            // PERBAIKAN BUG: sebelumnya tertulis "i.amount" di-loop map, diubah kembali menjadi item.amount di reduce
             const totalKeluar = p.reduce((sum, item) => sum + item.amount, 0); 
             document.getElementById('wali-tot-masuk').textContent = formatRupiah(totalMasuk); 
             document.getElementById('wali-tot-keluar').textContent = formatRupiah(totalKeluar); 
             document.getElementById('wali-tot-saldo').textContent = formatRupiah(totalMasuk - totalKeluar);
-        }
-
-        function openPengeluaranModal() {
-            Swal.fire({
-                title: '<span class="text-base font-black">Catat Pengeluaran</span>',
-                html: `<div class="flex flex-col gap-3 text-left mt-4"><label class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Tanggal</label><input type="date" id="swal-p-date" class="w-full p-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white" value="${getLocalYYYYMMDD(new Date())}"><label class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mt-1">Keterangan</label><input type="text" id="swal-p-desc" class="w-full p-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white" placeholder="Contoh: Beli Sapu & Pel"><label class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mt-1">Nominal (Rp)</label><input type="number" id="swal-p-amount" class="w-full p-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white font-mono" placeholder="Contoh: 15000"></div>`,
-                confirmButtonText: 'Simpan', showCancelButton: true, cancelButtonText: 'Batal', customClass: { popup: 'rounded-3xl w-[90%] max-w-sm p-5', confirmButton: 'btn-click bg-orange-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md', cancelButton: 'btn-click bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold' }, buttonsStyling: false,
-                preConfirm: () => { return { date: document.getElementById('swal-p-date').value, desc: document.getElementById('swal-p-desc').value, amount: parseInt(document.getElementById('swal-p-amount').value) } }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const data = result.value; if (!data.desc || !data.amount) return Swal.fire({icon: 'error', title: 'Data belum lengkap', customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
-                    const kelas = session.user.kelas; if (!db.pengeluaran[kelas]) db.pengeluaran[kelas] = []; db.pengeluaran[kelas].push({ id: Date.now().toString(), date: data.date, desc: data.desc, amount: data.amount }); saveDB(); renderWaliChecklist(); Swal.fire({icon: 'success', title: 'Tersimpan', showConfirmButton: false, timer: 1000, customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
-                }
-            });
-        }
-
-        function viewPengeluaranHistory() {
-            const kelas = session.user.kelas; const p = db.pengeluaran[kelas] || [];
-            if (p.length === 0) return Swal.fire({icon: 'info', title: 'Belum ada data pengeluaran.', customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
-            let html = `<div class="max-h-64 overflow-y-auto text-left text-xs bg-slate-50 rounded-xl border border-gray-100 mt-2"><table class="w-full"><thead class="bg-gray-100/80 text-[10px] text-gray-500 uppercase"><tr><th class="p-3 font-bold">Tanggal</th><th class="p-3 font-bold">Ket</th><th class="p-3 font-bold text-right">Nominal</th><th class="p-3"></th></tr></thead><tbody>`;
-            p.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(item => { html += `<tr class="border-b border-gray-100 hover:bg-white transition"><td class="p-3 font-medium text-gray-600 whitespace-nowrap">${item.date.slice(5).replace('-','/')}</td><td class="p-3 font-bold text-gray-800">${item.desc}</td><td class="p-3 text-right text-red-600 font-bold whitespace-nowrap">${formatRupiah(item.amount).replace('Rp','').trim()}</td><td class="p-3 text-center"><button onclick="deletePengeluaran('${item.id}')" class="btn-click text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded-lg transition"><i class="fas fa-trash text-[10px]"></i></button></td></tr>`; }); html += `</tbody></table></div>`;
-
-            window.deletePengeluaran = (id) => { db.pengeluaran[kelas] = db.pengeluaran[kelas].filter(x => x.id !== id); saveDB(); renderWaliChecklist(); Swal.close(); setTimeout(viewPengeluaranHistory, 250); };
-            Swal.fire({ title: '<span class="text-base font-black">Riwayat Pengeluaran</span>', html: html, showConfirmButton: false, showCloseButton: true, customClass: {popup: 'rounded-3xl w-[95%] max-w-md p-4'} });
         }
 
         // =========================================================================
@@ -1039,6 +1144,7 @@
                     const nominal = getNominalKelas(kls);
                     const printDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
 
+                    // Load KOP
                     if (!cachedKopAtas) cachedKopAtas = await getBase64ImageOptimized(LINK_KOP_ATAS, "image/jpeg");
                     if (!cachedKopBawah) cachedKopBawah = await getBase64ImageOptimized(LINK_KOP_BAWAH, "image/png");
 
@@ -1046,16 +1152,20 @@
                     if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = Math.min((pageWidth * imgA.height) / imgA.width, 130); }
                     if (cachedKopBawah) { const imgB = new Image(); imgB.src = cachedKopBawah; hBawah = Math.min((pageWidth * imgB.height) / imgB.width, 130); }
 
+                    // Tentukan rentang waktu
                     let monthsToProcess = [];
                     if (timeFilter === 'SELECTED') { monthsToProcess = [...session.selectedMonths].sort(); } 
                     else {
+                        // Kumpulkan semua bulan yang ada datanya di kelas ini
                         let allM = new Set();
                         if (db.infaq[kls]) { Object.keys(db.infaq[kls]).forEach(d => allM.add(d.slice(0,7))); }
                         monthsToProcess = Array.from(allM).sort();
-                        if(monthsToProcess.length === 0) monthsToProcess = [getLocalMonthStr()]; 
+                        if(monthsToProcess.length === 0) monthsToProcess = [getLocalMonthStr()]; // Fallback jika kosong
                     }
 
-                    // CABANG 1: BUKU INFAQ PER 1 SISWA SPESIFIK
+                    // ==========================================================
+                    // CABANG 1: CETAK BUKU INFAQ (HANYA 1 SISWA SAJA)
+                    // ==========================================================
                     if (target !== 'ALL') {
                         const s = db.users.murid.find(m => m.kelas === kls && m.presensi === target);
                         
@@ -1080,6 +1190,7 @@
                             let row = [formatMonthID(mStr)];
                             let mTotal = 0;
                             
+                            // Ambil data 5 pekan
                             for(let i=0; i<5; i++) {
                                 if (fridays[i]) {
                                     const dStr = getLocalYYYYMMDD(fridays[i]);
@@ -1088,7 +1199,7 @@
                                     else if (stat === 'libur') { row.push('LIBUR'); }
                                     else { row.push('-'); }
                                 } else {
-                                    row.push('');
+                                    row.push(''); // Tidak ada pekan ke-5
                                 }
                             }
                             row.push(formatRupiah(mTotal));
@@ -1112,7 +1223,9 @@
                         Swal.close(); return;
                     }
 
+                    // ==========================================================
                     // CABANG 2: CETAK REKAP KELAS (BUKU RAPOR 2 SISWA PER HALAMAN)
+                    // ==========================================================
                     const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
                     
                     // HALAMAN PERTAMA: SUMMARY KELAS
@@ -1141,14 +1254,14 @@
                     doc.setFillColor(249, 115, 22); doc.rect(40 + boxW, currentY, boxW - 5, boxH, 'F'); doc.setTextColor(255); doc.setFontSize(8); doc.text("TOTAL KELUAR", 40 + boxW + 10, currentY + 15); doc.setFontSize(12); doc.text(formatRupiah(totalKeluarKelas), 40 + boxW + 10, currentY + 35);
                     doc.setFillColor(16, 185, 129); doc.rect(40 + (boxW * 2), currentY, boxW - 5, boxH, 'F'); doc.setTextColor(255); doc.setFontSize(8); doc.text("SISA SALDO", 40 + (boxW * 2) + 10, currentY + 15); doc.setFontSize(12); doc.text(formatRupiah(totalMasukKelas - totalKeluarKelas), 40 + (boxW * 2) + 10, currentY + 35);
 
-                    // MEMULAI KARTU SISWA (2 SISWA PER HALAMAN)
+                    // MULAI PERULANGAN KARTU SISWA (2 SISWA PER HALAMAN)
                     currentY += boxH + 30; 
                     let studentCountOnPage = 0;
 
                     for (let i = 0; i < students.length; i++) {
                         const s = students[i];
 
-                        // Jika sudah ada 2 siswa di halaman ini, buat halaman baru
+                        // Buat halaman baru jika sudah ada 2 siswa, atau ruang habis
                         if (studentCountOnPage === 2 || (currentY + 280 > pageHeight - hBawah)) {
                             doc.addPage();
                             if (cachedKopAtas) doc.addImage(cachedKopAtas, 'JPEG', 0, 0, pageWidth, hAtas);
@@ -1157,22 +1270,20 @@
                             studentCountOnPage = 0;
                         }
 
-                        // Gambar Card / Kotak Luar Siswa
+                        // Gambar Card (Shape) Luar
                         doc.setFillColor(248, 250, 252); // bg-slate-50
                         doc.setDrawColor(226, 232, 240); // border-slate-200
                         doc.roundedRect(40, currentY, pageWidth - 80, 290, 8, 8, 'FD');
 
-                        // Gambar Header Biru pada Card
+                        // Gambar Card Header Biru
                         doc.setFillColor(37, 99, 235); // bg-blue-600
                         doc.roundedRect(40, currentY, pageWidth - 80, 25, 8, 8, 'F');
-                        
-                        // Menambal sudut bawah header agar lurus (opsional agar rapi)
-                        doc.rect(40, currentY + 15, pageWidth - 80, 10, 'F');
+                        doc.rect(40, currentY + 15, pageWidth - 80, 10, 'F'); // menambal siku bawah header
 
                         doc.setFont('Helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(255, 255, 255);
                         doc.text(`No: ${s.presensi}  |  Nama: ${s.nama}`, 50, currentY + 17);
 
-                        // Ambil Data Siswa Ini
+                        // Ambil Data Khusus Siswa Ini
                         let body = []; let totalSiswaMasuk = 0;
                         monthsToProcess.forEach(mStr => {
                             const [year, month] = mStr.split('-'); 
@@ -1197,7 +1308,7 @@
                         
                         body.push(['TOTAL KESELURUHAN', '', '', '', '', '', formatRupiah(totalSiswaMasuk)]);
 
-                        // Cetak Tabel di dalam Card
+                        // Cetak Mini-Tabel di dalam Card
                         doc.autoTable({
                             startY: currentY + 35,
                             head: [['Bulan', 'Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4', 'Pekan 5', 'Total']],
@@ -1208,7 +1319,7 @@
                             margin: { left: 45, right: 45 },
                             tableWidth: pageWidth - 90,
                             didParseCell: function(data) {
-                                // Menebalkan baris Total Keseluruhan
+                                // Menebalkan baris Total
                                 if (data.row.index === body.length - 1) {
                                     data.cell.styles.fontStyle = 'bold';
                                     data.cell.styles.fillColor = [226, 232, 240];
@@ -1217,7 +1328,7 @@
                             }
                         });
 
-                        currentY += 310; // Geser Y ke bawah untuk siswa berikutnya
+                        currentY += 310; // Geser Y ke bawah untuk menggambar kartu siswa berikutnya
                         studentCountOnPage++;
                     }
 
@@ -1226,7 +1337,7 @@
 
                 } catch (error) {
                     console.error("PDF Error:", error);
-                    Swal.fire({icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan saat memproses data PDF. Hubungi teknisi.'});
+                    Swal.fire({icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan saat memproses data PDF.'});
                 }
             }, 300);
         }
@@ -1306,13 +1417,6 @@
                 const p = db.pengeluaran[kls] || []; const totalKeluarKelas = p.reduce((sum, i) => sum + i.amount, 0);
                 aoa[5][1] = totalKeluarKelas; aoa[6][1] = totalMasukKelas - totalKeluarKelas;
 
-                if (p.length > 0) {
-                    aoa.push([], ["RINCIAN PENGELUARAN"], ["TANGGAL", "KETERANGAN", "NOMINAL"]);
-                    p.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => { 
-                        aoa.push([formatDateID(item.date), item.desc, item.amount]); 
-                    });
-                }
-
                 const ws = XLSX.utils.aoa_to_sheet(aoa);
                 ws['!cols'] = [{ wch: 5 }, { wch: 20 }, ...Array(allDates.length).fill({ wch: 8 }), { wch: 15 }];
                 XLSX.utils.book_append_sheet(wb, ws, `REKAP_${kls}`);
@@ -1321,7 +1425,31 @@
             Swal.fire({ icon: 'success', title: 'Berhasil!', showConfirmButton: false, timer: 1500, customClass: { popup: 'rounded-3xl w-[80%] max-w-sm' } });
         }
 
-        // --- ADMIN MURID VIEW LOGIC ---
+        function openPengeluaranModal() {
+            Swal.fire({
+                title: '<span class="text-base font-black">Catat Pengeluaran</span>',
+                html: `<div class="flex flex-col gap-3 text-left mt-4"><label class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Tanggal</label><input type="date" id="swal-p-date" class="w-full p-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer bg-white" value="${getLocalYYYYMMDD(new Date())}"><label class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mt-1">Keterangan</label><input type="text" id="swal-p-desc" class="w-full p-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white" placeholder="Contoh: Beli Sapu & Pel"><label class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mt-1">Nominal (Rp)</label><input type="number" id="swal-p-amount" class="w-full p-2.5 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white font-mono" placeholder="Contoh: 15000"></div>`,
+                confirmButtonText: 'Simpan', showCancelButton: true, cancelButtonText: 'Batal', customClass: { popup: 'rounded-3xl w-[90%] max-w-sm p-5', confirmButton: 'btn-click bg-orange-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md', cancelButton: 'btn-click bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold' }, buttonsStyling: false,
+                preConfirm: () => { return { date: document.getElementById('swal-p-date').value, desc: document.getElementById('swal-p-desc').value, amount: parseInt(document.getElementById('swal-p-amount').value) } }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const data = result.value; if (!data.desc || !data.amount) return Swal.fire({icon: 'error', title: 'Data belum lengkap', customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
+                    const kelas = session.user.kelas; if (!db.pengeluaran[kelas]) db.pengeluaran[kelas] = []; db.pengeluaran[kelas].push({ id: Date.now().toString(), date: data.date, desc: data.desc, amount: data.amount }); saveDB(); renderWaliChecklist(); Swal.fire({icon: 'success', title: 'Tersimpan', showConfirmButton: false, timer: 1000, customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
+                }
+            });
+        }
+
+        function viewPengeluaranHistory() {
+            const kelas = session.user.kelas; const p = db.pengeluaran[kelas] || [];
+            if (p.length === 0) return Swal.fire({icon: 'info', title: 'Belum ada data pengeluaran.', customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
+            let html = `<div class="max-h-64 overflow-y-auto text-left text-xs bg-slate-50 rounded-xl border border-gray-100 mt-2"><table class="w-full"><thead class="bg-gray-100/80 text-[10px] text-gray-500 uppercase"><tr><th class="p-3 font-bold">Tanggal</th><th class="p-3 font-bold">Ket</th><th class="p-3 font-bold text-right">Nominal</th><th class="p-3"></th></tr></thead><tbody>`;
+            p.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(item => { html += `<tr class="border-b border-gray-100 hover:bg-white transition"><td class="p-3 font-medium text-gray-600 whitespace-nowrap">${item.date.slice(5).replace('-','/')}</td><td class="p-3 font-bold text-gray-800">${item.desc}</td><td class="p-3 text-right text-red-600 font-bold whitespace-nowrap">${formatRupiah(item.amount).replace('Rp','').trim()}</td><td class="p-3 text-center"><button onclick="deletePengeluaran('${item.id}')" class="btn-click text-red-400 hover:text-red-600 bg-red-50 p-1.5 rounded-lg transition"><i class="fas fa-trash text-[10px]"></i></button></td></tr>`; }); html += `</tbody></table></div>`;
+
+            window.deletePengeluaran = (id) => { db.pengeluaran[kelas] = db.pengeluaran[kelas].filter(x => x.id !== id); saveDB(); renderWaliChecklist(); Swal.close(); setTimeout(viewPengeluaranHistory, 250); };
+            Swal.fire({ title: '<span class="text-base font-black">Riwayat Pengeluaran</span>', html: html, showConfirmButton: false, showCloseButton: true, customClass: {popup: 'rounded-3xl w-[95%] max-w-md p-4'} });
+        }
+
+        // --- WALI MURID VIEW LOGIC ---
         function setupMuridView() {
             document.getElementById('murid-title-nama').textContent = session.user.nama; document.getElementById('murid-title-kelas-only').textContent = session.user.kelas; document.getElementById('murid-title-pres-only').textContent = session.user.presensi;
             const imgMurid = document.getElementById('murid-foto-profil');
@@ -1464,35 +1592,11 @@
         }
 
         // =========================================================================
-        // ADMIN PDF GENERATOR 
+        // ADMIN PDF GENERATOR (Dipertahankan menggunakan metode lama)
         // =========================================================================
         function downloadReport() {
             const targetClass = document.getElementById('admin-report-class').value;
-            Swal.fire({
-                title: 'Pilih Format Laporan', text: 'Silakan pilih format file yang Anda inginkan.', icon: 'question', showCancelButton: true, confirmButtonText: 'PDF (Profesional)', cancelButtonText: 'Excel (Data)',
-                customClass: { popup: 'rounded-3xl w-[90%] max-w-sm', confirmButton: 'btn-click bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md', cancelButton: 'btn-click bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md' }, buttonsStyling: false
-            }).then((result) => { 
-                if (result.isConfirmed) { 
-                    Swal.fire({
-                        title: 'Menyiapkan Dokumen...', html: 'Sedang memuat KOP dan merender laporan...', allowOutsideClick: false,
-                        didOpen: () => { 
-                            Swal.showLoading();
-                            setTimeout(async () => {
-                                try {
-                                    const resultData = await processAdminPDF(targetClass, false);
-                                    resultData.doc.save(`Laporan_Infaq_ELINA_${targetClass}_${getLocalYYYYMMDD(new Date())}.pdf`);
-                                    Swal.close();
-                                } catch (error) {
-                                    console.error("PDF Error:", error);
-                                    Swal.fire({icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan saat membuat PDF.'});
-                                }
-                            }, 200);
-                        }
-                    });
-                } else if (result.dismiss === Swal.DismissReason.cancel) { 
-                    generateReportForClass(targetClass, false); 
-                } 
-            });
+            askFormat(targetClass, false); 
         }
 
         async function processAdminPDF(targetClass, filterBySelectedMonths) {
@@ -1508,6 +1612,7 @@
             if (!cachedKopBawah) cachedKopBawah = await getBase64ImageOptimized(LINK_KOP_BAWAH, "image/png"); 
 
             let hAtas = 80; let hBawah = 80;
+            // DIBATASI 130pt agar ukuran F4 muat 35 siswa per halaman
             if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = Math.min((pageWidth * imgA.height) / imgA.width, 130); }
             if (cachedKopBawah) { const imgB = new Image(); imgB.src = cachedKopBawah; hBawah = Math.min((pageWidth * imgB.height) / imgB.width, 130); }
 
@@ -1566,6 +1671,34 @@
             });
 
             return { doc, base64Atas: cachedKopAtas, base64Bawah: cachedKopBawah };
+        }
+
+        function askFormat(targetClass, filterBySelectedMonths) {
+            Swal.fire({
+                title: 'Pilih Format Laporan', text: 'Silakan pilih format file yang Anda inginkan.', icon: 'question', showCancelButton: true, confirmButtonText: 'PDF (Profesional)', cancelButtonText: 'Excel (Data)',
+                customClass: { popup: 'rounded-3xl w-[90%] max-w-sm', confirmButton: 'btn-click bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md', cancelButton: 'btn-click bg-green-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md' }, buttonsStyling: false
+            }).then((result) => { 
+                if (result.isConfirmed) { 
+                    Swal.fire({
+                        title: 'Menyiapkan Dokumen...', html: 'Sedang memuat KOP dan merender laporan...', allowOutsideClick: false,
+                        didOpen: () => { 
+                            Swal.showLoading();
+                            setTimeout(async () => {
+                                try {
+                                    const resultData = await processAdminPDF(targetClass, filterBySelectedMonths);
+                                    resultData.doc.save(`Laporan_Infaq_ELINA_${targetClass}_${getLocalYYYYMMDD(new Date())}.pdf`);
+                                    Swal.close();
+                                } catch (error) {
+                                    console.error("PDF Error:", error);
+                                    Swal.fire({icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan saat membuat PDF.'});
+                                }
+                            }, 200);
+                        }
+                    });
+                } else if (result.dismiss === Swal.DismissReason.cancel) { 
+                    generateReportForClass(targetClass, filterBySelectedMonths); 
+                } 
+            });
         }
     </script>
 </body>
