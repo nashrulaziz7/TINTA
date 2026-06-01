@@ -522,12 +522,12 @@
                 "theme_color": "#3B82F6",
                 "icons": [
                     {
-                        "src": "https://lh3.googleusercontent.com/d/1psvEKR4OwW81rTJEJByMpxvuU1xqSoc1",
+                        "src": "ELINA.png",
                         "sizes": "192x192",
                         "type": "image/png"
                     },
                     {
-                        "src": "https://lh3.googleusercontent.com/d/1psvEKR4OwW81rTJEJByMpxvuU1xqSoc1",
+                        "src": "ELINA.png",
                         "sizes": "512x512",
                         "type": "image/png"
                     }
@@ -557,7 +557,7 @@
         // =======================================================
         // 2. LINK GAMBAR KOP ANDA
         // =======================================================
-        const LINK_KOP_ATAS = "KOP ELINA ATAS.jpg"; 
+        const LINK_KOP_ATAS = "KOP ELINA ATAS PUTIH.jpg"; 
         const LINK_KOP_BAWAH = "KOP ELINA BAWAH.png"; 
         
         // CACHE GAMBAR AGAR DOWNLOAD PDF SANGAT CEPAT (TIDAK LOADING ULANG)
@@ -1040,7 +1040,7 @@
         }
 
         function updateWallet(kelas, totalMasuk) {
-            const p = db.pengeluaran[kelas] || []; const totalKeluar = p.reduce((sum, item) => sum + item.amount, 0);
+            const p = db.pengeluaran[kelas] || []; const totalKeluar = p.reduce((sum, item) => sum + i.amount, 0);
             document.getElementById('wali-tot-masuk').textContent = formatRupiah(totalMasuk); document.getElementById('wali-tot-keluar').textContent = formatRupiah(totalKeluar); document.getElementById('wali-tot-saldo').textContent = formatRupiah(totalMasuk - totalKeluar);
         }
 
@@ -1261,7 +1261,6 @@
                         const canvas = document.createElement("canvas");
                         canvas.width = img.width; canvas.height = img.height;
                         const ctx = canvas.getContext("2d"); ctx.drawImage(img, 0, 0);
-                        // Menggunakan JPEG dengan quality 0.8 jauh lebih cepat & ringan dibanding PNG bawaan
                         resolve(canvas.toDataURL(format || "image/jpeg", 0.8));
                     } catch (e) { console.warn("Canvas terblokir", e); resolve(null); }
                 };
@@ -1280,9 +1279,8 @@
             const printDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
             const userName = session.user.nama || session.user.username || "Admin";
 
-            // Load gambar HANYA JIKA belum ada di cache (Sangat Cepat!)
             if (!cachedKopAtas) cachedKopAtas = await getBase64ImageOptimized(LINK_KOP_ATAS, "image/jpeg");
-            if (!cachedKopBawah) cachedKopBawah = await getBase64ImageOptimized(LINK_KOP_BAWAH, "image/png"); // Bawah wajib PNG untuk transparansi jika ada
+            if (!cachedKopBawah) cachedKopBawah = await getBase64ImageOptimized(LINK_KOP_BAWAH, "image/png");
 
             let hAtas = 80; let hBawah = 80;
             if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = (pageWidth * imgA.height) / imgA.width; }
@@ -1342,7 +1340,6 @@
                 allowOutsideClick: false,
                 didOpen: () => { 
                     Swal.showLoading(); 
-                    // Menunda eksekusi sejenak agar UI loading SweetAlert sempat muncul (tidak freeze)
                     setTimeout(async () => {
                         try {
                             const result = await processPDF(targetClass, filterBySelectedMonths);
