@@ -2,13 +2,12 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>E-INFAQ | ELINA</title>
-    
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SweetAlert2 -->
@@ -44,9 +43,9 @@
             background-color: #f8fafc; 
             color: #1e293b; 
             -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: none;
         }
         
+        /* Premium Glassmorphism */
         .glass { 
             background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(10px); 
@@ -56,15 +55,25 @@
             border-radius: 16px;
         }
         
-        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        /* 3D Logo Effect */
+        .logo-3d { 
+            filter: drop-shadow(0px 10px 15px rgba(37, 99, 235, 0.2)); 
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+        .logo-3d:hover { 
+            transform: translateY(-5px) scale(1.08) rotate(-2deg); 
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(5px); } 
+            from { opacity: 0; transform: translateY(10px); } 
             to { opacity: 1; transform: translateY(0); } 
         }
         
         .btn-click { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .btn-click:active { transform: scale(0.95); }
 
+        /* Custom Scrollbar Mini */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -73,38 +82,39 @@
         table { border-collapse: separate; border-spacing: 0; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .cb-custom { accent-color: #2563EB; width: 1.2rem; height: 1.2rem; cursor: pointer; }
+
+        /* Styling Checkbox Laporan */
+        .cb-custom { accent-color: #2563EB; width: 1.1rem; height: 1.1rem; cursor: pointer; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col relative overflow-x-hidden text-sm pt-[50px]">
+<body class="bg-slate-50 min-h-screen flex flex-col relative overflow-x-hidden text-sm pt-14 pb-6">
 
     <!-- HEADER GLOBAL FIXED -->
-    <header class="fixed top-0 left-0 w-full h-[50px] z-[100] bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm flex items-center justify-center transition-all duration-300">
-        <button onclick="showInstallPopup()" id="btn-install" class="absolute right-4 bg-gradient-to-r from-orange-500 to-orange-400 text-white px-3 py-1.5 rounded-full text-[10px] font-bold shadow-md hover:scale-105 transition-transform flex items-center gap-1.5">
+    <header class="fixed top-0 left-0 w-full text-center py-2 px-4 z-[100] bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm flex flex-col items-center justify-center transition-all duration-300">
+        <button onclick="showInstallPopup()" id="btn-install" class="absolute right-4 top-1/2 -translate-y-1/2 bg-gradient-to-r from-orange-500 to-orange-400 text-white px-3 py-1.5 rounded-full text-[10px] font-bold shadow-md hover:scale-105 transition-transform flex items-center gap-1.5 cursor-pointer">
             <i class="fas fa-download"></i> <span class="hidden md:inline">Install App</span>
         </button>
-        <div class="flex flex-col items-center">
-            <p class="text-[11px] font-black text-gray-800 tracking-[0.2em] uppercase">E-INFAQ <span class="text-blue-500 font-bold mx-1">|</span> BY ZIVI•AI</p>
-            <div id="live-clock" class="text-[9px] font-semibold text-gray-500 tracking-wide">Memuat...</div>
-        </div>
+        <p class="text-[10px] md:text-[11px] font-black text-gray-800 tracking-[0.2em] uppercase">E-INFAQ <span class="text-blue-500 font-bold mx-1">|</span> BY ZIVI•AI</p>
+        <div id="live-clock" class="text-[9px] font-semibold text-gray-500 mt-0.5 tracking-wide">Memuat Waktu...</div>
     </header>
 
     <!-- CONTENT WRAPPER -->
     <div id="app-container" class="flex-grow flex flex-col w-full max-w-5xl mx-auto p-2 md:p-6 relative z-10">
 
         <!-- VIEW: LOGIN -->
-        <div id="view-login" class="flex-grow flex flex-col items-center justify-center fade-in w-full max-w-sm mx-auto relative z-10">
-            <img src="https://lh3.googleusercontent.com/d/1psvEKR4OwW81rTJEJByMpxvuU1xqSoc1" alt="Logo Sekolah" class="w-20 h-20 object-contain mb-2 drop-shadow-md">
-            <div class="text-center mb-5">
-                <h1 class="text-[4rem] font-tegas font-black tracking-tighter leading-none flex justify-center items-center uppercase">
+        <div id="view-login" class="flex-grow flex flex-col items-center justify-center fade-in w-full max-w-md mx-auto relative z-10 pt-4">
+            <img src="https://lh3.googleusercontent.com/d/1psvEKR4OwW81rTJEJByMpxvuU1xqSoc1" alt="Logo Sekolah" class="w-20 h-20 md:w-24 md:h-24 object-contain mb-3 drop-shadow-md relative z-10">
+            <div class="text-center mb-6 relative z-10">
+                <h1 class="text-[4.5rem] md:text-[5.5rem] font-tegas font-black tracking-tighter leading-none transform hover:scale-105 transition duration-500 flex justify-center items-center uppercase">
                     <span class="text-transparent bg-clip-text bg-gradient-to-br from-blue-700 to-blue-500">E</span>
                     <span class="text-transparent bg-clip-text bg-gradient-to-br from-orange-500 to-yellow-400">LINA</span>
                 </h1>
-                <p class="text-[9px] font-bold text-gray-500 tracking-[0.2em] mt-1 uppercase">Elektronik Infaq Al Kautsar</p>
+                <p class="text-[9px] md:text-[10px] font-bold text-gray-500 tracking-[0.2em] mt-2 uppercase">Elektronik Infaq Al Kautsar</p>
             </div>
 
             <div class="glass w-full p-5 relative overflow-hidden z-20">
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-blue-400 to-orange-400"></div>
+                
                 <div class="flex justify-center space-x-1 mb-5 bg-gray-100/80 p-1 rounded-xl border border-gray-200">
                     <button type="button" onclick="setLoginRole('admin')" id="tab-admin" class="btn-click flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all text-gray-500">Admin</button>
                     <button type="button" onclick="setLoginRole('wali')" id="tab-wali" class="btn-click flex-1 py-1.5 text-[11px] font-bold rounded-lg transition-all text-gray-500">Wali Kelas</button>
@@ -127,7 +137,9 @@
                             <div class="col-span-1">
                                 <label class="block text-[9px] font-bold text-gray-500 mb-1 tracking-wide">KELAS</label>
                                 <div class="relative">
-                                    <select id="wali-kelas" onchange="populateWaliNames()" class="w-full pl-2 pr-5 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-bold text-center"></select>
+                                    <select id="wali-kelas" onchange="populateWaliNames()" class="w-full pl-2 pr-5 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-bold text-center">
+                                        <option value="">--</option>
+                                    </select>
                                     <i class="fas fa-chevron-down absolute right-2 top-3 text-gray-400 text-[9px] pointer-events-none"></i>
                                 </div>
                             </div>
@@ -135,7 +147,9 @@
                                 <label class="block text-[9px] font-bold text-gray-500 mb-1 tracking-wide">NAMA WALI</label>
                                 <div class="relative">
                                     <i class="fas fa-user-tie absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
-                                    <select id="wali-nama" onchange="checkSavedCreds()" class="w-full pl-7 pr-3 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-semibold"><option value="">Pilih Wali</option></select>
+                                    <select id="wali-nama" onchange="checkSavedCreds()" class="w-full pl-7 pr-3 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-semibold">
+                                        <option value="">Pilih Wali</option>
+                                    </select>
                                     <i class="fas fa-chevron-down absolute right-2.5 top-3 text-gray-400 text-[9px] pointer-events-none"></i>
                                 </div>
                             </div>
@@ -147,7 +161,9 @@
                             <div class="col-span-1">
                                 <label class="block text-[9px] font-bold text-gray-500 mb-1 tracking-wide">KELAS</label>
                                 <div class="relative">
-                                    <select id="murid-kelas" onchange="populateMuridNames()" class="w-full pl-2 pr-5 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-bold text-center"></select>
+                                    <select id="murid-kelas" onchange="populateMuridNames()" class="w-full pl-2 pr-5 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-bold text-center">
+                                        <option value="">--</option>
+                                    </select>
                                     <i class="fas fa-chevron-down absolute right-2 top-3 text-gray-400 text-[9px] pointer-events-none"></i>
                                 </div>
                             </div>
@@ -155,7 +171,9 @@
                                 <label class="block text-[9px] font-bold text-gray-500 mb-1 tracking-wide">NAMA SISWA</label>
                                 <div class="relative">
                                     <i class="fas fa-child absolute left-2.5 top-2.5 text-gray-400 text-xs"></i>
-                                    <select id="murid-nama" onchange="checkSavedCreds()" class="w-full pl-7 pr-3 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-semibold"><option value="">Pilih Siswa</option></select>
+                                    <select id="murid-nama" onchange="checkSavedCreds()" class="w-full pl-7 pr-3 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none appearance-none text-xs font-semibold">
+                                        <option value="">Pilih Siswa</option>
+                                    </select>
                                     <i class="fas fa-chevron-down absolute right-2.5 top-3 text-gray-400 text-[9px] pointer-events-none"></i>
                                 </div>
                             </div>
@@ -167,141 +185,183 @@
                         <div class="relative">
                             <i class="fas fa-lock absolute left-3 top-2.5 text-gray-400 text-xs"></i>
                             <input type="password" id="login-kode" class="w-full pl-8 pr-8 py-2 bg-white/90 border border-gray-200 rounded-xl outline-none text-xs font-bold font-mono tracking-widest" placeholder="••••••">
-                            <button type="button" onclick="togglePassword('login-kode')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 focus:outline-none btn-click"><i class="fas fa-eye text-xs" id="login-kode-eye"></i></button>
+                            <button type="button" onclick="togglePassword('login-kode')" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 focus:outline-none btn-click">
+                                <i class="fas fa-eye text-xs" id="login-kode-eye"></i>
+                            </button>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-1">
-                        <label class="flex items-center text-[10px] font-semibold text-gray-500 cursor-pointer">
-                            <input type="checkbox" id="remember-me" class="mr-2 rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 border-gray-300"> Simpan Akses
+                        <label class="flex items-center text-[10px] font-semibold text-gray-500 cursor-pointer hover:text-blue-600">
+                            <input type="checkbox" id="remember-me" class="mr-2 rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5 border-gray-300">
+                            Simpan Akses
                         </label>
                     </div>
 
-                    <button type="submit" class="btn-click w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl shadow-md text-xs mt-2">MASUK <i class="fas fa-arrow-right ml-1"></i></button>
+                    <button type="submit" class="btn-click w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl shadow-md text-xs mt-2">
+                        MASUK <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
                 </form>
             </div>
         </div>
 
         <!-- VIEW: ADMIN -->
         <div id="view-admin" class="hidden fade-in w-full max-w-5xl mx-auto pt-2">
-            <div class="bg-white p-3 rounded-2xl flex justify-between items-center mb-4 border border-gray-100 shadow-sm sticky top-[50px] z-40">
+            <!-- Header Beku Admin -->
+            <div class="glass p-3 flex justify-between items-center mb-4 sticky top-[60px] z-40 bg-white/95">
                 <div class="flex items-center space-x-3">
-                    <img id="admin-foto-profil" src="" class="w-10 h-10 rounded-full object-cover border-2 border-blue-50 bg-blue-50" alt="Admin">
+                    <img id="admin-foto-profil" src="" class="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm" alt="Admin">
                     <div>
                         <h2 class="text-sm font-black text-gray-800 leading-tight">Panel Admin</h2>
                         <p class="text-[9px] font-bold text-blue-600"><i class="fas fa-shield-alt mr-1"></i> SUPER USER</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="btn-click bg-red-50 text-red-600 w-9 h-9 rounded-xl flex items-center justify-center border border-red-100"><i class="fas fa-power-off text-sm"></i></button>
+                <button onclick="logout()" class="btn-click bg-red-50 text-red-600 p-2 rounded-xl text-sm border border-red-100">
+                    <i class="fas fa-power-off"></i>
+                </button>
             </div>
 
-            <div class="grid grid-cols-5 gap-2 mb-4">
-                <button onclick="downloadFormatExcel()" class="btn-click bg-white border border-gray-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-file-excel text-green-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Format</span></button>
-                <label class="btn-click bg-white border border-gray-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1 cursor-pointer"><i class="fas fa-cloud-upload-alt text-blue-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Upload</span><input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden" onchange="uploadExcel(event)"></label>
-                <button onclick="openSetNominalModal()" class="btn-click bg-white border border-gray-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-coins text-orange-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Nominal</span></button>
-                <button onclick="openEditAccountModal()" class="btn-click bg-white border border-gray-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-users-cog text-purple-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Akun</span></button>
-                <button onclick="resetDatabase()" class="btn-click bg-red-50 border border-red-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-trash-alt text-red-500 text-lg"></i><span class="text-[8px] font-bold text-red-600">Reset Total</span></button>
+            <!-- Toolbar Action -->
+            <div class="grid grid-cols-4 gap-2 mb-4">
+                <button onclick="downloadFormatExcel()" class="btn-click glass p-2 flex flex-col items-center justify-center gap-1">
+                    <i class="fas fa-file-excel text-green-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Format</span>
+                </button>
+                <label class="btn-click glass p-2 flex flex-col items-center justify-center gap-1 cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt text-blue-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Upload</span>
+                    <input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden" onchange="uploadExcel(event)">
+                </label>
+                <button onclick="openSetNominalModal()" class="btn-click glass p-2 flex flex-col items-center justify-center gap-1">
+                    <i class="fas fa-coins text-orange-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Nominal</span>
+                </button>
+                <button onclick="openEditAccountModal()" class="btn-click glass p-2 flex flex-col items-center justify-center gap-1">
+                    <i class="fas fa-users-cog text-purple-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Akun</span>
+                </button>
             </div>
 
-            <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm mb-4 flex flex-col gap-3">
-                <div class="flex gap-2 items-center justify-between">
-                    <div class="flex-1">
-                        <p class="text-[9px] font-bold text-gray-400 mb-1">Cetak PDF 1 Tahun Ajaran</p>
-                        <select id="admin-report-class" class="w-full text-xs p-2 border border-gray-200 rounded-lg bg-gray-50 outline-none font-bold"></select>
-                    </div>
-                    <button onclick="downloadAdminReport()" class="btn-click mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1"><i class="fas fa-download"></i> Cetak</button>
-                </div>
+            <!-- Cetak Laporan Penuh Admin -->
+            <div class="glass p-3 flex gap-2 items-center justify-between mb-5 shadow-sm">
+                <select id="admin-report-class" class="flex-1 text-xs p-2 border border-gray-200 rounded-lg bg-gray-50 outline-none font-bold"></select>
+                <button onclick="downloadAdminReport()" class="btn-click bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md flex items-center gap-1"><i class="fas fa-file-pdf"></i> Cetak</button>
             </div>
 
-            <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-3 mb-6">
+            <!-- Monitor Kelas -->
+            <div class="glass p-3 mb-4 flex flex-col gap-2">
                 <div class="flex justify-between items-center border-b border-gray-100 pb-2">
                     <h3 class="font-black text-gray-800 text-xs"><i class="fas fa-desktop text-blue-500 mr-1"></i> Data Kelas</h3>
-                    <div class="flex gap-2"><select id="admin-view-class" onchange="renderAdminClassView()" class="w-20 p-1.5 border border-gray-200 rounded-lg text-xs font-bold bg-gray-50 outline-none"></select><button onclick="openAddStudentModal()" class="bg-gray-100 text-gray-700 px-2 rounded-lg text-[10px] font-bold"><i class="fas fa-plus"></i></button></div>
+                    <select id="admin-view-class" onchange="renderAdminClassView()" class="w-24 p-1.5 border border-gray-200 rounded-lg text-xs font-bold bg-gray-50"></select>
                 </div>
                 
+                <!-- Kotak Saldo Ramping -->
                 <div class="flex flex-col gap-2">
-                    <div class="flex gap-2 w-full">
-                        <div class="flex-1 bg-green-50 border border-green-200 p-2.5 rounded-xl flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-5 h-5 bg-green-100 rounded-full flex justify-center items-center"><i class="fas fa-arrow-down text-green-600 text-[8px]"></i></div><span class="text-[9px] font-bold text-gray-600">MASUK</span></div><span id="admin-tot-masuk" class="text-xs font-black text-green-700">Rp 0</span></div>
-                        <div class="flex-1 bg-red-50 border border-red-200 p-2.5 rounded-xl flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-5 h-5 bg-red-100 rounded-full flex justify-center items-center"><i class="fas fa-arrow-up text-red-600 text-[8px]"></i></div><span class="text-[9px] font-bold text-gray-600">KELUAR</span></div><span id="admin-tot-keluar" class="text-xs font-black text-red-700">Rp 0</span></div>
+                    <div class="bg-green-50 border border-green-200 p-2.5 rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2"><i class="fas fa-arrow-down text-green-500 text-xs"></i> <span class="text-[10px] font-bold text-gray-600">TOTAL MASUK</span></div>
+                        <span id="admin-tot-masuk" class="text-sm font-black text-green-700">Rp 0</span>
                     </div>
-                    <div class="w-full bg-blue-600 p-2.5 rounded-xl flex items-center justify-between shadow-md"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-white/20 rounded-full flex justify-center items-center"><i class="fas fa-wallet text-white text-[10px]"></i></div><span class="text-[10px] font-bold text-white tracking-wide">SISA SALDO</span></div><span id="admin-tot-saldo" class="text-sm font-black text-white">Rp 0</span></div>
+                    <div class="bg-red-50 border border-red-200 p-2.5 rounded-xl flex justify-between items-center">
+                        <div class="flex items-center gap-2"><i class="fas fa-arrow-up text-red-500 text-xs"></i> <span class="text-[10px] font-bold text-gray-600">TOTAL KELUAR</span></div>
+                        <span id="admin-tot-keluar" class="text-sm font-black text-red-700">Rp 0</span>
+                    </div>
+                    <div class="bg-blue-600 border border-blue-700 p-3 rounded-xl flex justify-between items-center shadow-md">
+                        <div class="flex items-center gap-2"><i class="fas fa-wallet text-blue-200"></i> <span class="text-[10px] font-bold text-white">SISA SALDO</span></div>
+                        <span id="admin-tot-saldo" class="text-base font-black text-white">Rp 0</span>
+                    </div>
                 </div>
+            </div>
 
-                <div class="mt-2 overflow-x-auto border border-gray-100 rounded-lg hide-scroll">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+                <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs" id="admin-table"></table>
                 </div>
             </div>
         </div>
 
         <!-- VIEW: WALI KELAS -->
-        <div id="view-walikelas" class="hidden fade-in w-full pt-1">
-            <div class="bg-white p-2.5 flex justify-between items-center mb-3 sticky top-[50px] z-40 border border-gray-100 shadow-sm rounded-2xl">
-                <div class="flex items-center space-x-3 overflow-hidden">
-                    <img id="wali-foto-profil" src="" alt="Foto Wali" class="w-10 h-10 object-cover rounded-full border-2 border-blue-50 shrink-0">
-                    <div class="truncate">
+        <div id="view-walikelas" class="hidden fade-in w-full pt-2">
+            <!-- Header Beku Ramping (Foto 1) -->
+            <div class="glass p-2.5 flex justify-between items-center mb-4 sticky top-[60px] z-40 bg-white/95">
+                <div class="flex items-center space-x-3 w-full">
+                    <img id="wali-foto-profil" src="" alt="Foto Wali" class="w-10 h-10 object-cover rounded-full border-2 border-blue-100 bg-blue-50">
+                    <div class="flex-1 overflow-hidden">
                         <h2 class="text-sm font-black text-gray-800 uppercase tracking-tight truncate" id="wali-title-kelas">KELAS -</h2>
                         <p class="text-[9px] font-bold text-blue-600 truncate"><i class="fas fa-chalkboard-teacher mr-1"></i> <span id="wali-title-nama">Nama Wali</span></p>
                     </div>
                 </div>
-                <div class="flex space-x-1.5 shrink-0">
-                    <button onclick="contactAdmin()" class="btn-click bg-green-50 text-green-600 px-3 h-9 rounded-xl flex items-center justify-center border border-green-100 font-bold text-[10px]"><i class="fab fa-whatsapp mr-1 text-sm"></i> WA</button>
+                <div class="flex space-x-1.5">
+                    <button onclick="contactAdmin()" class="btn-click bg-green-50 text-green-600 w-9 h-9 rounded-xl flex items-center justify-center border border-green-100"><i class="fab fa-whatsapp text-sm"></i></button>
                     <button onclick="logout()" class="btn-click bg-red-50 text-red-600 w-9 h-9 rounded-xl flex items-center justify-center border border-red-100"><i class="fas fa-power-off text-sm"></i></button>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2 mb-4 px-0.5">
+            <!-- Kotak Saldo Gepeng & Memanjang (Foto 1) -->
+            <div class="flex flex-col gap-2 mb-4 px-1">
                 <div class="flex gap-2 w-full">
-                    <div class="flex-1 bg-white border border-green-200 p-2.5 rounded-[14px] flex items-center justify-between shadow-sm"><div class="flex items-center gap-1.5"><div class="w-5 h-5 bg-green-100 rounded-full flex justify-center items-center"><i class="fas fa-arrow-down text-green-600 text-[8px]"></i></div><span class="text-[9px] font-bold text-gray-500">MASUK</span></div><span id="wali-tot-masuk" class="text-xs font-black text-green-600">Rp 0</span></div>
-                    <div class="flex-1 bg-white border border-red-200 p-2.5 rounded-[14px] flex items-center justify-between shadow-sm"><div class="flex items-center gap-1.5"><div class="w-5 h-5 bg-red-100 rounded-full flex justify-center items-center"><i class="fas fa-arrow-up text-red-600 text-[8px]"></i></div><span class="text-[9px] font-bold text-gray-500">KELUAR</span></div><span id="wali-tot-keluar" class="text-xs font-black text-red-600">Rp 0</span></div>
+                    <div class="flex-1 bg-green-50/80 border border-green-200 p-2.5 rounded-xl flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-1.5"><div class="w-5 h-5 bg-green-100 rounded-full flex justify-center items-center"><i class="fas fa-arrow-down text-green-600 text-[8px]"></i></div> <span class="text-[9px] font-bold text-gray-600">MASUK</span></div>
+                        <span id="wali-tot-masuk" class="text-xs md:text-sm font-black text-green-700">Rp 0</span>
+                    </div>
+                    <div class="flex-1 bg-red-50/80 border border-red-200 p-2.5 rounded-xl flex justify-between items-center shadow-sm">
+                        <div class="flex items-center gap-1.5"><div class="w-5 h-5 bg-red-100 rounded-full flex justify-center items-center"><i class="fas fa-arrow-up text-red-600 text-[8px]"></i></div> <span class="text-[9px] font-bold text-gray-600">KELUAR</span></div>
+                        <span id="wali-tot-keluar" class="text-xs md:text-sm font-black text-red-700">Rp 0</span>
+                    </div>
                 </div>
-                <div class="w-full bg-gradient-to-r from-blue-600 to-blue-500 p-3 rounded-[14px] flex items-center justify-between shadow-md border border-blue-400"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-white/20 rounded-full flex justify-center items-center backdrop-blur-sm"><i class="fas fa-wallet text-white text-[10px]"></i></div><span class="text-[10px] font-bold text-blue-50 tracking-wide">SISA SALDO</span></div><span id="wali-tot-saldo" class="text-sm font-black text-white drop-shadow-sm">Rp 0</span></div>
+                <div class="w-full bg-gradient-to-r from-blue-600 to-blue-500 p-3 rounded-xl flex justify-between items-center shadow-md border border-blue-400">
+                    <div class="flex items-center gap-2"><div class="w-6 h-6 bg-white/20 rounded-full flex justify-center items-center backdrop-blur-sm"><i class="fas fa-wallet text-white text-[10px]"></i></div> <span class="text-[11px] font-bold text-white tracking-wide">SISA SALDO</span></div>
+                    <span id="wali-tot-saldo" class="text-base md:text-lg font-black text-white drop-shadow-sm">Rp 0</span>
+                </div>
             </div>
 
-            <div class="flex gap-2 mb-4 px-0.5">
-                <button onclick="openPengeluaranModal()" class="btn-click flex-1 bg-orange-500 text-white py-2.5 rounded-xl font-bold shadow-sm text-[10px]"><i class="fas fa-minus-circle mr-1"></i> Pengeluaran</button>
-                <button onclick="viewPengeluaranHistory()" class="btn-click flex-1 bg-white text-gray-700 border border-gray-200 py-2.5 rounded-xl font-bold shadow-sm text-[10px]"><i class="fas fa-history mr-1"></i> Riwayat</button>
-                <button onclick="openWaliReportMenu()" class="btn-click flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold shadow-sm text-[10px]"><i class="fas fa-print mr-1"></i> Cetak PDF</button>
+            <!-- Action Bar -->
+            <div class="flex gap-2 mb-4 px-1">
+                <button onclick="openPengeluaranModal()" class="btn-click flex-1 bg-orange-500 text-white py-2 rounded-xl font-bold shadow-sm text-[10px]"><i class="fas fa-minus-circle mr-1"></i> Pengeluaran</button>
+                <button onclick="viewPengeluaranHistory()" class="btn-click flex-1 bg-white text-gray-700 border border-gray-200 py-2 rounded-xl font-bold shadow-sm text-[10px]"><i class="fas fa-history mr-1"></i> Riwayat</button>
+                <button onclick="openWaliReportMenu()" class="btn-click flex-1 bg-blue-600 text-white py-2 rounded-xl font-bold shadow-sm text-[10px]"><i class="fas fa-file-pdf mr-1"></i> Laporan</button>
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
+            <!-- Tabel Checklist Panjang & Beku (Foto 2) -->
+            <div class="glass overflow-hidden bg-white p-0 border border-gray-200">
                 <div class="p-2.5 bg-slate-50 border-b border-gray-200 flex justify-between items-center">
-                    <h3 class="font-black text-gray-700 text-[11px]"><i class="fas fa-tasks text-blue-500 mr-1.5"></i> Checklist Infaq Jumat</h3>
-                    <button onclick="resetChecklist()" class="btn-click bg-red-50 text-red-600 px-2 py-1 rounded border border-red-100 text-[9px] font-bold flex items-center gap-1 hover:bg-red-100 transition"><i class="fas fa-trash-alt"></i> Kosongkan</button>
+                    <h3 class="font-black text-gray-700 text-xs"><i class="fas fa-tasks text-blue-500 mr-1.5"></i> Checklist Infaq Jumat</h3>
                 </div>
+                
+                <!-- max-h-[85vh] agar tabel sangat panjang ke bawah muat banyak siswa -->
                 <div class="overflow-x-auto hide-scroll w-full max-h-[85vh] overflow-y-auto relative bg-white">
-                    <table class="w-full text-left text-xs border-separate border-spacing-0" id="wali-checklist-table"></table>
+                    <table class="w-full text-left text-xs border-collapse" id="wali-checklist-table"></table>
                 </div>
             </div>
             
             <div class="mt-4 mb-8 flex space-x-3 text-[9px] font-bold text-gray-500 justify-center">
-                <span class="flex items-center"><div class="w-3.5 h-3.5 bg-green-500 text-white rounded flex items-center justify-center mr-1"><i class="fas fa-check text-[7px]"></i></div> Lunas</span>
-                <span class="flex items-center"><div class="w-3.5 h-3.5 bg-red-50 text-red-500 border border-red-300 rounded flex items-center justify-center mr-1"><i class="fas fa-times text-[7px]"></i></div> Libur</span>
-                <span class="flex items-center"><div class="w-3.5 h-3.5 bg-gray-50 border border-gray-200 rounded mr-1"></div> Belum</span>
+                <span class="flex items-center"><div class="w-3 h-3 bg-green-500 text-white rounded flex items-center justify-center mr-1"><i class="fas fa-check text-[6px]"></i></div> Lunas</span>
+                <span class="flex items-center"><div class="w-3 h-3 bg-red-50 text-red-500 border border-red-300 rounded flex items-center justify-center mr-1"><i class="fas fa-times text-[6px]"></i></div> Libur</span>
+                <span class="flex items-center"><div class="w-3 h-3 bg-gray-50 border border-gray-200 rounded mr-1"></div> Belum</span>
             </div>
         </div>
 
         <!-- VIEW: WALI MURID -->
         <div id="view-walimurid" class="hidden fade-in w-full max-w-md mx-auto pt-2">
-            <div class="bg-white p-3 rounded-2xl flex justify-between items-center mb-4 border border-gray-100 shadow-sm sticky top-[50px] z-40">
-                <div class="flex items-center space-x-3 overflow-hidden">
-                    <img id="murid-foto-profil" src="" class="w-10 h-10 rounded-full object-cover border-2 border-blue-50 bg-blue-50" alt="Murid">
-                    <div class="truncate">
-                        <h2 class="text-sm font-black text-gray-800 leading-tight truncate" id="murid-title-nama">Nama</h2>
+            <div class="glass p-3 flex justify-between items-center mb-4 sticky top-[60px] z-40 bg-white/95">
+                <div class="flex items-center space-x-3">
+                    <img id="murid-foto-profil" src="" class="w-10 h-10 rounded-full object-cover border-2 border-blue-100 bg-blue-50" alt="Murid">
+                    <div>
+                        <h2 class="text-sm font-black text-gray-800 leading-tight truncate max-w-[150px]" id="murid-title-nama">Nama</h2>
                         <p class="text-[9px] font-bold text-blue-600">Kelas <span id="murid-title-kelas-only">-</span> | No: <span id="murid-title-pres-only">-</span></p>
                     </div>
                 </div>
-                <button onclick="logout()" class="btn-click bg-red-50 text-red-600 w-9 h-9 rounded-xl flex items-center justify-center border border-red-100 shrink-0"><i class="fas fa-power-off text-sm"></i></button>
+                <button onclick="logout()" class="btn-click bg-red-50 text-red-600 p-2 rounded-xl text-sm border border-red-100">
+                    <i class="fas fa-power-off"></i>
+                </button>
             </div>
 
-            <div class="p-3 bg-white border border-gray-100 rounded-2xl shadow-sm">
+            <div class="p-3 bg-white border border-gray-100 rounded-xl shadow-sm">
                 <h4 class="font-black text-gray-700 text-xs mb-3 border-b border-gray-100 pb-2"><i class="fas fa-history text-blue-500 mr-1.5"></i> Riwayat Infaq Tahunan</h4>
-                <div class="bg-blue-600 rounded-xl p-3 mb-4 flex justify-between items-center shadow-md">
+                
+                <div class="bg-blue-600 rounded-xl p-3 mb-4 flex justify-between items-center">
                     <div>
                         <p class="text-[9px] font-bold text-blue-200 uppercase tracking-wide">Total Terkumpul</p>
                         <p class="text-lg font-black text-white mt-0.5" id="murid-total-bulan">Rp 0</p>
                     </div>
-                    <div class="w-8 h-8 rounded-full bg-white/20 flex justify-center items-center"><i class="fas fa-wallet text-white text-xs"></i></div>
+                    <i class="fas fa-wallet text-white/30 text-2xl"></i>
                 </div>
+
                 <div id="murid-jumat-list" class="space-y-3"></div>
             </div>
             <div class="text-center mt-4 text-[9px] text-gray-400 font-bold px-4 mb-6"><i class="fas fa-check-circle text-green-500"></i> Tersinkron otomatis dengan sekolah.</div>
@@ -311,14 +371,24 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        // =======================================================
+        // SETUP PWA (Aplikasi Install HP)
+        // =======================================================
         (function setupPWA() {
             const manifestJSON = {
-                "name": "E-INFAQ ELINA", "short_name": "ELINA", "start_url": ".", "display": "standalone", "background_color": "#f8fafc", "theme_color": "#3B82F6",
-                "icons": [{ "src": "ELINA.png", "sizes": "192x192", "type": "image/png" }, { "src": "ELINA.png", "sizes": "512x512", "type": "image/png" }]
+                "name": "E-INFAQ ELINA",
+                "short_name": "ELINA",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#f8fafc",
+                "theme_color": "#3B82F6",
+                "icons": [
+                    { "src": "ELINA.png", "sizes": "192x192", "type": "image/png" },
+                    { "src": "ELINA.png", "sizes": "512x512", "type": "image/png" }
+                ]
             };
             const manifestData = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(manifestJSON));
             document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestData}">`);
-            if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => { console.log("PWA Fallback mode siap."); }); }
         })();
 
         // =======================================================
@@ -523,46 +593,47 @@
         function getLocalYYYYMMDD(dateObj) { const y = dateObj.getFullYear(); const m = String(dateObj.getMonth() + 1).padStart(2, '0'); const d = String(dateObj.getDate()).padStart(2, '0'); return `${y}-${m}-${d}`; }
         function formatRupiah(amount) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount); }
         function getNominalKelas(kelas) { return db.config.defaultNominal[kelas] || 2000; }
-        function formatDateID(dateStr) { if (!dateStr || dateStr.length < 10) return dateStr; const [y, m, d] = dateStr.split('-'); const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']; return `${d} ${months[parseInt(m, 10)-1]} ${y}`; }
-        function formatMonthID(YYYYMM) { const [y, m] = YYYYMM.split('-'); const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']; return `${months[parseInt(m)-1]} ${y}`; }
-
-        // --- WALI KELAS VIEW LOGIC ---
-        function setupWaliView() {
-            document.getElementById('wali-title-kelas').textContent = `KELAS ${session.user.kelas}`; document.getElementById('wali-title-nama').textContent = session.user.nama;
-            const imgEl = document.getElementById('wali-foto-profil');
-            if (session.user.foto && session.user.foto.trim() !== '') { imgEl.src = session.user.foto; } else { imgEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.nama)}&background=3B82F6&color=fff&bold=true`; }
-            renderWaliChecklist();
+        
+        function formatMonthID(YYYYMM) {
+            const [y, m] = YYYYMM.split('-'); const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']; return `${months[parseInt(m)-1]} ${y}`;
         }
 
-        function renderWaliChecklist() {
-            const kelas = session.user.kelas; const nominal = getNominalKelas(kelas);
-            const students = db.users.murid.filter(m => m.kelas === kelas).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
-            if (!db.infaq[kelas]) db.infaq[kelas] = {};
+        function formatDateID(dateStr) {
+            if (!dateStr || dateStr.length < 10) return dateStr; const [y, m, d] = dateStr.split('-'); const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; return `${d} ${months[parseInt(m, 10)-1]} ${y}`;
+        }
 
-            let allFridays = getFridaysFromAcademicYear();
-            const table = document.getElementById('wali-checklist-table');
+        // FUNGSI BARU: Mengubah text menjadi Proper Case (Huruf Besar di Awal Kata)
+        function toProperCase(str) {
+            if (!str) return "";
+            return str.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+        }
+
+        function updateMonthDisplay() {
+            const dispId = session.role === 'wali' ? 'wali-month-display' : 'murid-month-display'; const disp = document.getElementById(dispId); if (!disp) return;
             if (students.length === 0) { table.innerHTML = `<tr><td class="text-center p-5 text-gray-400 font-medium text-[10px]">Belum ada data siswa.</td></tr>`; updateWallet(kelas, 0); return; }
 
+            // FOTO 2: Menggunakan whitespace-nowrap agar tulisan tanggal tidak terputus jadi 2 baris
             let thead = `<thead><tr>
-                <th class="p-1.5 border-b border-gray-200 text-center w-[30px] min-w-[30px] sticky top-0 left-0 z-40 bg-slate-50 text-gray-400 font-bold text-[9px] shadow-[1px_1px_0_#e2e8f0]">NO</th>
-                <th class="p-1.5 border-b border-gray-200 text-left w-[110px] min-w-[110px] max-w-[110px] sticky top-0 left-[30px] z-40 bg-slate-50 text-gray-400 font-bold text-[9px] shadow-[1px_1px_0_#e2e8f0]">NAMA SISWA</th>
-                <th class="p-1.5 border-b border-gray-200 text-center w-[65px] min-w-[65px] bg-blue-50 sticky top-0 left-[140px] z-40 shadow-[2px_1px_5px_rgba(0,0,0,0.05)] text-blue-600 font-bold text-[9px]">TOTAL (Rp)</th>`;
+                <th class="p-2 border-b border-gray-200 text-center w-[30px] min-w-[30px] sticky top-0 left-0 z-40 bg-slate-50 text-gray-400 font-bold text-[9px] shadow-[1px_1px_0_#e2e8f0]">NO</th>
+                <th class="p-2 border-b border-gray-200 text-left w-[110px] min-w-[110px] max-w-[110px] sticky top-0 left-[30px] z-40 bg-slate-50 text-gray-400 font-bold text-[9px] shadow-[1px_1px_0_#e2e8f0]">NAMA SISWA</th>
+                <th class="p-2 border-b border-gray-200 text-center w-[70px] min-w-[70px] bg-blue-50 sticky top-0 left-[140px] z-40 shadow-[2px_1px_5px_rgba(0,0,0,0.05)] text-blue-600 font-bold text-[9px]">TOTAL (Rp)</th>`;
             
             allFridays.forEach((f) => {
                 const fStr = getLocalYYYYMMDD(f); const dText = `${f.getDate()}/${f.getMonth()+1}`; if (!db.infaq[kelas][fStr]) db.infaq[kelas][fStr] = {};
                 let hasLunas = students.length > 0 && students.every(st => db.infaq[kelas][fStr][st.presensi] === 'paid');
                 let hasLibur = students.length > 0 && students.every(st => db.infaq[kelas][fStr][st.presensi] === 'libur');
 
+                // FOTO 2: Tombol Global sejajar Lunas dan Libur
                 let btnLunas = hasLunas 
-                    ? `<button onclick="toggleGlobalLunas('${kelas}', '${fStr}', true)" class="bg-green-500 text-white w-5 h-5 rounded flex items-center justify-center shadow-sm"><i class="fas fa-undo text-[8px]"></i></button>`
-                    : `<button onclick="toggleGlobalLunas('${kelas}', '${fStr}', false)" class="bg-green-50 text-green-500 border border-green-200 hover:bg-green-100 w-5 h-5 rounded flex items-center justify-center transition"><i class="fas fa-check text-[8px]"></i></button>`;
+                    ? `<button onclick="toggleGlobalLunas('${kelas}', '${fStr}', true)" class="bg-green-500 text-white w-6 h-6 rounded-md flex items-center justify-center shadow-sm"><i class="fas fa-undo text-[9px]"></i></button>`
+                    : `<button onclick="toggleGlobalLunas('${kelas}', '${fStr}', false)" class="bg-white text-green-500 border border-green-200 hover:bg-green-50 w-6 h-6 rounded-md flex items-center justify-center transition"><i class="fas fa-check text-[9px]"></i></button>`;
                 
                 let btnLibur = hasLibur
-                    ? `<button onclick="toggleGlobalLibur('${kelas}', '${fStr}', true)" class="bg-red-500 text-white w-5 h-5 rounded flex items-center justify-center shadow-sm"><i class="fas fa-undo text-[8px]"></i></button>`
-                    : `<button onclick="toggleGlobalLibur('${kelas}', '${fStr}', false)" class="bg-red-50 text-red-500 border border-red-200 hover:bg-red-100 w-5 h-5 rounded flex items-center justify-center transition"><i class="fas fa-times text-[8px]"></i></button>`;
+                    ? `<button onclick="toggleGlobalLibur('${kelas}', '${fStr}', true)" class="bg-red-500 text-white w-6 h-6 rounded-md flex items-center justify-center shadow-sm"><i class="fas fa-undo text-[9px]"></i></button>`
+                    : `<button onclick="toggleGlobalLibur('${kelas}', '${fStr}', false)" class="bg-white text-red-500 border border-red-200 hover:bg-red-50 w-6 h-6 rounded-md flex items-center justify-center transition"><i class="fas fa-times text-[9px]"></i></button>`;
 
-                thead += `<th class="p-1 border-b border-gray-200 text-center w-[55px] min-w-[55px] sticky top-0 z-30 bg-white shadow-[0_1px_0_#e2e8f0] border-r border-gray-100">
-                    <span class="font-bold text-gray-800 text-[9px] block mb-1">Jum, ${dText}</span>
+                thead += `<th class="p-1.5 border-b border-gray-200 text-center min-w-[75px] sticky top-0 z-30 bg-white shadow-[0_1px_0_#e2e8f0] border-r border-gray-100">
+                    <div class="whitespace-nowrap font-bold text-gray-800 text-[10px] mb-1.5">Jum, ${dText}</div>
                     <div class="flex justify-center gap-1">${btnLunas}${btnLibur}</div>
                 </th>`;
             });
@@ -573,16 +644,16 @@
                 let studentTotal = 0;
                 Object.keys(db.infaq[kelas]).forEach(dateStr => { if (db.infaq[kelas][dateStr][s.presensi] === 'paid') { studentTotal += nominal; classTotalMasuk += nominal; } });
                 
-                tbody += `<tr class="hover:bg-blue-50/50 transition border-b border-gray-50 group">
-                    <td class="p-1.5 text-center text-gray-500 text-[10px] font-semibold sticky left-0 z-20 bg-white group-hover:bg-blue-50 shadow-[1px_0_0_#e2e8f0]">${s.presensi}</td>
-                    <td class="p-1.5 text-[10px] font-bold text-gray-800 whitespace-nowrap truncate sticky left-[30px] z-20 bg-white group-hover:bg-blue-50 shadow-[1px_0_0_#e2e8f0] max-w-[110px]" title="${s.nama}">${s.nama}</td>
-                    <td class="p-1.5 text-center font-bold text-blue-600 bg-blue-50 whitespace-nowrap text-[10px] sticky left-[140px] z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)] group-hover:bg-blue-100 transition-colors">${formatRupiah(studentTotal).replace('Rp','').trim()}</td>`;
+                tbody += `<tr class="hover:bg-blue-50/50 transition border-b border-gray-100 group">
+                    <td class="p-2 text-center text-gray-500 text-[10px] font-semibold sticky left-0 z-20 bg-white group-hover:bg-blue-50 shadow-[1px_0_0_#e2e8f0]">${s.presensi}</td>
+                    <td class="p-2 text-[10px] font-bold text-gray-800 whitespace-nowrap truncate sticky left-[30px] z-20 bg-white group-hover:bg-blue-50 shadow-[1px_0_0_#e2e8f0] max-w-[110px]" title="${s.nama}">${s.nama}</td>
+                    <td class="p-2 text-center font-bold text-blue-600 bg-blue-50 whitespace-nowrap text-[10px] sticky left-[140px] z-20 shadow-[2px_0_5px_rgba(0,0,0,0.05)] group-hover:bg-blue-100 transition-colors">${formatRupiah(studentTotal).replace('Rp','').trim()}</td>`;
                 
                 allFridays.forEach(f => {
                     const fStr = getLocalYYYYMMDD(f); const status = db.infaq[kelas][fStr][s.presensi]; let cellContent = '';
-                    if (status === 'libur') { cellContent = `<div class="w-5 h-5 rounded flex items-center justify-center mx-auto bg-red-50 text-red-400 border border-red-200"><i class="fas fa-times text-[8px]"></i></div>`; } 
-                    else if (status === 'paid') { cellContent = `<button onclick="toggleInfaq('${kelas}', '${fStr}', '${s.presensi}')" class="check-btn btn-click w-5 h-5 rounded flex items-center justify-center mx-auto bg-green-500 text-white shadow-sm transform scale-110"><i class="fas fa-check text-[8px]"></i></button>`; } 
-                    else { cellContent = `<button onclick="toggleInfaq('${kelas}', '${fStr}', '${s.presensi}')" class="check-btn btn-click w-5 h-5 rounded border border-gray-200 bg-gray-50 text-transparent hover:bg-gray-100 flex items-center justify-center mx-auto"><i class="fas fa-check text-[8px]"></i></button>`; }
+                    if (status === 'libur') { cellContent = `<div class="w-6 h-6 rounded-md flex items-center justify-center mx-auto bg-red-50 text-red-400 border border-red-200"><i class="fas fa-times text-[10px]"></i></div>`; } 
+                    else if (status === 'paid') { cellContent = `<button onclick="toggleInfaq('${kelas}', '${fStr}', '${s.presensi}')" class="check-btn btn-click w-6 h-6 rounded-md flex items-center justify-center mx-auto bg-green-500 text-white shadow-sm transform scale-110"><i class="fas fa-check text-[10px]"></i></button>`; } 
+                    else { cellContent = `<button onclick="toggleInfaq('${kelas}', '${fStr}', '${s.presensi}')" class="check-btn btn-click w-6 h-6 rounded-md border-2 border-gray-200 bg-gray-50 text-transparent hover:bg-gray-100 flex items-center justify-center mx-auto"><i class="fas fa-check text-[10px]"></i></button>`; }
                     tbody += `<td class="p-1 border-r border-gray-100 text-center">${cellContent}</td>`;
                 });
                 tbody += `</tr>`;
@@ -610,18 +681,15 @@
             saveDB(); renderWaliChecklist();
         }
 
-        function resetChecklist() {
-            const kelas = session.user.kelas;
-            Swal.fire({
-                title: 'Reset Semua Checklist?', text: "Semua data ceklist infaq (Lunas/Libur) di kelas ini akan dikosongkan. Tindakan ini tidak dapat dibatalkan!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Ya, Kosongkan!', cancelButtonText: 'Batal', customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
-            }).then((result) => { if (result.isConfirmed) { db.infaq[kelas] = {}; saveDB(); renderWaliChecklist(); Swal.fire({icon: 'success', title: 'Dikosongkan!', showConfirmButton: false, timer: 1000, customClass: {popup: 'rounded-2xl w-[70%]'}}); } });
-        }
-
         function updateWallet(kelas, totalMasuk) {
             const p = db.pengeluaran[kelas] || []; const totalKeluar = p.reduce((sum, item) => sum + item.amount, 0);
+            
+            // Wali
             let wm = document.getElementById('wali-tot-masuk'); if(wm) wm.textContent = formatRupiah(totalMasuk);
             let wk = document.getElementById('wali-tot-keluar'); if(wk) wk.textContent = formatRupiah(totalKeluar);
             let ws = document.getElementById('wali-tot-saldo'); if(ws) ws.textContent = formatRupiah(totalMasuk - totalKeluar);
+
+            // Admin
             let am = document.getElementById('admin-tot-masuk'); if(am) am.textContent = formatRupiah(totalMasuk);
             let ak = document.getElementById('admin-tot-keluar'); if(ak) ak.textContent = formatRupiah(totalKeluar);
             let as = document.getElementById('admin-tot-saldo'); if(as) as.textContent = formatRupiah(totalMasuk - totalKeluar);
@@ -646,11 +714,264 @@
             if (p.length === 0) return Swal.fire({icon: 'info', title: 'Belum ada data', customClass:{popup:'rounded-2xl w-[70%]'}});
             let html = `<div class="max-h-64 overflow-y-auto text-left text-[9px] bg-slate-50 rounded-lg border border-gray-100 mt-2"><table class="w-full"><thead class="bg-gray-100/80 text-gray-500 uppercase"><tr><th class="p-2 font-bold">Tanggal</th><th class="p-2 font-bold">Ket</th><th class="p-2 font-bold text-right">Nominal</th><th class="p-2"></th></tr></thead><tbody>`;
             p.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(item => { html += `<tr class="border-b border-gray-100 hover:bg-white transition"><td class="p-2 text-gray-600 whitespace-nowrap">${item.date.slice(5).replace('-','/')}</td><td class="p-2 font-bold text-gray-800">${item.desc}</td><td class="p-2 text-right text-red-600 font-bold whitespace-nowrap">${formatRupiah(item.amount).replace('Rp','').trim()}</td><td class="p-2 text-center"><button onclick="deletePengeluaran('${item.id}')" class="text-red-400 hover:text-red-600 bg-red-50 p-1 rounded"><i class="fas fa-trash text-[8px]"></i></button></td></tr>`; }); html += `</tbody></table></div>`;
-            html += `<button onclick="resetPengeluaran()" class="w-full mt-3 bg-red-50 text-red-600 border border-red-200 py-2 rounded-xl text-[10px] font-bold hover:bg-red-100 transition"><i class="fas fa-trash-alt mr-1"></i> Kosongkan Semua Riwayat</button>`;
 
             window.deletePengeluaran = (id) => { db.pengeluaran[kelas] = db.pengeluaran[kelas].filter(x => x.id !== id); saveDB(); renderWaliChecklist(); Swal.close(); setTimeout(viewPengeluaranHistory, 250); };
-            window.resetPengeluaran = () => { Swal.fire({ title: 'Kosongkan Riwayat?', text: "Semua data pengeluaran dihapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Ya, Hapus Semua!', cancelButtonText: 'Batal', customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'} }).then((result) => { if (result.isConfirmed) { db.pengeluaran[kelas] = []; saveDB(); renderWaliChecklist(); Swal.fire({icon: 'success', title: 'Terhapus!', showConfirmButton: false, timer: 1000, customClass: {popup: 'rounded-2xl w-[70%]'}}); } }); };
             Swal.fire({ title: '<span class="text-sm font-black">Riwayat Pengeluaran</span>', html: html, showConfirmButton: false, showCloseButton: true, customClass: {popup: 'rounded-2xl w-[90%] max-w-sm p-4'} });
+        }
+
+        // =========================================================================
+        // FITUR BARU: MENU LAPORAN CHECKBOX & PDF
+        // =========================================================================
+        function openWaliReportMenu() {
+            const kls = session.user.kelas;
+            const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
+            
+            if (students.length === 0) return Swal.fire({icon: 'warning', title: 'Kelas Kosong', customClass:{popup:'rounded-3xl w-[70%]'}});
+
+            // FOTO 3: Hapus "Hanya Siswa", buat opsi Checkbox yang defaultnya Kosong (tidak dicentang)
+            let checkboxes = `
+                <label class="flex items-center justify-between p-3 border border-blue-200 bg-blue-50/50 rounded-xl cursor-pointer mb-2 transition">
+                    <span class="text-xs font-black text-blue-700">Semua Siswa (Cetak Lengkap)</span>
+                    <input type="checkbox" id="cb-all-students" class="cb-custom" onchange="toggleAllStudents(this)">
+                </label>
+                <div class="max-h-[40vh] overflow-y-auto bg-white rounded-xl border border-gray-100 hide-scroll space-y-1 p-1">
+            `;
+            students.forEach(s => {
+                checkboxes += `
+                    <label class="flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer">
+                        <span class="text-[10px] font-bold text-gray-700">${s.presensi} - ${s.nama}</span>
+                        <input type="checkbox" class="stu-cb cb-custom" value="${s.presensi}" onchange="checkIndividualStudent()">
+                    </label>`;
+            });
+            checkboxes += `</div>`;
+
+            // Setup Event Listener internal SweetAlert
+            window.toggleAllStudents = (el) => {
+                const cbs = document.querySelectorAll('.stu-cb');
+                cbs.forEach(cb => cb.checked = el.checked);
+            };
+            window.checkIndividualStudent = () => {
+                const allCb = document.getElementById('cb-all-students');
+                const cbs = document.querySelectorAll('.stu-cb');
+                allCb.checked = Array.from(cbs).every(c => c.checked);
+            };
+
+            Swal.fire({
+                title: '<span class="text-sm font-black">Pengaturan Laporan</span>',
+                html: `
+                    <div class="text-left mt-2 space-y-3">
+                        <p class="text-[9px] font-medium text-gray-500 leading-tight">* Laporan otomatis memuat 1 Tahun Ajaran Penuh.</p>
+                        ${checkboxes}
+                    </div>
+                `,
+                showCancelButton: true, confirmButtonText: 'Mulai Unduh <i class="fas fa-download ml-1"></i>', cancelButtonText: 'Batal',
+                customClass: { popup: 'rounded-3xl w-[95%] max-w-sm p-4 bg-slate-50', confirmButton: 'btn-click bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md w-full mb-2', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-xs font-bold w-full', actions: 'flex flex-col w-full' }, buttonsStyling: false,
+                preConfirm: () => {
+                    const selected = Array.from(document.querySelectorAll('.stu-cb:checked')).map(cb => cb.value);
+                    if(selected.length === 0) { Swal.showValidationMessage("Pilih minimal 1 siswa"); return false; }
+                    return selected;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    generateWaliPDF(result.value);
+                }
+            });
+        }
+
+        // FUNGSI PENARIKAN GAMBAR KOP (SUPER STABIL UNTUK GITHUB PAGES)
+        async function getSafeBase64(url) {
+            try {
+                const res = await fetch(url, { cache: 'no-cache' });
+                const blob = await res.blob();
+                return await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+            } catch (e) {
+                console.warn("Gambar gagal:", e); return null;
+            }
+        }
+
+        async function generateWaliPDF(selectedStudentsArr) {
+            Swal.fire({ title: 'Menyiapkan Laporan...', html: 'Mengekstrak data 1 Tahun Penuh...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            
+            setTimeout(async () => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const kls = session.user.kelas; const nominal = getNominalKelas(kls);
+                    const printDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+
+                    // Load KOP
+                    if(!cachedKopAtas) cachedKopAtas = await getSafeBase64(LINK_KOP_ATAS);
+                    if(!cachedKopBawah) cachedKopBawah = await getSafeBase64(LINK_KOP_BAWAH);
+
+                    let allFridays = getFridaysFromAcademicYear();
+                    let monthsData = [];
+                    // Pengelompokan berdasar Bulan (Tahun Ajaran)
+                    let currentMonth = -1; let currentGroup = null;
+                    allFridays.forEach(f => {
+                        if(f.getMonth() !== currentMonth) {
+                            if(currentGroup) monthsData.push(currentGroup);
+                            currentMonth = f.getMonth();
+                            currentGroup = { monthStr: formatMonthID(getLocalYYYYMMDD(f).slice(0,7)), dates: [] };
+                        }
+                        currentGroup.dates.push(getLocalYYYYMMDD(f));
+                    });
+                    if(currentGroup) monthsData.push(currentGroup);
+
+                    const students = db.users.murid.filter(m => m.kelas === kls && selectedStudentsArr.includes(m.presensi)).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
+                    const allClassStudentsCount = db.users.murid.filter(m => m.kelas === kls).length;
+
+                    // Rekap Total Kelas untuk Kotak Saldo
+                    let totalMasukKelas = 0;
+                    db.users.murid.filter(m => m.kelas === kls).forEach(s => {
+                        allFridays.forEach(f => { if(db.infaq[kls]?.[getLocalYYYYMMDD(f)]?.[s.presensi] === 'paid') totalMasukKelas += nominal; });
+                    });
+                    const p = db.pengeluaran[kls] || []; const totalKeluarKelas = p.reduce((sum, i) => sum + i.amount, 0);
+
+                    // ==========================================
+                    // CABANG: CETAK REKAP KELAS LENGKAP ATAU BUKU INFAQ SISWA
+                    // ==========================================
+                    if (selectedStudentsArr.length === allClassStudentsCount) {
+                        // MENCETAK REKAP KELAS FULL (KERTAS LANDSCAPE AGAR 55 KOLOM MUAT)
+                        const pageWidth = 935.43; const pageHeight = 612.28; // LANDSCAPE F4
+                        const doc = new jsPDF('l', 'pt', [pageHeight, pageWidth]);
+                        
+                        let hAtas = 80; let hBawah = 80;
+                        if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = Math.min((pageWidth * imgA.height) / imgA.width, 100); }
+                        if (cachedKopBawah) { const imgB = new Image(); imgB.src = cachedKopBawah; hBawah = Math.min((pageWidth * imgB.height) / imgB.width, 100); }
+
+                        if (cachedKopAtas) doc.addImage(cachedKopAtas, 'PNG', 0, 0, pageWidth, hAtas);
+                        if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, pageHeight - hBawah, pageWidth, hBawah);
+
+                        let cY = hAtas + 15;
+                        doc.setFont('Helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(30, 41, 59); doc.text(`LAPORAN REKAP INFAQ - KELAS ${kls}`, 40, cY);
+                        cY += 12; doc.setFont('Helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.text(`Dicetak pada : ${printDate} WIB`, 40, cY);
+
+                        cY += 15; const bW = (pageWidth - 80) / 3; const bH = 35; 
+                        doc.setFillColor(59, 130, 246); doc.rect(40, cY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL MASUK", 48, cY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas), 48, cY + 26);
+                        doc.setFillColor(249, 115, 22); doc.rect(40 + bW, cY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL KELUAR", 40 + bW + 8, cY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalKeluarKelas), 40 + bW + 8, cY + 26);
+                        doc.setFillColor(16, 185, 129); doc.rect(40 + (bW * 2), cY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("SISA SALDO", 40 + (bW * 2) + 8, cY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas - totalKeluarKelas), 40 + (bW * 2) + 8, cY + 26);
+
+                        cY += bH + 10;
+                        let bodyR = [];
+                        students.forEach(s => {
+                            let row = [s.presensi, s.nama]; let stTotal = 0;
+                            allFridays.forEach(f => {
+                                const stat = db.infaq[kls]?.[getLocalYYYYMMDD(f)]?.[s.presensi];
+                                if(stat === 'paid') { row.push('v'); stTotal += nominal; } else if(stat === 'libur') row.push('x'); else row.push('-');
+                            });
+                            row.push(formatRupiah(stTotal).replace('Rp','').trim()); bodyR.push(row);
+                        });
+
+                        // Ukuran huruf extra kecil untuk menampung >50 kolom
+                        let colCount = allFridays.length + 3;
+                        let dynFontSize = colCount > 45 ? 5 : (colCount > 30 ? 6 : 7); 
+
+                        doc.autoTable({
+                            startY: cY,
+                            head: [['No', 'Nama Siswa', ...allFridays.map(f => `${String(f.getDate()).padStart(2,'0')}/${f.getMonth()+1}`), 'Tot']],
+                            body: bodyR, theme: 'striped', 
+                            styles: { fontSize: dynFontSize, cellPadding: 1, halign: 'center' }, 
+                            headStyles: { fillColor: [30, 64, 175], cellPadding: 1.5, fontSize: dynFontSize }, 
+                            columnStyles: { 1: { halign: 'left', cellWidth: 80 } }, 
+                            alternateRowStyles: { fillColor: [240, 249, 255] }, 
+                            margin: { top: hAtas + 10, left: 20, right: 20, bottom: hBawah + 10 },
+                            didDrawPage: function (data) {
+                                if (data.pageNumber > 1) {
+                                    if (cachedKopAtas) doc.addImage(cachedKopAtas, 'JPEG', 0, 0, pageWidth, hAtas);
+                                    if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, pageHeight - hBawah, pageWidth, hBawah);
+                                }
+                            }
+                        });
+
+                        let pY = doc.lastAutoTable.finalY + 15;
+                        doc.setFont('Helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(30, 41, 59); doc.text(`Daftar Pengeluaran Kelas:`, 40, pY);
+                        if (p.length > 0) {
+                            let dataP = []; p.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => { dataP.push([formatDateID(item.date), item.desc, formatRupiah(item.amount).replace('Rp','').trim()]); });
+                            doc.autoTable({ startY: pY + 8, head: [['Tanggal', 'Keterangan Pengeluaran', 'Nominal (Rp)']], body: dataP, theme: 'striped', headStyles: { fillColor: [249, 115, 22], fontSize: 7, cellPadding: 2 }, bodyStyles: { fontSize: 7, cellPadding: 2 }, columnStyles: { 2: { halign: 'right', fontStyle: 'bold', textColor: [220, 38, 38] } }, margin: { left: 40, right: 40, bottom: hBawah + 10 } });
+                        } else { doc.setFont('Helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(156, 163, 175); doc.text(`Belum ada pengeluaran.`, 40, pY + 15); }
+
+                    } else {
+                        // MENCETAK BUKU INFAQ SISWA (Maks 2 Siswa per halaman, PORTRAIT F4)
+                        const pageWidth = 612.28; const pageHeight = 935.43;
+                        const doc = new jsPDF('p', 'pt', [pageWidth, pageHeight]);
+                        
+                        let hAtas = 80; let hBawah = 80;
+                        if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = Math.min((pageWidth * imgA.height) / imgA.width, 130); }
+                        if (cachedKopBawah) { const imgB = new Image(); imgB.src = cachedKopBawah; hBawah = Math.min((pageWidth * imgB.height) / imgB.width, 130); }
+
+                        for (let i = 0; i < students.length; i++) {
+                            const s = students[i];
+                            if (i > 0 && i % 2 === 0) doc.addPage();
+                            
+                            if (i % 2 === 0) {
+                                if (cachedKopAtas) doc.addImage(cachedKopAtas, 'PNG', 0, 0, pageWidth, hAtas);
+                                if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, pageHeight - hBawah, pageWidth, hBawah);
+                            }
+
+                            let currentY = (i % 2 === 0) ? hAtas + 15 : (pageHeight / 2) + 15;
+
+                            if (i === 0) {
+                                doc.setFont('Helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(30, 41, 59); doc.text(`LAPORAN KEUANGAN INFAQ - KELAS ${kls}`, 40, currentY);
+                                currentY += 12; doc.setFont('Helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.text(`Dicetak pada : ${printDate} WIB`, 40, currentY);
+                                currentY += 15; const bW = (pageWidth - 80) / 3; const bH = 35; 
+                                doc.setFillColor(59, 130, 246); doc.rect(40, currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL MASUK", 48, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas), 48, currentY + 26);
+                                doc.setFillColor(249, 115, 22); doc.rect(40 + bW, currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL KELUAR", 40 + bW + 8, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalKeluarKelas), 40 + bW + 8, currentY + 26);
+                                doc.setFillColor(16, 185, 129); doc.rect(40 + (bW * 2), currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("SISA SALDO", 40 + (bW * 2) + 8, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas - totalKeluarKelas), 40 + (bW * 2) + 8, currentY + 26);
+                                currentY += bH + 15;
+                            }
+
+                            // Card Shape Nama Siswa
+                            doc.setFillColor(37, 99, 235); doc.roundedRect(40, currentY, pageWidth - 80, 20, 3, 3, 'F');
+                            doc.setFont('Helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(255); doc.text(`No: ${s.presensi}  |  Nama Siswa: ${s.nama}`, 48, currentY + 13);
+
+                            let body = []; let totalSiswaMasuk = 0;
+                            monthsData.forEach(mGroup => {
+                                let row = [mGroup.monthStr]; let mTotal = 0;
+                                for(let w=0; w<5; w++) {
+                                    if(mGroup.dates[w]) {
+                                        const stat = db.infaq[kls]?.[mGroup.dates[w]]?.[s.presensi];
+                                        if (stat === 'paid') { row.push('LUNAS'); mTotal += nominal; totalSiswaMasuk += nominal; }
+                                        else if (stat === 'libur') row.push('-'); else row.push('-');
+                                    } else row.push('');
+                                }
+                                row.push(formatRupiah(mTotal).replace('Rp','').trim()); body.push(row);
+                            });
+                            body.push(["TOTAL KESELURUHAN", "", "", "", "", "", formatRupiah(totalSiswaMasuk).replace('Rp','').trim()]);
+
+                            doc.autoTable({
+                                startY: currentY + 20,
+                                head: [['Bulan', 'Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4', 'Pekan 5', 'Total (Rp)']],
+                                body: body, theme: 'grid', 
+                                headStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59], halign: 'center', fontSize: 8, cellPadding: 2 },
+                                bodyStyles: { halign: 'center', fontSize: 7, cellPadding: 1.5, textColor: [100, 116, 139] },
+                                columnStyles: { 0: { halign: 'left', fontStyle: 'bold', textColor: [30, 41, 59] }, 6: { halign: 'right', fontStyle: 'bold', textColor: [22, 163, 74] } },
+                                margin: { left: 40, right: 40, bottom: hBawah + 10 },
+                                didParseCell: function (data) {
+                                    if (data.section === 'body' && data.row.index === body.length - 1) {
+                                        data.cell.styles.fillColor = [241, 245, 249];
+                                        if (data.column.index === 0) { data.cell.styles.fontStyle = 'bold'; data.cell.styles.textColor = [71, 85, 105]; }
+                                    }
+                                }
+                            });
+
+                            if (i === students.length - 1) {
+                                let pY = doc.lastAutoTable.finalY + 15;
+                                if (pY > pageHeight - hBawah - 50) { doc.addPage(); if (cachedKopAtas) doc.addImage(cachedKopAtas, 'PNG', 0, 0, pageWidth, hAtas); if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, pageHeight - hBawah, pageWidth, hBawah); pY = hAtas + 20; }
+                                doc.setFont('Helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(30, 41, 59); doc.text(`Daftar Pengeluaran Kelas:`, 40, pY);
+                                if (p.length > 0) {
+                                    let dataP = []; p.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => { dataP.push([formatDateID(item.date), item.desc, formatRupiah(item.amount).replace('Rp','').trim()]); });
+                                    doc.autoTable({ startY: pY + 8, head: [['Tanggal', 'Keterangan Pengeluaran', 'Nominal (Rp)']], body: dataP, theme: 'striped', headStyles: { fillColor: [249, 115, 22], fontSize: 7, cellPadding: 2 }, bodyStyles: { fontSize: 7, cellPadding: 2 }, columnStyles: { 2: { halign: 'right', fontStyle: 'bold', textColor: [220, 38, 38] } }, margin: { left: 40, right: 40, bottom: hBawah + 10 } });
+                                } else { doc.setFont('Helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(156, 163, 175); doc.text(`Belum ada catatan pengeluaran.`, 40, pY + 15); }
+                            }
+                        }
+                    }
+
+                    doc.save(`Laporan_Infaq_${kls}.pdf`); Swal.close();
+                } catch (error) { console.error("PDF Error:", error); Swal.fire({icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan saat memproses data PDF.'}); }
+            }, 300);
         }
 
         // --- ADMIN VIEW LOGIC ---
@@ -660,15 +981,7 @@
             viewSel.innerHTML = (classes.length > 0) ? opts : '<option value="">Kosong</option>'; reportSel.innerHTML = '<option value="ALL">Semua Kelas</option>' + opts;
             const imgAdmin = document.getElementById('admin-foto-profil');
             if (db.users.admin[0]?.foto && db.users.admin[0].foto.trim() !== '') { imgAdmin.src = db.users.admin[0].foto; } else { imgAdmin.src = `https://ui-avatars.com/api/?name=Admin&background=3B82F6&color=fff&bold=true`; }
-            
-            if (classes.length > 0) {
-                renderAdminClassView();
-            } else {
-                document.getElementById('admin-tot-masuk').textContent = 'Rp 0';
-                document.getElementById('admin-tot-keluar').textContent = 'Rp 0';
-                document.getElementById('admin-tot-saldo').textContent = 'Rp 0';
-                document.getElementById('admin-table').innerHTML = '<tr><td class="text-center p-5 text-gray-400 text-[10px] font-medium">Database kosong. Silakan upload file Excel terbaru.</td></tr>';
-            }
+            if (classes.length > 0) renderAdminClassView();
         }
 
         function renderAdminClassView() {
@@ -684,195 +997,29 @@
                 });
             }
             
-            const p = db.pengeluaran[kls] || []; const totalKeluar = p.reduce((sum, i) => sum + i.amount, 0); // BUG FIXED HERE: 'sum' instead of 's'
+            const p = db.pengeluaran[kls] || []; const totalKeluar = p.reduce((sum, i) => sum + i.amount, 0);
             document.getElementById('admin-tot-masuk').textContent = formatRupiah(totalMasuk); document.getElementById('admin-tot-keluar').textContent = formatRupiah(totalKeluar); document.getElementById('admin-tot-saldo').textContent = formatRupiah(totalMasuk - totalKeluar);
             document.getElementById('admin-table').innerHTML = `<thead class="bg-slate-50 text-[9px] text-gray-500 uppercase tracking-wide border-b border-gray-200"><tr><th class="p-2 text-center w-10">No</th><th class="p-2">Nama Lengkap</th><th class="p-2">Kode Unik</th><th class="p-2 text-right">Total Infaq</th></tr></thead><tbody>${tbody}</tbody>`;
         }
 
-        // =========================================================================
-        // PDF GENERATOR (Wali & Admin)
-        // =========================================================================
-        function openWaliReportMenu() {
-            const kls = session.user.kelas;
-            const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
-            if (students.length === 0) return Swal.fire({icon: 'warning', title: 'Kelas Kosong', customClass:{popup:'rounded-3xl w-[70%]'}});
-
-            let checkboxes = `
-                <label class="flex items-center justify-between p-3 border border-blue-200 bg-blue-50/50 rounded-xl cursor-pointer mb-2 transition">
-                    <span class="text-xs font-black text-blue-700">Semua Siswa (Cetak 1 Tahun)</span>
-                    <input type="checkbox" id="cb-all-students" class="cb-custom" onchange="toggleAllStudents(this)">
-                </label>
-                <div class="max-h-[40vh] overflow-y-auto bg-white rounded-xl border border-gray-100 hide-scroll space-y-1 p-1">
-            `;
-            students.forEach(s => {
-                checkboxes += `<label class="flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer"><span class="text-[10px] font-bold text-gray-700">${s.presensi} - ${s.nama}</span><input type="checkbox" class="stu-cb cb-custom" value="${s.presensi}" onchange="checkIndividualStudent()"></label>`;
-            });
-            checkboxes += `</div>`;
-
-            window.toggleAllStudents = (el) => { document.querySelectorAll('.stu-cb').forEach(cb => cb.checked = el.checked); };
-            window.checkIndividualStudent = () => { document.getElementById('cb-all-students').checked = Array.from(document.querySelectorAll('.stu-cb')).every(c => c.checked); };
-
-            Swal.fire({
-                title: '<span class="text-sm font-black">Pengaturan Laporan</span>',
-                html: `<div class="text-left mt-2 space-y-3"><p class="text-[9px] font-medium text-gray-500 leading-tight">* Laporan otomatis memuat 1 Tahun Ajaran Penuh.</p>${checkboxes}</div>`,
-                showCancelButton: true, confirmButtonText: 'Mulai Unduh <i class="fas fa-download ml-1"></i>', cancelButtonText: 'Batal',
-                customClass: { popup: 'rounded-3xl w-[95%] max-w-sm p-4 bg-slate-50', confirmButton: 'btn-click bg-blue-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md w-full mb-2', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-xs font-bold w-full', actions: 'flex flex-col w-full' }, buttonsStyling: false,
-                preConfirm: () => { const selected = Array.from(document.querySelectorAll('.stu-cb:checked')).map(cb => cb.value); if(selected.length === 0) { Swal.showValidationMessage("Pilih minimal 1 siswa"); return false; } return selected; }
-            }).then((result) => { if (result.isConfirmed) { generateWaliPDF(result.value); } });
-        }
-
-        // FUNGSI PENARIKAN GAMBAR KOP (SUPER STABIL)
-        async function fetchImageToDataURL(url) {
-            try {
-                const response = await fetch(url, { cache: "no-store" });
-                const blob = await response.blob();
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(blob);
-                });
-            } catch (error) {
-                console.warn("Gagal muat KOP:", url); return null;
-            }
-        }
-
-        async function generateWaliPDF(selectedStudentsArr) {
-            Swal.fire({ title: 'Menyiapkan Laporan...', html: 'Mengekstrak data 1 Tahun Penuh...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
-            
-            setTimeout(async () => {
-                try {
-                    const { jsPDF } = window.jspdf;
-                    const pageWidth = 612.28; const pageHeight = 935.43; // F4
-                    const doc = new jsPDF('p', 'pt', [pageWidth, pageHeight]);
-                    const kls = session.user.kelas; const nominal = getNominalKelas(kls);
-                    const printDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
-
-                    if(!cachedKopAtas) cachedKopAtas = await fetchImageToDataURL(LINK_KOP_ATAS);
-                    if(!cachedKopBawah) cachedKopBawah = await fetchImageToDataURL(LINK_KOP_BAWAH);
-
-                    let hAtas = 80; let hBawah = 80;
-                    if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = Math.min((pageWidth * imgA.height) / imgA.width, 120); }
-                    if (cachedKopBawah) { const imgB = new Image(); imgB.src = cachedKopBawah; hBawah = Math.min((pageWidth * imgB.height) / imgB.width, 120); }
-
-                    let allFridays = getFridaysFromAcademicYear();
-                    let monthsData = []; let currentMonth = -1; let currentGroup = null;
-                    allFridays.forEach(f => {
-                        if(f.getMonth() !== currentMonth) {
-                            if(currentGroup) monthsData.push(currentGroup);
-                            currentMonth = f.getMonth();
-                            currentGroup = { monthStr: formatMonthID(getLocalYYYYMMDD(f).slice(0,7)), dates: [] };
-                        }
-                        currentGroup.dates.push(getLocalYYYYMMDD(f));
-                    });
-                    if(currentGroup) monthsData.push(currentGroup);
-
-                    const students = db.users.murid.filter(m => m.kelas === kls && selectedStudentsArr.includes(m.presensi)).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
-
-                    let totalMasukKelas = 0;
-                    db.users.murid.filter(m => m.kelas === kls).forEach(s => { allFridays.forEach(f => { if(db.infaq[kls]?.[getLocalYYYYMMDD(f)]?.[s.presensi] === 'paid') totalMasukKelas += nominal; }); });
-                    const p = db.pengeluaran[kls] || []; const totalKeluarKelas = p.reduce((sum, i) => sum + i.amount, 0);
-
-                    // MENCETAK LAPORAN SISWA WALI KELAS (PASTI 1 HALAMAN 1 SISWA!)
-                    for (let i = 0; i < students.length; i++) {
-                        const s = students[i];
-                        if (i > 0) doc.addPage();
-                        
-                        if (cachedKopAtas) doc.addImage(cachedKopAtas, 'PNG', 0, 0, pageWidth, hAtas);
-                        if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, pageHeight - hBawah, pageWidth, hBawah);
-
-                        let currentY = hAtas + 15;
-                        doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(30, 41, 59); doc.text(`LAPORAN KEUANGAN INFAQ - KELAS ${kls}`, 40, currentY);
-                        currentY += 12; doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 116, 139); doc.text(`Dicetak pada : ${printDate} WIB`, 40, currentY);
-                        
-                        currentY += 15; const bW = (pageWidth - 80) / 3; const bH = 35; 
-                        doc.setFillColor(59, 130, 246); doc.rect(40, currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL MASUK KELAS", 48, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas), 48, currentY + 26);
-                        doc.setFillColor(249, 115, 22); doc.rect(40 + bW, currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL KELUAR KELAS", 40 + bW + 8, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalKeluarKelas), 40 + bW + 8, currentY + 26);
-                        doc.setFillColor(16, 185, 129); doc.rect(40 + (bW * 2), currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("SISA SALDO KELAS", 40 + (bW * 2) + 8, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas - totalKeluarKelas), 40 + (bW * 2) + 8, currentY + 26);
-                        currentY += bH + 15;
-
-                        doc.setFillColor(37, 99, 235); doc.roundedRect(40, currentY, pageWidth - 80, 20, 3, 3, 'F');
-                        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(255); doc.text(`No: ${s.presensi}  |  Nama Siswa: ${s.nama}`, 48, currentY + 13);
-
-                        let body = []; let totalSiswaMasuk = 0;
-                        monthsData.forEach(mGroup => {
-                            let row = [mGroup.monthStr]; let mTotal = 0;
-                            for(let w=0; w<5; w++) {
-                                if(mGroup.dates[w]) {
-                                    const stat = db.infaq[kls]?.[mGroup.dates[w]]?.[s.presensi];
-                                    if (stat === 'paid') { row.push('LUNAS'); mTotal += nominal; totalSiswaMasuk += nominal; }
-                                    else if (stat === 'libur') row.push('LIBUR'); else row.push('-');
-                                } else row.push('');
-                            }
-                            row.push(formatRupiah(mTotal).replace('Rp','').trim()); body.push(row);
-                        });
-                        body.push(["TOTAL KESELURUHAN INFAQ", "", "", "", "", "", formatRupiah(totalSiswaMasuk).replace('Rp','').trim()]);
-
-                        doc.autoTable({
-                            startY: currentY + 20,
-                            head: [['Bulan', 'Pekan 1', 'Pekan 2', 'Pekan 3', 'Pekan 4', 'Pekan 5', 'Total (Rp)']],
-                            body: body, theme: 'plain', 
-                            styles: { halign: 'center', valign: 'middle', cellPadding: 6, fontSize: 8 },
-                            columnStyles: { 0: { halign: 'left', fontStyle: 'bold', textColor: [51, 65, 85], cellWidth: 80 }, 6: { halign: 'right', fontStyle: 'bold', textColor: [22, 163, 74] } },
-                            margin: { left: 40, right: 40, bottom: hBawah + 10 },
-                            willDrawCell: function(data) { data.cell.text = ''; },
-                            didDrawCell: function (data) {
-                                let x = data.cell.x; let y = data.cell.y; let w = data.cell.width; let h = data.cell.height; let text = data.cell.raw;
-                                if (data.section === 'head') {
-                                    doc.setTextColor(100, 116, 139); doc.setFontSize(8); doc.setFont('helvetica', 'bold');
-                                    if(data.column.index === 0) doc.text(text, x + 5, y + h/2 + 3); else doc.text(text, x + w/2, y + h/2 + 3, {align: 'center'});
-                                } else if (data.section === 'body') {
-                                    if (data.row.index === body.length - 1) {
-                                        doc.setFillColor(241, 245, 249); doc.rect(x, y, w, h, 'F');
-                                        if (data.column.index === 0) { doc.setTextColor(71, 85, 105); doc.setFont('helvetica', 'bold'); doc.text(text, x + 5, y + h/2 + 3); }
-                                        else if (data.column.index === 6) { doc.setTextColor(22, 163, 74); doc.setFont('helvetica', 'bold'); doc.text(text, x + w - 5, y + h/2 + 3, {align: 'right'}); }
-                                        return;
-                                    }
-                                    if (data.column.index === 0) {
-                                        doc.setTextColor(51, 65, 85); doc.setFont('helvetica', 'bold'); doc.text(text, x + 5, y + h/2 + 3);
-                                    } else if (data.column.index >= 1 && data.column.index <= 5) {
-                                        let py = y + 2; let ph = h - 4; let px = x + 5; let pw = w - 10;
-                                        if (text === 'LUNAS') { doc.setFillColor(34, 197, 94); doc.roundedRect(px, py, pw, ph, 4, 4, 'F'); doc.setTextColor(255); doc.setFontSize(6); doc.text("LUNAS", x + w/2, y + h/2 + 2, {align: 'center'}); } 
-                                        else if (text === 'LIBUR') { doc.setFillColor(248, 113, 113); doc.roundedRect(px, py, pw, ph, 4, 4, 'F'); doc.setTextColor(255); doc.setFontSize(6); doc.text("LIBUR", x + w/2, y + h/2 + 2, {align: 'center'}); } 
-                                        else if (text === '-') { doc.setFillColor(241, 245, 249); doc.roundedRect(px, py, pw, ph, 4, 4, 'F'); doc.setTextColor(148, 163, 184); doc.setFontSize(7); doc.text("-", x + w/2, y + h/2 + 2, {align: 'center'}); }
-                                    } else if (data.column.index === 6) {
-                                        doc.setTextColor(37, 99, 235); doc.setFont('helvetica', 'bold'); doc.text(text, x + w - 5, y + h/2 + 3, {align: 'right'});
-                                    }
-                                    doc.setDrawColor(241, 245, 249); doc.line(x, y + h, x + w, y + h);
-                                }
-                            }
-                        });
-
-                        // Daftar Pengeluaran
-                        let pY = doc.lastAutoTable.finalY + 20;
-                        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(30, 41, 59); doc.text(`Daftar Pengeluaran Kelas:`, 40, pY);
-                        if (p.length > 0) {
-                            let dataP = []; p.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => { dataP.push([formatDateID(item.date), item.desc, formatRupiah(item.amount).replace('Rp','').trim()]); });
-                            doc.autoTable({ startY: pY + 8, head: [['Tanggal', 'Keterangan Pengeluaran', 'Nominal (Rp)']], body: dataP, theme: 'plain', headStyles: { fillColor: [241, 245, 249], textColor: [71, 85, 105], fontSize: 8, cellPadding: 4 }, bodyStyles: { fontSize: 8, cellPadding: 4, textColor: [100, 116, 139] }, columnStyles: { 2: { halign: 'right', fontStyle: 'bold', textColor: [220, 38, 38] } }, margin: { left: 40, right: 40, bottom: hBawah + 10 }, willDrawCell: function(data){ if(data.section==='body'){ doc.setDrawColor(241, 245, 249); doc.line(data.cell.x, data.cell.y + data.cell.height, data.cell.x + data.cell.width, data.cell.y + data.cell.height); } } });
-                        } else { doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(156, 163, 175); doc.text(`Belum ada catatan pengeluaran.`, 40, pY + 15); }
-                    }
-
-                    doc.save(`Laporan_Infaq_${kls}.pdf`); Swal.close();
-                } catch (error) { console.error("PDF Error:", error); Swal.fire({icon: 'error', title: 'Gagal', text: 'Terjadi kesalahan saat memproses data PDF.'}); }
-            }, 300);
-        }
-
+        // --- ADMIN REPORT (CETAK 1 TAHUN PENUH LANGSUNG) ---
         function downloadAdminReport() {
             const targetClass = document.getElementById('admin-report-class').value;
             Swal.fire({
                 title: 'Menyiapkan Dokumen...', html: 'Merender rekap laporan 1 Tahun Penuh...', allowOutsideClick: false, didOpen: () => { Swal.showLoading();
                 setTimeout(async () => {
                     try {
-                        const { jsPDF } = window.jspdf; const pageWidth = 612.28; const pageHeight = 935.43; 
-                        const doc = new jsPDF('l', 'pt', [pageHeight, pageWidth]); // Landscape Admin (936 x 612)
+                        const { jsPDF } = window.jspdf; const pageWidth = 935.43; const pageHeight = 612.28; // LANDSCAPE F4
+                        const doc = new jsPDF('l', 'pt', [pageHeight, pageWidth]); 
                         let classesToProcess = targetClass === 'ALL' ? [...new Set(db.users.wali.map(w => w.kelas))] : [targetClass];
                         const printDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
 
-                        if (!cachedKopAtas) cachedKopAtas = await fetchImageToDataURL(LINK_KOP_ATAS);
-                        if (!cachedKopBawah) cachedKopBawah = await fetchImageToDataURL(LINK_KOP_BAWAH);
+                        if (!cachedKopAtas) cachedKopAtas = await getSafeBase64(LINK_KOP_ATAS);
+                        if (!cachedKopBawah) cachedKopBawah = await getSafeBase64(LINK_KOP_BAWAH);
 
                         let hAtas = 80; let hBawah = 80;
-                        if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = Math.min((pageHeight * imgA.height) / imgA.width, 100); }
-                        if (cachedKopBawah) { const imgB = new Image(); imgB.src = cachedKopBawah; hBawah = Math.min((pageHeight * imgB.height) / imgB.width, 100); }
+                        if (cachedKopAtas) { const imgA = new Image(); imgA.src = cachedKopAtas; hAtas = Math.min((pageWidth * imgA.height) / imgA.width, 100); }
+                        if (cachedKopBawah) { const imgB = new Image(); imgB.src = cachedKopBawah; hBawah = Math.min((pageWidth * imgB.height) / imgB.width, 100); }
 
                         let allFridays = getFridaysFromAcademicYear();
                         let monthsData = []; let currentMonth = -1; let currentGroup = null;
@@ -891,8 +1038,8 @@
                             const nominal = getNominalKelas(kls);
                             const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
                             
-                            if (cachedKopAtas) doc.addImage(cachedKopAtas, 'PNG', 0, 0, pageHeight, hAtas);
-                            if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, pageWidth - hBawah, pageHeight, hBawah);
+                            if (cachedKopAtas) doc.addImage(cachedKopAtas, 'PNG', 0, 0, pageWidth, hAtas);
+                            if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, pageHeight - hBawah, pageWidth, hBawah);
 
                             let currentY = hAtas + 15;
                             doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.setTextColor(30, 41, 59); doc.text(`LAPORAN REKAP INFAQ - KELAS ${kls}`, 40, currentY);
@@ -901,7 +1048,7 @@
                             let totalMasukKelas = 0; students.forEach(s => { allFridays.forEach(d => { if (db.infaq[kls]?.[getLocalYYYYMMDD(d)]?.[s.presensi] === 'paid') totalMasukKelas += nominal; }); });
                             const p = db.pengeluaran[kls] || []; const totalKeluarKelas = p.reduce((sum, i) => sum + i.amount, 0);
 
-                            currentY += 15; const bW = (pageHeight - 80) / 3; const bH = 35;
+                            currentY += 15; const bW = (pageWidth - 80) / 3; const bH = 35;
                             doc.setFillColor(59, 130, 246); doc.rect(40, currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL MASUK KELAS", 48, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas), 48, currentY + 26);
                             doc.setFillColor(249, 115, 22); doc.rect(40 + bW, currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("TOTAL KELUAR KELAS", 40 + bW + 8, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalKeluarKelas), 40 + bW + 8, currentY + 26);
                             doc.setFillColor(16, 185, 129); doc.rect(40 + (bW * 2), currentY, bW - 5, bH, 'F'); doc.setTextColor(255); doc.setFontSize(7); doc.text("SISA SALDO KELAS", 40 + (bW * 2) + 8, currentY + 12); doc.setFontSize(11); doc.text(formatRupiah(totalMasukKelas - totalKeluarKelas), 40 + (bW * 2) + 8, currentY + 26);
@@ -961,69 +1108,50 @@
         // =========================================================================
         // PENGATURAN ADMIN (Format, Nominal, Akun)
         // =========================================================================
-        
-        // FUNGSI RESET DATABASE TOTAL (ADMIN)
         function resetDatabase() {
             Swal.fire({
-                title: 'Reset Total Database?',
-                html: 'Semua data <b>Siswa, Wali Kelas, Checklist Infaq, Nominal</b> dan <b>Pengeluaran</b> akan dihapus permanen!<br><br><span class="text-red-500 font-bold">Hanya akun Admin yang tersisa.</span> Anda harus mengunggah file Excel baru setelah ini.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#cbd5e1',
-                confirmButtonText: 'Ya, Bersihkan Total!',
-                cancelButtonText: 'Batal',
-                customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
+                title: 'Reset Total Database?', html: 'Semua data <b>Siswa, Wali Kelas, Checklist Infaq, Nominal</b> dan <b>Pengeluaran</b> akan dihapus permanen!<br><br><span class="text-red-500 font-bold">Hanya akun Admin yang tersisa.</span> Anda harus mengunggah file Excel baru setelah ini.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Ya, Bersihkan Total!', cancelButtonText: 'Batal', customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
             }).then((result) => {
-                if (result.isConfirmed) {
-                    db.users.wali = [];
-                    db.users.murid = [];
-                    db.config.defaultNominal = {};
-                    db.infaq = {};
-                    db.pengeluaran = {};
-                    saveDB();
-                    setupAdminView();
-                    Swal.fire({icon: 'success', title: 'Database Bersih!', text: 'Silakan upload data Excel terbaru.', showConfirmButton: false, timer: 2000, customClass: {popup: 'rounded-2xl w-[75%]'}});
-                }
+                if (result.isConfirmed) { db.users.wali = []; db.users.murid = []; db.config.defaultNominal = {}; db.infaq = {}; db.pengeluaran = {}; saveDB(); setupAdminView(); Swal.fire({icon: 'success', title: 'Database Bersih!', text: 'Silakan upload data Excel terbaru.', showConfirmButton: false, timer: 2000, customClass: {popup: 'rounded-2xl w-[75%]'}}); }
             });
         }
 
         function openSetNominalModal() {
             let html = '<div class="space-y-2 text-left mt-2 max-h-64 overflow-y-auto pr-2">'; const classes = [...new Set(db.users.wali.map(w => w.kelas))].sort();
             classes.forEach(c => { html += `<div class="flex justify-between items-center bg-white p-2 rounded-lg border border-gray-200 shadow-sm"><span class="font-bold text-gray-700 text-xs">Kelas ${c}</span><div class="flex items-center"><span class="text-[10px] text-gray-400 font-bold mr-1">Rp</span><input type="number" id="nom-${c}" value="${getNominalKelas(c)}" class="border border-gray-200 rounded p-1.5 w-20 text-right font-mono font-bold text-orange-600 outline-none bg-orange-50/50 text-[10px]"></div></div>`; }); html += '</div>';
-            Swal.fire({ title: '<span class="text-sm font-black">Set Nominal Default</span>', html: html, showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Batal', customClass: { popup: 'rounded-3xl w-[85%] max-w-sm p-4', confirmButton: 'btn-click bg-orange-500 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md', cancelButton: 'btn-click bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold' }, buttonsStyling: false, preConfirm: () => { let res = {}; classes.forEach(c => { res[c] = parseInt(document.getElementById(`nom-${c}`).value) || 0; }); return res; } }).then(result => { if (result.isConfirmed) { db.config.defaultNominal = result.value; saveDB(); renderAdminClassView(); Swal.fire({icon:'success', title:'Tersimpan', showConfirmButton:false, timer:1000, customClass:{popup:'rounded-3xl w-[70%]'}}); } });
-        }
-
-        window.updateEditUserList = () => {
-            const role = document.getElementById('edit-role').value; const sel = document.getElementById('edit-user-select'); const fields = document.getElementById('edit-fields');
-            sel.classList.add('hidden'); fields.classList.add('hidden'); if (!role) return;
-            let opts = '<option value="">-- Pilih Akun --</option>';
-            if (role === 'admin') { db.users.admin.forEach((a, i) => opts += `<option value="${i}">${a.username}</option>`); } else if (role === 'wali') { db.users.wali.forEach((w, i) => opts += `<option value="${i}">Kelas ${w.kelas} - ${w.nama}</option>`); } else if (role === 'murid') { db.users.murid.forEach((m, i) => opts += `<option value="${i}">Kelas ${m.kelas} - ${m.presensi} - ${m.nama}</option>`); }
-            sel.innerHTML = opts; sel.classList.remove('hidden');
-        }
-
-        window.updateEditFields = () => {
-            const role = document.getElementById('edit-role').value; const idx = document.getElementById('edit-user-select').value; const fields = document.getElementById('edit-fields');
-            if (idx === '') { fields.classList.add('hidden'); return; } fields.classList.remove('hidden');
-            const elKelas = document.getElementById('edit-kelas'); const elId = document.getElementById('edit-id'); const elNama = document.getElementById('edit-nama'); const elPass = document.getElementById('edit-pass'); const elFoto = document.getElementById('edit-foto'); const btnDelete = document.getElementById('btn-delete-account');
-
-            elFoto.style.display = 'block'; if (role === 'admin' && db.users.admin.length <= 1) { btnDelete.classList.add('hidden'); } else { btnDelete.classList.remove('hidden'); }
-
-            if (role === 'admin') { elKelas.style.display = 'none'; elNama.style.display = 'none'; elId.style.display = 'block'; elId.placeholder = "Username"; elId.value = db.users.admin[idx].username; elPass.value = db.users.admin[idx].kode; elFoto.value = db.users.admin[idx].foto || ""; } else if (role === 'wali') { const u = db.users.wali[idx]; elKelas.style.display = 'block'; elNama.style.display = 'block'; elId.style.display = 'none'; elKelas.value = u.kelas; elNama.value = u.nama; elPass.value = u.kode; elFoto.value = u.foto || ""; } else if (role === 'murid') { const u = db.users.murid[idx]; elKelas.style.display = 'block'; elNama.style.display = 'block'; elId.style.display = 'block'; elId.placeholder = "No Presensi"; elKelas.value = u.kelas; elId.value = u.presensi; elNama.value = u.nama; elPass.value = u.kode; elFoto.value = u.foto || ""; }
-        }
-
-        window.deleteSelectedAccount = () => {
-            const role = document.getElementById('edit-role').value; const idx = document.getElementById('edit-user-select').value; if(!role || idx === '') return;
-            Swal.fire({ title: 'Hapus Akun?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Hapus', cancelButtonText: 'Batal', customClass: {popup: 'rounded-3xl w-[85%] max-w-sm p-4'} }).then((result) => { if (result.isConfirmed) { if (role === 'admin') db.users.admin.splice(idx, 1); else if (role === 'wali') db.users.wali.splice(idx, 1); else if (role === 'murid') db.users.murid.splice(idx, 1); saveDB(); setupAdminView(); Swal.fire({icon: 'success', title: 'Terhapus!', showConfirmButton: false, timer: 1000, customClass: {popup: 'rounded-3xl w-[70%]'}}); } });
-        }
-
-        function openEditAccountModal() {
-            Swal.fire({ title: '<span class="text-sm font-black">Manajemen Akun</span>', html: `<div class="flex flex-col gap-2 mt-2 text-left"><select id="edit-role" onchange="window.updateEditUserList()" class="w-full p-2 border border-gray-200 rounded-lg text-xs outline-none bg-white"><option value="">-- Level --</option><option value="wali">Wali Kelas</option><option value="murid">Wali Murid</option><option value="admin">Admin</option></select><select id="edit-user-select" onchange="window.updateEditFields()" class="w-full p-2 border border-gray-200 rounded-lg text-xs outline-none bg-white hidden"></select><div id="edit-fields" class="flex-col gap-2 hidden border-t border-gray-100 pt-2"><input type="text" id="edit-kelas" class="w-full p-2 border border-gray-200 rounded-lg text-xs bg-white" placeholder="Kelas"><input type="text" id="edit-id" class="w-full p-2 border border-gray-200 rounded-lg text-xs bg-white" placeholder="Presensi / Username"><input type="text" id="edit-nama" class="w-full p-2 border border-gray-200 rounded-lg text-xs bg-white" placeholder="Nama"><input type="url" id="edit-foto" class="w-full p-2 border border-gray-200 rounded-lg text-xs bg-white" placeholder="Link Foto"><input type="text" id="edit-pass" class="w-full p-2 border border-orange-200 rounded-lg text-xs font-mono font-bold text-orange-600 bg-orange-50/50" placeholder="KODE"><button type="button" id="btn-delete-account" onclick="window.deleteSelectedAccount()" class="w-full text-red-500 border border-red-200 py-1.5 rounded-lg text-[10px] font-bold mt-1"><i class="fas fa-trash-alt mr-1"></i> HAPUS</button></div></div>`, showCancelButton: true, confirmButtonText: 'Simpan', cancelButtonText: 'Tutup', customClass: { popup: 'rounded-3xl w-[85%] max-w-md p-4 bg-slate-50', confirmButton: 'btn-click bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold' }, buttonsStyling: false, preConfirm: () => { const role = document.getElementById('edit-role').value; const idx = document.getElementById('edit-user-select').value; if (!role || idx === '') return false; return { role, idx, kelas: document.getElementById('edit-kelas').value, id: document.getElementById('edit-id').value, nama: document.getElementById('edit-nama').value, pass: document.getElementById('edit-pass').value, foto: document.getElementById('edit-foto').value } } }).then(res => { if (res.isConfirmed && res.value) { const data = res.value; if (!data.pass) return; if (data.role === 'admin') { db.users.admin[data.idx].username = data.id; db.users.admin[data.idx].kode = data.pass; db.users.admin[data.idx].foto = data.foto; } else if (data.role === 'wali') { db.users.wali[data.idx].kelas = data.kelas; db.users.wali[data.idx].nama = data.nama; db.users.wali[data.idx].kode = data.pass; db.users.wali[data.idx].foto = data.foto; } else if (data.role === 'murid') { db.users.murid[data.idx].kelas = data.kelas; db.users.murid[data.idx].presensi = data.id; db.users.murid[data.idx].nama = data.nama; db.users.murid[data.idx].kode = data.pass; db.users.murid[data.idx].foto = data.foto; } saveDB(); setupAdminView(); Swal.fire({icon:'success', title:'Tersimpan', showConfirmButton:false, timer:1500, customClass:{popup:'rounded-3xl w-[70%]'}}); } });
+            }).then(res => {
+                if (res.isConfirmed && res.value) {
+                    const data = res.value; 
+                    if (!data.pass) return Swal.fire({icon:'error', title:'Kode kosong', customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
+                    
+                    if (data.role === 'admin') { db.users.admin[data.idx].username = data.id; db.users.admin[data.idx].kode = data.pass; db.users.admin[data.idx].foto = data.foto; } 
+                    else if (data.role === 'wali') { db.users.wali[data.idx].kelas = data.kelas; db.users.wali[data.idx].nama = toProperCase(data.nama); db.users.wali[data.idx].kode = data.pass; db.users.wali[data.idx].foto = data.foto; } 
+                    else if (data.role === 'murid') { db.users.murid[data.idx].kelas = data.kelas; db.users.murid[data.idx].presensi = data.id; db.users.murid[data.idx].nama = toProperCase(data.nama); db.users.murid[data.idx].kode = data.pass; db.users.murid[data.idx].foto = data.foto; }
+                    saveDB(); setupAdminView(); Swal.fire({icon:'success', title:'Tersimpan', showConfirmButton:false, timer:1500, customClass:{popup:'rounded-3xl w-[80%] max-w-xs'}});
+                }
+            });
         }
 
         function openAddStudentModal() {
-            const kls = document.getElementById('admin-view-class').value; if (!kls) return Swal.fire({icon:'warning', title:'Pilih Kelas', customClass: {popup: 'rounded-3xl w-[70%]'}});
-            Swal.fire({ title: `<span class="text-sm font-black">Tambah Siswa ${kls}</span>`, html: `<div class="flex flex-col gap-2 text-left mt-2"><input type="text" id="add-s-presensi" class="w-full p-2 border border-gray-200 rounded-lg text-xs" placeholder="No Presensi"><input type="text" id="add-s-nama" class="w-full p-2 border border-gray-200 rounded-lg text-xs" placeholder="Nama Lengkap"><input type="text" id="add-s-kode" class="w-full p-2 border border-gray-200 rounded-lg text-xs font-mono" placeholder="Kode Login"></div>`, showCancelButton: true, confirmButtonText: 'Tambah', cancelButtonText: 'Batal', customClass: { popup: 'rounded-3xl w-[85%] p-4', confirmButton: 'btn-click bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold' }, buttonsStyling: false, preConfirm: () => { return { presensi: document.getElementById('add-s-presensi').value, nama: document.getElementById('add-s-nama').value, kode: document.getElementById('add-s-kode').value } } }).then(res => { if (res.isConfirmed) { const data = res.value; if (!data.presensi || !data.nama || !data.kode) return; if (db.users.murid.find(m => m.kelas === kls && m.presensi === data.presensi)) return Swal.fire({icon:'error', title:'Presensi ada', customClass:{popup:'rounded-3xl'}}); db.users.murid.push({ kelas: kls, presensi: data.presensi, nama: data.nama, kode: data.kode, foto: "" }); saveDB(); renderAdminClassView(); Swal.fire({icon:'success', title:'Berhasil', showConfirmButton:false, timer:1000, customClass:{popup:'rounded-3xl w-[70%]'}}); } });
+            const kls = document.getElementById('admin-view-class').value;
+            if (!kls) return Swal.fire({icon:'warning', title:'Pilih Kelas', text:'Pilih kelas terlebih dahulu.', customClass: {popup: 'rounded-3xl'}});
+
+            Swal.fire({ 
+                title: `<span class="text-base font-black">Tambah Siswa ${kls}</span>`, 
+                html: `<div class="flex flex-col gap-3 text-left mt-4"><input type="text" id="add-s-presensi" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-medium bg-white" placeholder="No Presensi (misal: 35)"><input type="text" id="add-s-nama" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-medium bg-white" placeholder="Nama Lengkap"><input type="text" id="add-s-kode" class="w-full p-3 border border-gray-200 rounded-xl text-sm font-medium font-mono bg-white" placeholder="Kode Login"></div>`, 
+                showCancelButton: true, confirmButtonText: 'Tambah', cancelButtonText: 'Batal', 
+                customClass: { popup: 'rounded-3xl w-[90%] max-w-sm p-5 bg-slate-50', confirmButton: 'btn-click bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-sm font-bold' }, buttonsStyling: false, 
+                preConfirm: () => { return { presensi: document.getElementById('add-s-presensi').value, nama: document.getElementById('add-s-nama').value, kode: document.getElementById('add-s-kode').value } }
+            }).then(res => {
+                if (res.isConfirmed) {
+                    const data = res.value; 
+                    if (!data.presensi || !data.nama || !data.kode) return Swal.fire({icon:'error', title:'Data tidak lengkap', customClass:{popup:'rounded-3xl'}});
+                    if (db.users.murid.find(m => m.kelas === kls && m.presensi === data.presensi)) return Swal.fire({icon:'error', title:'Presensi sudah ada', customClass:{popup:'rounded-3xl'}});
+                    
+                    db.users.murid.push({ kelas: kls, presensi: data.presensi, nama: toProperCase(data.nama), kode: data.kode, foto: "" }); 
+                    saveDB(); renderAdminClassView(); Swal.fire({icon:'success', title:'Berhasil', showConfirmButton:false, timer:1000, customClass:{popup:'rounded-3xl'}});
+                }
+            });
         }
 
         function downloadFormatExcel() {
@@ -1035,9 +1163,26 @@
             reader.onload = async (evt) => { 
                 try { 
                     const data = evt.target.result; const wb = XLSX.read(data, {type: 'binary'}); 
-                    if (wb.Sheets["ADMIN"]) { const adminJson = XLSX.utils.sheet_to_json(wb.Sheets["ADMIN"]); if (adminJson.length > 0 && adminJson[0].Username) db.users.admin = adminJson.map(a => ({ username: a.Username, kode: a.Kode.toString(), foto: a.Link_Foto || "" })); } 
-                    if (wb.Sheets["WALI_KELAS"]) { db.users.wali = []; XLSX.utils.sheet_to_json(wb.Sheets["WALI_KELAS"]).forEach(w => { const kls = w.Kelas.toString(); db.users.wali.push({ kelas: kls, nama: w.Nama_Wali, kode: w.Kode_Login.toString(), foto: w.Link_Foto || "" }); db.config.defaultNominal[kls] = parseInt(w.Nominal_Default) || 2000; }); } 
-                    if (wb.Sheets["WALI_MURID"]) { db.users.murid = []; XLSX.utils.sheet_to_json(wb.Sheets["WALI_MURID"]).forEach(m => { let p = m.Presensi.toString(); if (p.length === 1) p = '0'+p; db.users.murid.push({ kelas: m.Kelas.toString(), presensi: p, nama: m.Nama_Siswa, kode: m.Kode_Login.toString(), foto: m.Link_Foto || "" }); }); } 
+                    
+                    if (wb.Sheets["ADMIN"]) { 
+                        const adminJson = XLSX.utils.sheet_to_json(wb.Sheets["ADMIN"]); 
+                        if (adminJson.length > 0 && adminJson[0].Username) db.users.admin = adminJson.map(a => ({ username: a.Username, kode: a.Kode.toString(), foto: a.Link_Foto || "" })); 
+                    } 
+                    if (wb.Sheets["WALI_KELAS"]) { 
+                        db.users.wali = []; 
+                        XLSX.utils.sheet_to_json(wb.Sheets["WALI_KELAS"]).forEach(w => { 
+                            const kls = w.Kelas.toString(); 
+                            db.users.wali.push({ kelas: kls, nama: toProperCase(w.Nama_Wali), kode: w.Kode_Login.toString(), foto: w.Link_Foto || "" }); 
+                            db.config.defaultNominal[kls] = parseInt(w.Nominal_Default) || 2000; 
+                        }); 
+                    } 
+                    if (wb.Sheets["WALI_MURID"]) { 
+                        db.users.murid = []; 
+                        XLSX.utils.sheet_to_json(wb.Sheets["WALI_MURID"]).forEach(m => { 
+                            let p = m.Presensi.toString(); if (p.length === 1) p = '0'+p; 
+                            db.users.murid.push({ kelas: m.Kelas.toString(), presensi: p, nama: toProperCase(m.Nama_Siswa), kode: m.Kode_Login.toString(), foto: m.Link_Foto || "" }); 
+                        }); 
+                    } 
                     
                     // MEMAKSA SINKRONISASI CLOUD SETELAH UPLOAD EXCEL LOKAL
                     Swal.fire({ title: 'Sinkronisasi Cloud...', html: 'Mengupdate database dan membuat Sheet Spreadsheet...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
@@ -1052,6 +1197,6 @@
             }; 
             reader.readAsBinaryString(file);
         }
-    </script>
-</body>
-</html>
+
+        // =========================================================================
+        // TURBO PDF GENERATOR - LOGIC ASYNCHRONOUS UNTUK MENCEGAH UI FREEZE
