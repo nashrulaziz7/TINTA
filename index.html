@@ -372,7 +372,7 @@
         })();
 
         // =======================================================
-        // INTEGRATED STATE / DATABASE PERSISTENCE
+        // INTEGRATED STATE / DATABASE PERSISTENCE WITH EXPLICIT CLOUD QUEUES
         // =======================================================
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTyyFCAm6geCLJpxfiDZHVD5eMgqLTUZ_pqbaId0Zae-aQRkDkltjrLZtPnxqbgb2_mw/exec"; 
         
@@ -517,7 +517,7 @@
             if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
                 if (isSyncing) {
                     pendingSync = true;
-                    return;
+                    return false;
                 }
                 isSyncing = true;
                 showSyncingUI();
@@ -534,6 +534,12 @@
                         el.classList.replace('text-blue-900', 'text-green-600'); 
                         setTimeout(hideSyncingUI, 1500); 
                     }
+                    isSyncing = false;
+                    if (pendingSync) {
+                        pendingSync = false;
+                        await saveDB();
+                    }
+                    return true;
                 } catch (error) {
                     let el = document.getElementById('sync-indicator');
                     if(el) { 
@@ -541,14 +547,11 @@
                         el.classList.replace('text-blue-900', 'text-red-600'); 
                         setTimeout(hideSyncingUI, 1500); 
                     }
-                } finally {
                     isSyncing = false;
-                    if (pendingSync) {
-                        pendingSync = false;
-                        await saveDB();
-                    }
+                    return false;
                 }
             }
+            return true;
         }
 
         function routeView() {
@@ -907,23 +910,40 @@
             renderWaliChecklist();
         }
 
-        function manualSave() {
-            saveDB();
+        async function manualSave() {
             Swal.fire({
-                icon: 'success',
-                title: 'Data Tersimpan!',
-                text: 'Perubahan checklist infaq kelas berhasil dikunci ke dalam server.',
-                showConfirmButton: false,
-                timer: 1200,
-                customClass: { popup: 'rounded-2xl w-[80%] max-w-xs' }
+                title: 'Menyimpan...',
+                html: 'Menulis rekaman data terenkripsi ke Google Spreadsheet Cloud...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
             });
+            
+            const success = await saveDB();
+            if (success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Data Tersimpan!',
+                    text: 'Perubahan checklist infaq kelas berhasil dikunci ke dalam server Spreadsheet.',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: { popup: 'rounded-2xl w-[80%] max-w-xs' }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sinkronisasi Tertunda',
+                    text: 'Koneksi internet bermasalah. Data tetap aman tersimpan secara lokal di browser HP ini.',
+                    confirmButtonText: 'Baik',
+                    customClass: { popup: 'rounded-2xl w-[80%] max-w-xs' }
+                });
+            }
         }
 
         function resetChecklist() {
             const kelas = session.user.kelas;
             Swal.fire({
                 title: 'Reset Checklist?', 
-                text: "Semua tanda lunas & libur infaq kelas ini akan dikosongkan. Anda dapat membatalkannya dengan tombol 'Batal Reset'!", 
+                text: "Semua tanda lunas & libur infaq kelas ini akan dikosongkan. Perubahan akan langsung disinkronkan ke Spreadsheet!", 
                 icon: 'warning', 
                 showCancelButton: true, 
                 confirmButtonColor: '#ef4444', 
@@ -931,14 +951,21 @@
                 confirmButtonText: 'Ya, Reset!', 
                 cancelButtonText: 'Batal', 
                 customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
-            }).then((result) => { 
+            }).then(async (result) => { 
                 if (result.isConfirmed) { 
                     // Make a backup copy before purging
                     localStorage.setItem('elina_backup_' + kelas, JSON.stringify(db.infaq[kelas] || {}));
-                    
                     db.infaq[kelas] = {}; 
-                    saveDB(); 
+                    
+                    Swal.fire({
+                        title: 'Sinkronisasi Reset...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+                    
+                    await saveDB(); 
                     renderWaliChecklist(); 
+                    
                     Swal.fire({
                         icon: 'success', 
                         title: 'Data Direset!', 
@@ -951,19 +978,27 @@
             });
         }
 
-        function batalResetChecklist() {
+        async function batalResetChecklist() {
             const kelas = session.user.kelas;
             const backupData = localStorage.getItem('elina_backup_' + kelas);
             if (backupData) {
                 db.infaq[kelas] = JSON.parse(backupData);
                 // Clean the backup registry once applied
                 localStorage.removeItem('elina_backup_' + kelas);
-                saveDB();
+                
+                Swal.fire({
+                    title: 'Memulihkan Data...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+                
+                await saveDB();
                 renderWaliChecklist();
+                
                 Swal.fire({
                     icon: 'success',
                     title: 'Reset Dibatalkan!',
-                    text: 'Riwayat data infaq kelas berhasil dipulihkan sepenuhnya.',
+                    text: 'Riwayat data infaq kelas berhasil dipulihkan sepenuhnya ke Spreadsheet.',
                     showConfirmButton: false,
                     timer: 1500,
                     customClass: { popup: 'rounded-2xl w-[85%] max-w-sm p-4' }
@@ -1001,15 +1036,18 @@
                 }, 
                 buttonsStyling: false,
                 preConfirm: () => { return { date: document.getElementById('swal-p-date').value, desc: document.getElementById('swal-p-desc').value, amount: parseInt(document.getElementById('swal-p-amount').value) } }
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
                     const data = result.value; 
                     if (!data.desc || !data.amount) return Swal.fire({icon: 'error', title: 'Data belum lengkap', customClass:{popup:'rounded-2xl w-[70%]'}});
                     const kelas = session.user.kelas; 
                     if (!db.pengeluaran[kelas]) db.pengeluaran[kelas] = []; 
                     db.pengeluaran[kelas].push({ id: Date.now().toString(), date: data.date, desc: data.desc, amount: data.amount }); 
-                    saveDB(); 
+                    
+                    Swal.fire({ title: 'Menyimpan Pengeluaran...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    await saveDB(); 
                     renderWaliChecklist(); 
+                    
                     Swal.fire({icon: 'success', title: 'Data Tersimpan', showConfirmButton: false, timer: 1000, customClass:{popup:'rounded-2xl w-[70%]'}});
                 }
             });
@@ -1042,9 +1080,10 @@
             html += `</tbody></table></div>`;
             html += `<button onclick="resetPengeluaran()" class="w-full mt-3 bg-red-50 text-red-600 border border-red-200 py-2 rounded-xl text-[10px] font-bold hover:bg-red-100 transition"><i class="fas fa-trash-alt mr-1"></i> Kosongkan Riwayat Pengeluaran</button>`;
 
-            window.deletePengeluaran = (id) => { 
+            window.deletePengeluaran = async (id) => { 
                 db.pengeluaran[kelas] = db.pengeluaran[kelas].filter(x => x.id !== id); 
-                saveDB(); 
+                Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                await saveDB(); 
                 renderWaliChecklist(); 
                 Swal.close(); 
                 setTimeout(viewPengeluaranHistory, 250); 
@@ -1053,10 +1092,11 @@
             window.resetPengeluaran = () => { 
                 Swal.fire({ 
                     title: 'Hapus Semua Pengeluaran?', text: "Seluruh riwayat keuangan pengeluaran kas kelas akan terhapus permanen!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Ya, Bersihkan!', cancelButtonText: 'Batal', customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'} 
-                }).then((result) => { 
+                }).then(async (result) => { 
                     if (result.isConfirmed) { 
                         db.pengeluaran[kelas] = []; 
-                        saveDB(); 
+                        Swal.fire({ title: 'Menghapus...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                        await saveDB(); 
                         renderWaliChecklist(); 
                         Swal.fire({icon: 'success', title: 'Berhasil dikosongkan!', showConfirmButton: false, timer: 1000, customClass: {popup: 'rounded-2xl w-[70%]'}}); 
                     } 
@@ -1208,7 +1248,6 @@
             }
         }
 
-        // Helper to obtain actual image dimensions and compute aspect ratios securely
         function getImageDimensions(dataUrl) {
             return new Promise((resolve) => {
                 if (!dataUrl) {
@@ -1276,7 +1315,6 @@
                     const nominal = getNominalKelas(kls);
                     const students = db.users.murid.filter(m => m.kelas === kls && selectedStudentsArr.includes(m.presensi)).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
                     
-                    // Sesuai dengan instruksi FOTO 2: Cetak semua siswa/banyak siswa tetap "satu siswa satu halaman", layout Potret
                     const pw = 612.28; // Portrait Letter Width
                     const ph = 792.00; // Portrait Letter Height
                     const doc = new jsPDF('p', 'pt', [pw, ph]);
@@ -1322,7 +1360,6 @@
                         if (cachedKopAtas) {
                             doc.addImage(cachedKopAtas, 'JPEG', 0, 0, pw, hAtas);
                         } else {
-                            // Fallback vector kop jika berkas gambar tidak ditemukan
                             doc.setFillColor(30, 58, 138); doc.rect(0, 0, pw, 14, 'F');
                             doc.setFillColor(249, 115, 22); doc.rect(0, 14, pw, 4, 'F');
                         }
@@ -1424,7 +1461,6 @@
                     try {
                         const { jsPDF } = window.jspdf; 
                         
-                        // Sesuai dengan instruksi FOTO 3: Laporan Rekap Admin dibuat tetap dalam format PORTRAIT (tegak)
                         const pw = 612.28; // Portrait Letter Width
                         const ph = 792.00; // Portrait Letter Height
                         const doc = new jsPDF('p', 'pt', [pw, ph]); 
@@ -1446,7 +1482,6 @@
                         let currentMonth = -1; 
                         let currentGroup = null;
                         
-                        // Sesuai dengan FOTO 3: Menggunakan singkatan nama bulan padat agar muat sempurna di format Potret
                         const monthMap = {
                             '07': 'Jul', '08': 'Agt', '09': 'Sep', '10': 'Okt', '11': 'Nov', '12': 'Des',
                             '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr', '05': 'Mei', '06': 'Jun'
@@ -1610,7 +1645,14 @@
                         }); 
                     } 
                     
-                    saveDB(); 
+                    Swal.fire({
+                        title: 'Sinkronisasi Spreadsheet...',
+                        html: 'Sedang mendaftarkan struktur kelas baru...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+                    
+                    await saveDB(); 
                     setupAdminView(); 
                     Swal.fire({icon:'success', title:'Sinkronisasi Database Sukses', text: 'Database lokal ELINA berhasil di-update dari file Excel Anda.', customClass:{popup:'rounded-3xl w-[80%]'}}); 
                 } catch (error) { 
@@ -1628,13 +1670,17 @@
         function resetDatabase() {
             Swal.fire({
                 title: 'Hapus Bersih Database?',
-                html: 'Tindakan ini akan mengosongkan data <b>Siswa, Wali Kelas, Checklist, Arus Kas</b> secara permanen dari sistem browser ini!<br><br><span class="text-red-600 font-bold">Hanya data login Admin standar yang tersisa.</span>',
+                html: 'Tindakan ini akan mengosongkan data <b>Siswa, Wali Kelas, Checklist, Arus Kas</b> secara permanen dari sistem Spreadsheet dan HP ini!<br><br><span class="text-red-600 font-bold">Hanya data login Admin standar yang tersisa.</span>',
                 icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#cbd5e1', confirmButtonText: 'Ya, Bersihkan Total!', cancelButtonText: 'Batal',
                 customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
                     db.users.wali = []; db.users.murid = []; db.config.defaultNominal = {}; db.infaq = {}; db.pengeluaran = {};
-                    saveDB(); setupAdminView();
+                    
+                    Swal.fire({ title: 'Menghapus Cloud Spreadsheet...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    await saveDB(); 
+                    setupAdminView();
+                    
                     Swal.fire({icon: 'success', title: 'Database Kosong!', text: 'Silakan upload file template Excel baru.', showConfirmButton: false, timer: 2000, customClass: {popup: 'rounded-2xl w-[75%]'}});
                 }
             });
@@ -1657,17 +1703,18 @@
             Swal.fire({ 
                 title: '<span class="text-xs font-black uppercase text-blue-900">Atur Nominal Kas Infaq</span>', 
                 html: html, showCancelButton: true, confirmButtonText: 'Simpan Aturan', cancelButtonText: 'Batal', 
-                customClass: { popup: 'rounded-3xl w-[85%] max-w-sm p-4 bg-slate-50', confirmButton: 'btn-click bg-blue-900 text-white px-4 py-2 rounded-lg text-[10px] font-bold shadow-md', cancelButton: 'btn-click bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-[10px] font-bold' }, 
+                customClass: { popup: 'rounded-3xl w-[85%] max-w-sm p-4 bg-slate-50', confirmButton: 'btn-click bg-blue-900 text-white px-4 py-2 rounded-lg text-[10px] font-bold shadow-md', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-[10px] font-bold' }, 
                 buttonsStyling: false, 
                 preConfirm: () => { 
                     let res = {}; 
                     classes.forEach(c => { res[c] = parseInt(document.getElementById(`nom-${c}`).value) || 0; }); 
                     return res; 
                 } 
-            }).then(result => { 
+            }).then(async (result) => { 
                 if (result.isConfirmed) { 
                     db.config.defaultNominal = result.value; 
-                    saveDB(); 
+                    Swal.fire({ title: 'Menyimpan Aturan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    await saveDB(); 
                     renderAdminClassView(); 
                     Swal.fire({icon:'success', title:'Data Nominal Disimpan', showConfirmButton:false, timer:1000, customClass:{popup:'rounded-3xl w-[70%]'}}); 
                 } 
@@ -1733,13 +1780,16 @@
             Swal.fire({ 
                 title: 'Hapus Akun Ini?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Hapus Permanen', cancelButtonText: 'Batal', 
                 customClass: {popup: 'rounded-3xl w-[85%] max-w-sm p-4'} 
-            }).then((result) => { 
+            }).then(async (result) => { 
                 if (result.isConfirmed) { 
                     if (role === 'admin') db.users.admin.splice(idx, 1); 
                     else if (role === 'wali') db.users.wali.splice(idx, 1); 
                     else if (role === 'murid') db.users.murid.splice(idx, 1); 
-                    saveDB(); 
+                    
+                    Swal.fire({ title: 'Menghapus Akun...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    await saveDB(); 
                     setupAdminView(); 
+                    
                     Swal.fire({icon: 'success', title: 'Data Akun Terhapus!', showConfirmButton: false, timer: 1000, customClass: {popup: 'rounded-3xl w-[70%]'}}); 
                 } 
             });
@@ -1779,7 +1829,7 @@
                         pass: document.getElementById('edit-pass').value 
                     } 
                 } 
-            }).then(res => { 
+            }).then(async (res) => { 
                 if (res.isConfirmed && res.value) { 
                     const data = res.value; 
                     if (!data.pass) return; 
@@ -1790,8 +1840,11 @@
                     } else if (data.role === 'murid') { 
                         db.users.murid[data.idx].kelas = data.kelas; db.users.murid[data.idx].presensi = data.id; db.users.murid[data.idx].nama = data.nama; db.users.murid[data.idx].kode = data.pass; 
                     } 
-                    saveDB(); 
+                    
+                    Swal.fire({ title: 'Menyimpan Perubahan Akun...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    await saveDB(); 
                     setupAdminView(); 
+                    
                     Swal.fire({icon:'success', title:'Perubahan Tersimpan', showConfirmButton:false, timer:1500, customClass:{popup:'rounded-3xl w-[70%]'}}); 
                 } 
             });
@@ -1812,15 +1865,18 @@
                 customClass: { popup: 'rounded-3xl w-[85%] p-4 bg-slate-50', confirmButton: 'btn-click bg-blue-900 text-white px-4 py-2 rounded-lg text-xs font-bold', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold' }, 
                 buttonsStyling: false, 
                 preConfirm: () => { return { presensi: document.getElementById('add-s-presensi').value, nama: document.getElementById('add-s-nama').value, kode: document.getElementById('add-s-kode').value } } 
-            }).then(res => { 
+            }).then(async (res) => { 
                 if (res.isConfirmed) { 
                     const data = res.value; 
                     if (!data.presensi || !data.nama || !data.kode) return; 
                     if (db.users.murid.find(m => m.kelas === kls && m.presensi === data.presensi)) return Swal.fire({icon:'error', title:'Nomor Presensi Sudah Terdaftar', customClass:{popup:'rounded-3xl'}}); 
                     
                     db.users.murid.push({ kelas: kls, presensi: data.presensi, nama: toProperCase(data.nama), kode: data.kode }); 
-                    saveDB(); 
+                    
+                    Swal.fire({ title: 'Mendaftarkan ke Spreadsheet...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    await saveDB(); 
                     renderAdminClassView(); 
+                    
                     Swal.fire({icon:'success', title:'Siswa Terdaftar!', showConfirmButton:false, timer:1000, customClass:{popup:'rounded-3xl w-[70%]'}}); 
                 } 
             });
