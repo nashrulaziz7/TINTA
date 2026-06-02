@@ -328,6 +328,7 @@
             <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
                 <div class="p-2.5 bg-slate-50 border-b border-gray-200 flex justify-between items-center">
                     <h3 class="font-black text-gray-700 text-[11px]"><i class="fas fa-tasks text-blue-500 mr-1.5"></i> Checklist Infaq Jumat</h3>
+                    <button onclick="resetChecklist()" class="btn-click bg-red-50 text-red-600 px-2 py-1 rounded border border-red-100 text-[9px] font-bold flex items-center gap-1 hover:bg-red-100 transition"><i class="fas fa-trash-alt"></i> Reset</button>
                 </div>
                 
                 <!-- max-h-[85vh] agar muat sampai 35 baris ke bawah tanpa potong layar -->
@@ -720,6 +721,28 @@
             saveDB(); renderWaliChecklist();
         }
 
+        function resetChecklist() {
+            const kelas = session.user.kelas;
+            Swal.fire({
+                title: 'Reset Semua Checklist?',
+                text: "Semua data ceklist infaq (Lunas/Libur) di kelas ini akan dikosongkan. Tindakan ini tidak dapat dibatalkan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#cbd5e1',
+                confirmButtonText: 'Ya, Kosongkan!',
+                cancelButtonText: 'Batal',
+                customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.infaq[kelas] = {};
+                    saveDB();
+                    renderWaliChecklist();
+                    Swal.fire({icon: 'success', title: 'Dikosongkan!', showConfirmButton: false, timer: 1000, customClass: {popup: 'rounded-2xl w-[70%]'}});
+                }
+            });
+        }
+
         function updateWallet(kelas, totalMasuk) {
             const p = db.pengeluaran[kelas] || []; const totalKeluar = p.reduce((sum, item) => sum + item.amount, 0);
             let wm = document.getElementById('wali-tot-masuk'); if(wm) wm.textContent = formatRupiah(totalMasuk);
@@ -750,7 +773,31 @@
             let html = `<div class="max-h-64 overflow-y-auto text-left text-[9px] bg-slate-50 rounded-lg border border-gray-100 mt-2"><table class="w-full"><thead class="bg-gray-100/80 text-gray-500 uppercase"><tr><th class="p-2 font-bold">Tanggal</th><th class="p-2 font-bold">Ket</th><th class="p-2 font-bold text-right">Nominal</th><th class="p-2"></th></tr></thead><tbody>`;
             p.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(item => { html += `<tr class="border-b border-gray-100 hover:bg-white transition"><td class="p-2 text-gray-600 whitespace-nowrap">${item.date.slice(5).replace('-','/')}</td><td class="p-2 font-bold text-gray-800">${item.desc}</td><td class="p-2 text-right text-red-600 font-bold whitespace-nowrap">${formatRupiah(item.amount).replace('Rp','').trim()}</td><td class="p-2 text-center"><button onclick="deletePengeluaran('${item.id}')" class="text-red-400 hover:text-red-600 bg-red-50 p-1 rounded"><i class="fas fa-trash text-[8px]"></i></button></td></tr>`; }); html += `</tbody></table></div>`;
 
+            html += `<button onclick="resetPengeluaran()" class="w-full mt-3 bg-red-50 text-red-600 border border-red-200 py-2 rounded-xl text-[10px] font-bold hover:bg-red-100 transition"><i class="fas fa-trash-alt mr-1"></i> Kosongkan Semua Riwayat</button>`;
+
             window.deletePengeluaran = (id) => { db.pengeluaran[kelas] = db.pengeluaran[kelas].filter(x => x.id !== id); saveDB(); renderWaliChecklist(); Swal.close(); setTimeout(viewPengeluaranHistory, 250); };
+            
+            window.resetPengeluaran = () => {
+                Swal.fire({
+                    title: 'Kosongkan Riwayat?',
+                    text: "Semua data pengeluaran kelas ini akan dihapus permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#cbd5e1',
+                    confirmButtonText: 'Ya, Hapus Semua!',
+                    cancelButtonText: 'Batal',
+                    customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        db.pengeluaran[kelas] = [];
+                        saveDB();
+                        renderWaliChecklist();
+                        Swal.fire({icon: 'success', title: 'Terhapus!', showConfirmButton: false, timer: 1000, customClass: {popup: 'rounded-2xl w-[70%]'}});
+                    }
+                });
+            };
+
             Swal.fire({ title: '<span class="text-sm font-black">Riwayat Pengeluaran</span>', html: html, showConfirmButton: false, showCloseButton: true, customClass: {popup: 'rounded-2xl w-[90%] max-w-sm p-4'} });
         }
 
