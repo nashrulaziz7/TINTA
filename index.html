@@ -90,7 +90,6 @@
 
     <!-- HEADER GLOBAL FIXED -->
     <header class="fixed top-0 left-0 w-full h-[50px] z-[100] bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm flex items-center justify-between px-4 transition-all duration-300">
-        <!-- Logo K dan nama sekolah di bagian kiri telah dihapus dari seluruh halaman agar tampilan minimalis dan fokus -->
         <div class="flex flex-col items-center absolute left-1/2 -translate-x-1/2">
             <p class="text-[10px] font-bold text-blue-900 tracking-[0.2em] uppercase">ELINA <span class="text-orange-500 font-bold mx-1">|</span> BY ZIVI•AI</p>
             <div id="live-clock" class="text-[8px] font-bold text-gray-500 tracking-wide">Memuat...</div>
@@ -351,27 +350,6 @@
 
     <!-- JAVASCRIPT SYSTEM LOGIC -->
     <script>
-        // PWA setup inline dynamically referencing ELINA.png
-        (function setupPWA() {
-            const manifestJSON = {
-                "name": "ELINA E-INFAQ", 
-                "short_name": "ELINA", 
-                "start_url": ".", 
-                "display": "standalone", 
-                "background_color": "#1E3A8A", 
-                "theme_color": "#1E3A8A",
-                "icons": [
-                    { "src": "ELINA.png", "sizes": "192x192", "type": "image/png" }, 
-                    { "src": "ELINA.png", "sizes": "512x512", "type": "image/png" }
-                ]
-            };
-            const manifestData = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(manifestJSON));
-            document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestData}">`);
-        })();
-
-        // =======================================================
-        // INTEGRATED STATE / DATABASE PERSISTENCE WITH EXPLICIT CLOUD QUEUES
-        // =======================================================
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTyyFCAm6geCLJpxfiDZHVD5eMgqLTUZ_pqbaId0Zae-aQRkDkltjrLZtPnxqbgb2_mw/exec"; 
         
         let db = { 
@@ -414,6 +392,16 @@
             return str.toString().trim().toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
         }
 
+        // --- EXPLICIT DATA VALIDATION GUARDRAILS ---
+        // Prevents empty, incomplete or corrupt database sync to local / cloud
+        function isValidElinaDB(data) {
+            return data && 
+                   data.users && 
+                   Array.isArray(data.users.admin) && 
+                   Array.isArray(data.users.wali) && 
+                   Array.isArray(data.users.murid);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             initClock(); 
             await loadCloudDB();
@@ -439,15 +427,30 @@
         async function loadCloudDB() {
             if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
                 try {
-                    Swal.fire({ title: 'Menyinkronkan Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+                    Swal.fire({ 
+                        title: 'Menyinkronkan Data...', 
+                        html: 'Membaca basis data SDIT Muhammadiyah Al Kautsar...',
+                        allowOutsideClick: false, 
+                        didOpen: () => { Swal.showLoading(); } 
+                    });
+                    
+                    // Prevent browser cache to ensure raw realtime lookup
                     const response = await fetch(SCRIPT_URL + "?t=" + new Date().getTime()); 
                     if (!response.ok) throw new Error("Jaringan bermasalah");
                     const text = await response.text(); 
-                    if (text.trim().startsWith("<")) throw new Error("Akses Ditolak");
+                    
+                    if (text.trim().startsWith("<") || text.trim() === "") {
+                        throw new Error("Akses Ditolak/Data Masih Kosong");
+                    }
+                    
                     const cloudDB = JSON.parse(text);
-                    if (cloudDB && cloudDB.users) { 
+                    if (isValidElinaDB(cloudDB)) { 
                         db = cloudDB; 
                         localStorage.setItem('elina_github_db', JSON.stringify(db)); 
+                        console.log("Sinkronisasi cloud sukses!");
+                    } else {
+                        console.warn("Format data cloud tidak valid, menggunakan backup lokal.");
+                        loadLocalFallback();
                     }
                     Swal.close();
                 } catch (error) { 
@@ -462,30 +465,25 @@
 
         function loadLocalFallback() {
             const local = localStorage.getItem('elina_github_db');
-            if (local) { 
-                db = JSON.parse(local); 
+            const parsedLocal = local ? JSON.parse(local) : null;
+            
+            if (parsedLocal && isValidElinaDB(parsedLocal)) { 
+                db = parsedLocal; 
             } else {
-                db.users.wali.push({ kelas: '4D', nama: 'Budi Santoso, S.Pd.', kode: '123' });
-                db.users.wali.push({ kelas: '3D', nama: 'Siti Aminah, M.Pd.', kode: '123' });
-                
-                db.users.murid.push({ kelas: '4D', presensi: '01', nama: 'ADEEVA AFSHEEN ABDILLAH', kode: '111' });
-                db.users.murid.push({ kelas: '4D', presensi: '02', nama: 'ALILA KAIA MAULANA', kode: '222' });
-                db.users.murid.push({ kelas: '3D', presensi: '01', nama: 'AFIZA AZKAYRA SETYAWAN', kode: '333' });
-                db.users.murid.push({ kelas: '3D', presensi: '02', nama: 'AHNAF HASHIF WIBOWO', kode: '444' });
-                
-                db.config.defaultNominal['4D'] = 7000;
-                db.config.defaultNominal['3D'] = 5000;
-                
-                db.infaq['4D'] = {
-                    '2026-07-03': { '01': 'paid', '02': 'paid' },
-                    '2026-07-10': { '01': 'paid', '02': 'paid' },
-                    '2026-07-17': { '01': 'libur', '02': 'none' },
-                    '2026-07-24': { '01': 'paid', '02': 'none' },
-                    '2026-08-07': { '01': 'paid', '02': 'none' }
-                };
-                
-                db.pengeluaran['4D'] = [];
-                
+                // SEED DEFAULT STABLE STRUCTURE TO PREVENT `--` BLANK DROPDOWNS
+                db.users.wali = [
+                    { kelas: '4D', nama: 'Budi Santoso, S.Pd.', kode: '123' },
+                    { kelas: '3D', nama: 'Siti Aminah, M.Pd.', kode: '123' }
+                ];
+                db.users.murid = [
+                    { kelas: '4D', presensi: '01', nama: 'ADEEVA AFSHEEN ABDILLAH', kode: '111' },
+                    { kelas: '4D', presensi: '02', nama: 'ALILA KAIA MAULANA', kode: '222' },
+                    { kelas: '3D', presensi: '01', nama: 'AFIZA AZKAYRA SETYAWAN', kode: '333' },
+                    { kelas: '3D', presensi: '02', nama: 'AHNAF HASHIF WIBOWO', kode: '444' }
+                ];
+                db.config.defaultNominal = { '4D': 7000, '3D': 5000 };
+                db.infaq = {};
+                db.pengeluaran = {};
                 saveDB();
             }
         }
@@ -511,7 +509,13 @@
         let pendingSync = false;
 
         async function saveDB() {
+            if (!isValidElinaDB(db)) {
+                console.error("Mencegah penyimpanan data corrupt/kosong.");
+                return false;
+            }
+            
             localStorage.setItem('elina_github_db', JSON.stringify(db));
+            
             if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
                 if (isSyncing) {
                     pendingSync = true;
@@ -526,6 +530,7 @@
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                         body: JSON.stringify(db) 
                     });
+                    
                     let el = document.getElementById('sync-indicator');
                     if(el) { 
                         el.innerHTML = '<i class="fas fa-check text-green-500"></i> Tersinkron'; 
@@ -729,61 +734,9 @@
             sessionStorage.removeItem('elina_session'); 
             routeView(); 
         }
-        
-        function contactAdmin() { 
-            window.open('https://wa.me/6287847702772', '_blank'); 
-        }
 
         // =======================================================
-        // ACADEMIC FRIDAY DATE CALCULATOR
-        // =======================================================
-        function getFridaysFromAcademicYear() {
-            const now = new Date(); 
-            let startYear = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1; 
-            let fridays = [];
-            for(let i=0; i<12; i++) {
-                let currentMonthDate = new Date(startYear, 6 + i, 1);
-                let y = currentMonthDate.getFullYear(); 
-                let m = currentMonthDate.getMonth(); 
-                let d = new Date(y, m, 1);
-                while (d.getMonth() === m) { 
-                    if (d.getDay() === 5) fridays.push(new Date(d.getTime())); 
-                    d.setDate(d.getDate() + 1); 
-                }
-            }
-            return fridays;
-        }
-
-        function getLocalYYYYMMDD(dateObj) { 
-            const y = dateObj.getFullYear(); 
-            const m = String(dateObj.getMonth() + 1).padStart(2, '0'); 
-            const d = String(dateObj.getDate()).padStart(2, '0'); 
-            return `${y}-${m}-${d}`; 
-        }
-        
-        function formatRupiah(amount) { 
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount); 
-        }
-        
-        function getNominalKelas(kelas) { 
-            return db.config.defaultNominal[kelas] || 2000; 
-        }
-        
-        function formatDateID(dateStr) { 
-            if (!dateStr || dateStr.length < 10) return dateStr; 
-            const [y, m, d] = dateStr.split('-'); 
-            const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des']; 
-            return `${d} ${months[parseInt(m, 10)-1]} ${y}`; 
-        }
-        
-        function formatMonthID(YYYYMM) { 
-            const [y, m] = YYYYMM.split('-'); 
-            const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; 
-            return `${months[parseInt(m)-1]} ${y}`; 
-        }
-
-        // =======================================================
-        // WALI KELAS VIEW CONTROLLER
+        // RENDERING WALI KELAS VIEW
         // =======================================================
         function setupWaliView() {
             document.getElementById('wali-title-kelas').textContent = `KELAS ${session.user.kelas}`; 
@@ -826,7 +779,6 @@
                 let hasLunas = students.length > 0 && students.every(st => db.infaq[kelas][fStr][st.presensi] === 'paid');
                 let hasLibur = students.length > 0 && students.every(st => db.infaq[kelas][fStr][st.presensi] === 'libur');
 
-                // Enlarge buttons inside table headers to w-7 h-7 for easy click target
                 let btnLunas = hasLunas 
                     ? `<button onclick="toggleGlobalLunas('${kelas}', '${fStr}', true)" class="bg-green-600 text-white w-7 h-7 rounded-lg flex items-center justify-center shadow-sm" title="Undo Semua"><i class="fas fa-undo text-[9px]"></i></button>`
                     : `<button onclick="toggleGlobalLunas('${kelas}', '${fStr}', false)" class="bg-green-50 text-green-600 border border-green-200 hover:bg-green-100 w-7 h-7 rounded-lg flex items-center justify-center transition" title="Lunas Semua"><i class="fas fa-check text-[9px]"></i></button>`;
@@ -907,7 +859,7 @@
         async function manualSave() {
             Swal.fire({
                 title: 'Menyimpan...',
-                html: 'Menulis rekaman data terenkripsi ke Google Spreadsheet Cloud...',
+                html: 'Mengunggah data mutasi infaq terbaru ke Google Spreadsheet...',
                 allowOutsideClick: false,
                 didOpen: () => { Swal.showLoading(); }
             });
@@ -947,7 +899,6 @@
                 customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
             }).then(async (result) => { 
                 if (result.isConfirmed) { 
-                    // Make a backup copy before purging
                     localStorage.setItem('elina_backup_' + kelas, JSON.stringify(db.infaq[kelas] || {}));
                     db.infaq[kelas] = {}; 
                     
@@ -977,7 +928,6 @@
             const backupData = localStorage.getItem('elina_backup_' + kelas);
             if (backupData) {
                 db.infaq[kelas] = JSON.parse(backupData);
-                // Clean the backup registry once applied
                 localStorage.removeItem('elina_backup_' + kelas);
                 
                 Swal.fire({
@@ -1101,7 +1051,7 @@
         }
 
         // =======================================================
-        // WALI MURID (STUDENT VIEW) CONTROLLER
+        // RENDERING WALI MURID VIEW
         // =======================================================
         function setupMuridView() {
             document.getElementById('murid-title-nama').textContent = session.user.nama; 
@@ -1225,41 +1175,66 @@
         }
 
         // =========================================================================
-        // PROGRAMMATIC KOP SURAT IMAGE UTILITY (FETCHING FROM GITHUB)
+        // PROGRAMMATIC KOP SURAT IMAGE UTILITY
         // =========================================================================
-        async function fetchImageToDataURL(url) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.readAsDataURL(blob);
-                });
-            } catch (e) {
-                console.error("Gagal memuat aset gambar dari repositori: " + url, e);
-                return null;
-            }
+        function drawOfficialKop(doc, width, margin) {
+            // Draw Blue & Orange Top Accent Lines
+            doc.setFillColor(30, 58, 138); 
+            doc.rect(0, 0, width, 14, 'F');
+            doc.setFillColor(249, 115, 22); 
+            doc.rect(0, 14, width, 4, 'F');
+
+            // Draw Emblem/Shield Vektor SDIT Muhammadiyah Al Kautsar
+            const logoX = margin + 20;
+            const logoY = 50;
+            doc.setDrawColor(30, 58, 138);
+            doc.setLineWidth(2.5);
+            doc.setFillColor(255, 255, 255);
+            doc.ellipse(logoX, logoY, 22, 22, 'FD');
+            doc.setDrawColor(249, 115, 22);
+            doc.setLineWidth(1.2);
+            doc.ellipse(logoX, logoY, 17, 17, 'D');
+            doc.setFillColor(30, 58, 138);
+            doc.triangle(logoX, logoY - 10, logoX - 9, logoY + 6, logoX + 9, logoY + 6, 'F');
+            doc.setFillColor(255, 255, 255);
+            doc.circle(logoX, logoY + 1, 4, 'F');
+
+            // Kop Surat Teks Resmi
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(30, 58, 138);
+            doc.text("YAYASAN MAJELIS PENDIDIKAN DASAR MENENGAH DAN PNF KARTASURA", width / 2 + 10, 38, { align: "center" });
+            
+            doc.setFontSize(13);
+            doc.text("SDIT MUHAMMADIYAH AL KAUTSAR", width / 2 + 10, 54, { align: "center" });
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(100, 116, 139);
+            doc.text("Terakreditasi A  -  NPSN: 20532345  -  Email: sdit.alkautsar.gs@gmail.com", width / 2 + 10, 67, { align: "center" });
+            doc.text("Alamat: Jl. Cendana II, Rt.03 Rw.III, Gumpang, Kartasura, Sukoharjo, Jawa Tengah", width / 2 + 10, 78, { align: "center" });
+
+            // Double border divider lines
+            doc.setDrawColor(30, 58, 138);
+            doc.setLineWidth(2.5);
+            doc.line(margin, 88, width - margin, 88);
+            doc.setLineWidth(0.75);
+            doc.line(margin, 92, width - margin, 92);
         }
 
-        function getImageDimensions(dataUrl) {
-            return new Promise((resolve) => {
-                if (!dataUrl) {
-                    resolve({ width: 1000, height: 140, ratio: 1000 / 140 });
-                    return;
-                }
-                const img = new Image();
-                img.onload = () => {
-                    resolve({ width: img.width, height: img.height, ratio: img.width / img.height });
-                };
-                img.onerror = () => {
-                    resolve({ width: 1000, height: 140, ratio: 1000 / 140 });
-                };
-                img.src = dataUrl;
-            });
+        function drawOfficialFooter(doc, width, height, margin) {
+            doc.setFillColor(30, 58, 138); 
+            doc.rect(0, height - 12, width, 12, 'F');
+            doc.setFillColor(249, 115, 22); 
+            doc.rect(0, height - 16, width, 4, 'F');
+
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(7);
+            doc.setTextColor(148, 163, 184);
+            doc.text("Sistem Infaq Sekolah Digital ELINA - Cetakan Sah Terverifikasi Sistem Otomatis", margin, height - 22);
         }
 
-        // --- EXPORT PDF UNTUK WALI KELAS ---
+        // --- EXPORT PDF UNTUK WALI KELAS (One Page Per Student) ---
         function openWaliReportMenu() {
             const kls = session.user.kelas;
             const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
@@ -1302,7 +1277,7 @@
         async function generateWaliPDF(selectedStudentsArr) {
             Swal.fire({ title: 'Merender Laporan...', html: 'Menggambar KOP Resmi & Menghitung Data Keuangan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
             
-            setTimeout(async () => {
+            setTimeout(() => {
                 try {
                     const { jsPDF } = window.jspdf;
                     const kls = session.user.kelas; 
@@ -1313,16 +1288,6 @@
                     const ph = 792.00; // Portrait Letter Height
                     const doc = new jsPDF('p', 'pt', [pw, ph]);
                     const printDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-                    // Memuat KOP Atas & Bawah
-                    const cachedKopAtas = await fetchImageToDataURL("KOP ELINA ATAS PUTIH.jpg");
-                    const cachedKopBawah = await fetchImageToDataURL("KOP ELINA BAWAH.png");
-
-                    // Hitung aspect ratio KOP secara dinamis agar pas penuh kiri-kanan (0 margin) dan tidak gepeng/lonjong
-                    const dimsAtas = await getImageDimensions(cachedKopAtas);
-                    const hAtas = pw / dimsAtas.ratio;
-                    const dimsBawah = await getImageDimensions(cachedKopBawah);
-                    const hBawah = pw / dimsBawah.ratio;
 
                     let allFridays = getFridaysFromAcademicYear();
                     let monthsData = []; 
@@ -1345,25 +1310,14 @@
                     const p = db.pengeluaran[kls] || []; 
                     const totalKeluarKelas = p.reduce((sum, i) => sum + i.amount, 0);
 
-                    // Loop mencetak individual student per page (Portrait)
                     for(let idx=0; idx<students.length; idx++) {
                         const s = students[idx];
                         if (idx > 0) doc.addPage();
                         
-                        // Gambar KOP Atas penuh dari ujung kiri ke ujung kanan (0 margin)
-                        if (cachedKopAtas) {
-                            doc.addImage(cachedKopAtas, 'JPEG', 0, 0, pw, hAtas);
-                        } else {
-                            doc.setFillColor(30, 58, 138); doc.rect(0, 0, pw, 14, 'F');
-                            doc.setFillColor(249, 115, 22); doc.rect(0, 14, pw, 4, 'F');
-                        }
+                        drawOfficialKop(doc, pw, 40);
+                        drawOfficialFooter(doc, pw, ph, 40);
 
-                        // Gambar KOP Bawah penuh di dasar kertas (0 margin)
-                        if (cachedKopBawah) {
-                            doc.addImage(cachedKopBawah, 'PNG', 0, ph - hBawah, pw, hBawah);
-                        }
-
-                        let currentY = hAtas + 15;
+                        let currentY = 115;
                         doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(30, 41, 59); 
                         doc.text(`LAPORAN KEUANGAN PERSONAL INFAQ SISWA`, 40, currentY);
                         doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(100, 116, 139); 
@@ -1400,7 +1354,7 @@
                             theme: 'plain', 
                             styles: { halign: 'center', valign: 'middle', cellPadding: 5, fontSize: 8 }, 
                             columnStyles: { 0: { halign: 'left', fontStyle: 'bold', textColor: [51, 65, 85], cellWidth: 80 }, 6: { halign: 'right', fontStyle: 'bold', textColor: [22, 163, 74] } }, 
-                            margin: { left: 40, right: 40, bottom: hBawah + 10 },
+                            margin: { left: 40, right: 40 },
                             willDrawCell: function(data) { data.cell.text = ''; },
                             didDrawCell: function (data) {
                                 let x = data.cell.x; let y = data.cell.y; let w = data.cell.width; let h = data.cell.height; let text = data.cell.raw;
@@ -1433,11 +1387,11 @@
                         doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(30, 41, 59); doc.text(`Transparansi Arus Keluar Kas Kelas:`, 40, sY);
                         if (p.length > 0) {
                             let dataP = []; p.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(item => { dataP.push([formatDateID(item.date), item.desc, formatRupiah(item.amount).replace('Rp','').trim()]); });
-                            doc.autoTable({ startY: sY + 6, head: [['Tanggal', 'Keperluan Pengeluaran Kas', 'Nominal (Rp)']], body: dataP, theme: 'plain', headStyles: { fillColor: [241, 245, 249], textColor: [71, 85, 105], fontSize: 7, cellPadding: 4 }, bodyStyles: { fontSize: 7, cellPadding: 4, textColor: [100, 116, 139] }, columnStyles: { 2: { halign: 'right', fontStyle: 'bold', textColor: [220, 38, 38] } }, margin: { left: 40, right: 40, bottom: hBawah + 10 }, willDrawCell: function(data){ if(data.section==='body'){ doc.setDrawColor(241, 245, 249); doc.line(data.cell.x, data.cell.y + data.cell.height, data.cell.x + data.cell.width, data.cell.y + data.cell.height); } } });
+                            doc.autoTable({ startY: sY + 6, head: [['Tanggal', 'Keperluan Pengeluaran Kas', 'Nominal (Rp)']], body: dataP, theme: 'plain', headStyles: { fillColor: [241, 245, 249], textColor: [71, 85, 105], fontSize: 7, cellPadding: 4 }, bodyStyles: { fontSize: 7, cellPadding: 4, textColor: [100, 116, 139] }, columnStyles: { 2: { halign: 'right', fontStyle: 'bold', textColor: [220, 38, 38] } }, margin: { left: 40, right: 40 }, willDrawCell: function(data){ if(data.section==='body'){ doc.setDrawColor(241, 245, 249); doc.line(data.cell.x, data.cell.y + data.cell.height, data.cell.x + data.cell.width, data.cell.y + data.cell.height); } } });
                         } else { doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(156, 163, 175); doc.text(`Belum ada rekap pengeluaran kas dicatat oleh Wali Kelas.`, 40, sY + 15); }
                     }
 
-                    doc.save(`Laporan_Infaq_ELINA_SDIT_Kautsar_${kls}.pdf`); 
+                    doc.save(`Laporan_Infaq_ELINA_SD_Kautsar_${kls}.pdf`); 
                     Swal.close();
                 } catch (error) { 
                     console.error("PDF Export error:", error); 
@@ -1451,7 +1405,7 @@
             const targetClass = document.getElementById('admin-report-class').value;
             Swal.fire({
                 title: 'Merender Laporan Administrator...', html: 'Menggambar KOP Atas Bawah dan Menghitung Rekap...', allowOutsideClick: false, didOpen: () => { Swal.showLoading();
-                setTimeout(async () => {
+                setTimeout(() => {
                     try {
                         const { jsPDF } = window.jspdf; 
                         
@@ -1461,15 +1415,6 @@
                         
                         let classesToProcess = targetClass === 'ALL' ? [...new Set(db.users.wali.map(w => w.kelas))] : [targetClass];
                         const printDate = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-                        const cachedKopAtas = await fetchImageToDataURL("KOP ELINA ATAS PUTIH.jpg");
-                        const cachedKopBawah = await fetchImageToDataURL("KOP ELINA BAWAH.png");
-
-                        // Hitung aspect ratio KOP secara dinamis agar pas penuh kiri-kanan (0 margin) dan tidak gepeng/lonjong
-                        const dimsAtas = await getImageDimensions(cachedKopAtas);
-                        const hAtas = pw / dimsAtas.ratio;
-                        const dimsBawah = await getImageDimensions(cachedKopBawah);
-                        const hBawah = pw / dimsBawah.ratio;
 
                         let allFridays = getFridaysFromAcademicYear();
                         let monthsData = []; 
@@ -1498,20 +1443,10 @@
                             const nominal = getNominalKelas(kls);
                             const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
                             
-                            // Render KOP Atas penuh (0 margin)
-                            if (cachedKopAtas) {
-                                doc.addImage(cachedKopAtas, 'JPEG', 0, 0, pw, hAtas);
-                            } else {
-                                doc.setFillColor(30, 58, 138); doc.rect(0, 0, pw, 14, 'F');
-                                doc.setFillColor(249, 115, 22); doc.rect(0, 14, pw, 4, 'F');
-                            }
+                            drawOfficialKop(doc, pw, 40);
+                            drawOfficialFooter(doc, pw, ph, 40);
 
-                            // Render KOP Bawah penuh (0 margin)
-                            if (cachedKopBawah) {
-                                doc.addImage(cachedKopBawah, 'PNG', 0, ph - hBawah, pw, hBawah);
-                            }
-
-                            let currentY = hAtas + 15;
+                            let currentY = 115;
                             doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(30, 41, 59); 
                             doc.text(`LAPORAN REKAP ADMINISTRATOR INFAQ - KELAS ${kls}`, 40, currentY);
                             doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(100, 116, 139); 
@@ -1536,7 +1471,6 @@
                                 row.push(formatRupiah(stTotal).replace('Rp','').trim()); bodyR.push(row);
                             });
 
-                            // AutoTable disesuaikan agar muat persis pada lebar potret Letter (612pt) dengan margin 40pt
                             doc.autoTable({
                                 startY: currentY, 
                                 head: [['No', 'Nama Siswa', ...monthsData.map(m => m.monthStr), 'Total']], 
@@ -1560,7 +1494,7 @@
                                     13: { cellWidth: 32, halign: 'center' }, // Jun
                                     14: { cellWidth: 46, halign: 'right' }  // Total
                                 }, 
-                                margin: { top: 110, left: 40, right: 40, bottom: hBawah + 10 },
+                                margin: { top: 110, left: 40, right: 40 },
                                 willDrawCell: function(data) { data.cell.text = ''; },
                                 didDrawCell: function(data) {
                                     let x = data.cell.x; let y = data.cell.y; let w = data.cell.width; let h = data.cell.height; let text = data.cell.raw;
@@ -1853,7 +1787,7 @@
                 html: `<div class="flex flex-col gap-2 text-left mt-2">
                         <input type="text" id="add-s-presensi" class="w-full p-2.5 border border-gray-200 rounded-lg text-xs" placeholder="No Presensi (Contoh: 03)">
                         <input type="text" id="add-s-nama" class="w-full p-2.5 border border-gray-200 rounded-lg text-xs" placeholder="Nama Lengkap Siswa">
-                        <input type="text" id="add-s-kode" class="w-full p-2.5 border border-gray-200 rounded-lg text-xs font-mono font-bold text-orange-600 bg-orange-50/20 border-orange-200" placeholder="PIN Wali Mudrid (Contoh: 555)">
+                        <input type="text" id="add-s-kode" class="w-full p-2.5 border border-gray-200 rounded-lg text-xs font-mono font-bold text-orange-600 bg-orange-50/20 border-orange-200" placeholder="PIN Wali Murid (Contoh: 555)">
                        </div>`, 
                 showCancelButton: true, confirmButtonText: 'Daftarkan Siswa', cancelButtonText: 'Batal', 
                 customClass: { popup: 'rounded-3xl w-[85%] p-4 bg-slate-50', confirmButton: 'btn-click bg-blue-900 text-white px-4 py-2 rounded-lg text-xs font-bold', cancelButton: 'btn-click bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold' }, 
