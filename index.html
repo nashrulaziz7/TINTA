@@ -22,7 +22,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
-        tailwind.config = {
+        window.tailwind = window.tailwind || {};
+        window.tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -200,7 +201,7 @@
                 <label class="btn-click bg-white border border-gray-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1 cursor-pointer"><i class="fas fa-cloud-upload-alt text-blue-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Upload</span><input type="file" id="excel-upload" accept=".xlsx, .xls" class="hidden" onchange="uploadExcel(event)"></label>
                 <button onclick="openSetNominalModal()" class="btn-click bg-white border border-gray-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-coins text-orange-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Nominal</span></button>
                 <button onclick="openEditAccountModal()" class="btn-click bg-white border border-gray-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-users-cog text-purple-500 text-lg"></i><span class="text-[8px] font-bold text-gray-600">Akun</span></button>
-                <button onclick="resetDatabase()" class="btn-click bg-red-50 border border-red-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-trash-alt text-red-500 text-lg"></i><span class="text-[8px] font-bold text-red-600">Reset</span></button>
+                <button onclick="resetDatabase()" class="btn-click bg-red-50 border border-red-100 shadow-sm rounded-2xl p-2 flex flex-col items-center justify-center gap-1"><i class="fas fa-trash-alt text-red-500 text-lg"></i><span class="text-[8px] font-bold text-red-600">Reset Total</span></button>
             </div>
 
             <div class="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm mb-4 flex flex-col gap-3">
@@ -350,7 +351,6 @@
             }
         }
 
-        // FUNGSI BARU: Mengubah text menjadi Proper Case (Huruf Besar di Awal Kata)
         function toProperCase(str) {
             if (!str) return "";
             return str.toString().trim().toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
@@ -659,39 +659,127 @@
             Swal.fire({ title: '<span class="text-sm font-black">Riwayat Pengeluaran</span>', html: html, showConfirmButton: false, showCloseButton: true, customClass: {popup: 'rounded-2xl w-[90%] max-w-sm p-4'} });
         }
 
+        // --- WALI MURID VIEW LOGIC ---
+        function setupMuridView() {
+            document.getElementById('murid-title-nama').textContent = session.user.nama; 
+            document.getElementById('murid-title-kelas-only').textContent = session.user.kelas; 
+            document.getElementById('murid-title-pres-only').textContent = session.user.presensi;
+            const imgMurid = document.getElementById('murid-foto-profil');
+            if (session.user.foto && session.user.foto.trim() !== '') { imgMurid.src = session.user.foto; } else { imgMurid.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(session.user.nama)}&background=3B82F6&color=fff&bold=true`; }
+            renderMuridView();
+        }
+
+        function renderMuridView() {
+            const kls = session.user.kelas; 
+            const presensi = session.user.presensi; 
+            const nominal = getNominalKelas(kls); 
+            let grandTotal = 0; 
+            let listHTML = '';
+            
+            let allFridays = getFridaysFromAcademicYear();
+            let monthsData = []; let currentMonth = -1; let currentGroup = null;
+            
+            allFridays.forEach(f => {
+                if(f.getMonth() !== currentMonth) {
+                    if(currentGroup) monthsData.push(currentGroup);
+                    currentMonth = f.getMonth();
+                    currentGroup = { monthStr: formatMonthID(getLocalYYYYMMDD(f).slice(0,7)), dates: [] };
+                }
+                currentGroup.dates.push(f);
+            });
+            if(currentGroup) monthsData.push(currentGroup);
+
+            monthsData.forEach(mGroup => {
+                listHTML += `<div class="mb-4 bg-slate-50 border border-gray-100 rounded-xl p-3 shadow-sm">
+                    <div class="inline-block bg-blue-100 text-blue-700 text-[10px] font-black px-3 py-1 rounded-lg mb-3 border border-blue-200 uppercase tracking-widest">${mGroup.monthStr}</div>
+                    <div class="grid grid-cols-5 gap-2">`;
+                
+                for(let i=0; i<5; i++) {
+                    if(mGroup.dates[i]) {
+                        const f = mGroup.dates[i];
+                        const fStr = getLocalYYYYMMDD(f);
+                        const status = (db.infaq[kls] && db.infaq[kls][fStr]) ? db.infaq[kls][fStr][presensi] : null;
+                        
+                        let styleClass = 'bg-white border-gray-200', textRp = '-', colorRp = 'text-gray-400', icon = '<i class="fas fa-minus text-gray-300 text-[10px]"></i>';
+
+                        if (status === 'paid') { 
+                            styleClass = 'bg-green-50 border-green-300'; 
+                            textRp = formatRupiah(nominal).replace('Rp','').trim(); 
+                            colorRp = 'text-green-600'; 
+                            icon = '<i class="fas fa-check-circle text-green-500 text-[10px]"></i>'; 
+                            grandTotal += nominal; 
+                        } else if (status === 'libur') { 
+                            styleClass = 'bg-red-50 border-red-200'; 
+                            textRp = 'Libur'; 
+                            colorRp = 'text-red-500'; 
+                            icon = '<i class="fas fa-times-circle text-red-400 text-[10px]"></i>'; 
+                        }
+
+                        listHTML += `<div class="${styleClass} border rounded-xl p-2 flex flex-col justify-center items-center text-center shadow-sm h-[65px] transition-all">
+                            <span class="text-[9px] text-gray-500 font-bold mb-1">${String(f.getDate()).padStart(2,'0')}</span>
+                            <div class="mb-1">${icon}</div>
+                            <div class="text-[9px] font-black ${colorRp}">${textRp}</div>
+                        </div>`;
+                    } else {
+                        listHTML += `<div class="bg-transparent border border-dashed border-gray-200 rounded-xl opacity-50 h-[65px]"></div>`;
+                    }
+                }
+                listHTML += `</div></div>`;
+            });
+
+            document.getElementById('murid-jumat-list').innerHTML = listHTML; 
+            document.getElementById('murid-total-bulan').textContent = formatRupiah(grandTotal);
+        }
+
         // --- ADMIN VIEW LOGIC ---
         function setupAdminView() {
-            const classes = [...new Set(db.users.wali.map(w => w.kelas))].sort(); const viewSel = document.getElementById('admin-view-class'); const reportSel = document.getElementById('admin-report-class');
+            const classes = [...new Set(db.users.wali.map(w => w.kelas))].sort(); 
+            const viewSel = document.getElementById('admin-view-class'); 
+            const reportSel = document.getElementById('admin-report-class');
             let opts = classes.map(c => `<option value="${c}">Kelas ${c}</option>`).join('');
-            viewSel.innerHTML = (classes.length > 0) ? opts : '<option value="">Kosong</option>'; reportSel.innerHTML = '<option value="ALL">Semua Kelas</option>' + opts;
+            viewSel.innerHTML = (classes.length > 0) ? opts : '<option value="">Kosong</option>'; 
+            reportSel.innerHTML = '<option value="ALL">Semua Kelas</option>' + opts;
             const imgAdmin = document.getElementById('admin-foto-profil');
-            if (db.users.admin[0]?.foto && db.users.admin[0].foto.trim() !== '') { imgAdmin.src = db.users.admin[0].foto; } else { imgAdmin.src = `https://ui-avatars.com/api/?name=Admin&background=3B82F6&color=fff&bold=true`; }
-            
+            if (db.users.admin[0]?.foto && db.users.admin[0].foto.trim() !== '') { 
+                imgAdmin.src = db.users.admin[0].foto; 
+            } else { 
+                imgAdmin.src = `https://ui-avatars.com/api/?name=Admin&background=3B82F6&color=fff&bold=true`; 
+            }
             if (classes.length > 0) {
                 renderAdminClassView();
             } else {
                 document.getElementById('admin-tot-masuk').textContent = 'Rp 0';
                 document.getElementById('admin-tot-keluar').textContent = 'Rp 0';
                 document.getElementById('admin-tot-saldo').textContent = 'Rp 0';
-                document.getElementById('admin-table').innerHTML = '<tr><td class="text-center p-5 text-gray-400 text-[10px] font-medium">Database kosong. Silakan upload file Excel terbaru.</td></tr>';
+                document.getElementById('admin-table').innerHTML = '<tr><td colspan="4" class="text-center p-5 text-gray-400 text-[10px] font-medium">Database kosong. Silakan upload file Excel terbaru.</td></tr>';
             }
         }
 
         function renderAdminClassView() {
             const kls = document.getElementById('admin-view-class').value; if (!kls) return;
-            const nominal = getNominalKelas(kls); const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
+            const nominal = getNominalKelas(kls); 
+            const students = db.users.murid.filter(m => m.kelas === kls).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
             let totalMasuk = 0, tbody = '';
             
-            if (students.length === 0) { tbody = `<tr><td colspan="4" class="text-center p-5 text-gray-400 text-[10px] font-medium">Belum ada data siswa.</td></tr>`; } 
-            else {
+            if (students.length === 0) { 
+                tbody = `<tr><td colspan="4" class="text-center p-5 text-gray-400 text-[10px] font-medium">Belum ada data siswa.</td></tr>`; 
+            } else {
                 students.forEach(s => {
-                    let stTot = 0; if (db.infaq[kls]) { Object.keys(db.infaq[kls]).forEach(d => { if (db.infaq[kls][d][s.presensi] === 'paid') { stTot += nominal; totalMasuk += nominal; } }); }
+                    let stTot = 0; 
+                    if (db.infaq[kls]) { 
+                        Object.keys(db.infaq[kls]).forEach(d => { 
+                            if (db.infaq[kls][d][s.presensi] === 'paid') { stTot += nominal; totalMasuk += nominal; } 
+                        }); 
+                    }
                     tbody += `<tr class="border-b border-gray-100 hover:bg-slate-50 transition"><td class="p-2 text-center text-gray-500">${s.presensi}</td><td class="p-2 font-bold text-gray-800">${s.nama}</td><td class="p-2 font-mono text-gray-400 text-[10px]">${s.kode}</td><td class="p-2 text-right font-black text-blue-600 bg-blue-50/30">${formatRupiah(stTot)}</td></tr>`;
                 });
             }
             
-            const p = db.pengeluaran[kls] || []; const totalKeluar = p.reduce((sum, i) => sum + i.amount, 0); 
-            document.getElementById('admin-tot-masuk').textContent = formatRupiah(totalMasuk); document.getElementById('admin-tot-keluar').textContent = formatRupiah(totalKeluar); document.getElementById('admin-tot-saldo').textContent = formatRupiah(totalMasuk - totalKeluar);
+            const p = db.pengeluaran[kls] || []; 
+            const totalKeluar = p.reduce((sum, i) => sum + i.amount, 0); 
+            document.getElementById('admin-tot-masuk').textContent = formatRupiah(totalMasuk); 
+            document.getElementById('admin-tot-keluar').textContent = formatRupiah(totalKeluar); 
+            document.getElementById('admin-tot-saldo').textContent = formatRupiah(totalMasuk - totalKeluar);
             document.getElementById('admin-table').innerHTML = `<thead class="bg-slate-50 text-[9px] text-gray-500 uppercase tracking-wide border-b border-gray-200"><tr><th class="p-2 text-center w-10">No</th><th class="p-2">Nama Lengkap</th><th class="p-2">Kode Unik</th><th class="p-2 text-right">Total Infaq</th></tr></thead><tbody>${tbody}</tbody>`;
         }
 
@@ -750,11 +838,9 @@
                     const students = db.users.murid.filter(m => m.kelas === session.user.kelas && selectedStudentsArr.includes(m.presensi)).sort((a,b) => String(a.presensi).localeCompare(String(b.presensi), undefined, {numeric: true}));
                     const isAllStudents = (selectedStudentsArr.length === db.users.murid.filter(m => m.kelas === session.user.kelas).length);
                     
-                    // JIKA SEMUA SISWA -> KERTAS LANDSCAPE (TIDUR) AGAR 55 KOLOM MUAT
-                    // JIKA BEBERAPA SISWA -> KERTAS PORTRAIT (BERDIRI) UNTUK RAPOR SISWA
                     let orientation = isAllStudents ? 'l' : 'p';
-                    let pw = isAllStudents ? 935.43 : 612.28; // Landscape / Portrait Width
-                    let ph = isAllStudents ? 612.28 : 935.43; // Landscape / Portrait Height
+                    let pw = isAllStudents ? 935.43 : 612.28; 
+                    let ph = isAllStudents ? 612.28 : 935.43;
 
                     const doc = new jsPDF(orientation, 'pt', [pw, ph]);
                     const kls = session.user.kelas; const nominal = getNominalKelas(kls);
@@ -784,7 +870,6 @@
                     const p = db.pengeluaran[kls] || []; const totalKeluarKelas = p.reduce((sum, i) => sum + i.amount, 0);
 
                     if (isAllStudents) {
-                        // CETAK REKAP LANDSCAPE (ALL STUDENTS)
                         if (cachedKopAtas) doc.addImage(cachedKopAtas, 'PNG', 0, 0, pw, hAtas);
                         if (cachedKopBawah) doc.addImage(cachedKopBawah, 'PNG', 0, ph - hBawah, pw, hBawah);
 
@@ -839,7 +924,6 @@
                         } else { doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(156, 163, 175); doc.text(`Belum ada catatan pengeluaran.`, 40, pY + 15); }
 
                     } else {
-                        // CETAK RAPOR SISWA PORTRAIT (BEBERAPA SISWA)
                         for (let i = 0; i < students.length; i++) {
                             const s = students[i];
                             if (i > 0) doc.addPage();
@@ -861,7 +945,6 @@
                             doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(255); doc.text(`No: ${s.presensi}  |  Nama Siswa: ${s.nama}`, 48, currentY + 13);
 
                             let body = []; let totalSiswaMasuk = 0;
-                            // Re-format array untuk kolom pekan (Portrait muat 5 pekan horizontal)
                             let currentMonthDates = -1; let mGroupsPortrait = []; let cg = null;
                             allFridays.forEach(f => {
                                 if(f.getMonth() !== currentMonthDates) {
@@ -1033,7 +1116,6 @@
         // PENGATURAN ADMIN (Format, Nominal, Akun)
         // =========================================================================
         
-        // FUNGSI RESET DATABASE TOTAL (ADMIN)
         function resetDatabase() {
             Swal.fire({
                 title: 'Reset Total Database?',
@@ -1047,13 +1129,8 @@
                 customClass: {popup: 'rounded-2xl w-[85%] max-w-sm p-4'}
             }).then((result) => {
                 if (result.isConfirmed) {
-                    db.users.wali = [];
-                    db.users.murid = [];
-                    db.config.defaultNominal = {};
-                    db.infaq = {};
-                    db.pengeluaran = {};
-                    saveDB();
-                    setupAdminView();
+                    db.users.wali = []; db.users.murid = []; db.config.defaultNominal = {}; db.infaq = {}; db.pengeluaran = {};
+                    saveDB(); setupAdminView();
                     Swal.fire({icon: 'success', title: 'Database Bersih!', text: 'Silakan upload data Excel terbaru.', showConfirmButton: false, timer: 2000, customClass: {popup: 'rounded-2xl w-[75%]'}});
                 }
             });
@@ -1127,7 +1204,6 @@
                         }); 
                     } 
                     
-                    // MEMAKSA SINKRONISASI CLOUD SETELAH UPLOAD EXCEL LOKAL
                     Swal.fire({ title: 'Sinkronisasi Cloud...', html: 'Mengupdate database dan membuat Sheet Spreadsheet...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
                     await saveDB(); 
                     
