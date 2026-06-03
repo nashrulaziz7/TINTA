@@ -350,7 +350,7 @@
 
     <!-- JAVASCRIPT SYSTEM LOGIC -->
     <script>
-        // DI SINI LINK WEB GS YANG SUDAH KAMU BERIKAN
+        // DI SINI LINK WEB GS YANG SUDAH KAMU BERIKAN (PASTIKAN MENGGUNAKAN DEPLOYMENT BARU!)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzu4ctbe2kE6cfIrpqj17aKBTs05ImQE4vEkY3dKQG82Uyi3ccbayp8EISZ1GSDoVM4nw/exec"; 
         
         let db = { 
@@ -422,36 +422,53 @@
             clockEl.textContent = new Date().toLocaleDateString('id-ID', options) + " WIB";
         }
 
-        // Fungsi baru menggunakan fetch murni agar dapat melewati pembatasan CORS saat membaca data
+        // TEKNIK MEMBACA DATA 100% BYPASS CORS MENGGUNAKAN JSONP
         async function loadCloudDB() {
             if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
-                try {
-                    Swal.fire({ 
-                        title: 'Menyinkronkan Data...', 
-                        html: 'Membaca basis data SDIT Muhammadiyah Al Kautsar...',
-                        allowOutsideClick: false, 
-                        didOpen: () => { Swal.showLoading(); } 
-                    });
+                Swal.fire({ 
+                    title: 'Menyinkronkan Data...', 
+                    html: 'Membaca basis data SDIT Muhammadiyah Al Kautsar...',
+                    allowOutsideClick: false, 
+                    didOpen: () => { Swal.showLoading(); } 
+                });
+                
+                return new Promise((resolve) => {
+                    const callbackName = 'elinaJsonpCallback_' + Math.round(100000 * Math.random());
                     
-                    // Fetch GET request murni, tanpa no-cors, dengan penambahan parameter waktu untuk bypass cache
-                    const response = await fetch(SCRIPT_URL + "?t=" + new Date().getTime()); 
-                    if (!response.ok) throw new Error("Jaringan bermasalah");
-                    const cloudDB = await response.json(); // Mengambil langsung sebagai JSON
+                    window[callbackName] = function(data) {
+                        if (isValidElinaDB(data)) { 
+                            db = data; 
+                            localStorage.setItem('elina_github_db', JSON.stringify(db)); 
+                            console.log("Sinkronisasi cloud sukses!");
+                        } else {
+                            console.warn("Format data cloud tidak valid, menggunakan backup lokal.");
+                            loadLocalFallback();
+                        }
+                        cleanup();
+                        resolve();
+                    };
+
+                    const script = document.createElement('script');
+                    script.id = callbackName;
+                    // Menambahkan callback agar ditangkap oleh doGet Google Apps Script
+                    script.src = SCRIPT_URL + "?callback=" + callbackName + "&t=" + new Date().getTime();
                     
-                    if (isValidElinaDB(cloudDB)) { 
-                        db = cloudDB; 
-                        localStorage.setItem('elina_github_db', JSON.stringify(db)); 
-                        console.log("Sinkronisasi cloud sukses!");
-                    } else {
-                        console.warn("Format data cloud tidak valid, menggunakan backup lokal.");
-                        loadLocalFallback();
+                    script.onerror = function() {
+                        console.warn("Gagal sinkron cloud, menggunakan data lokal.");
+                        loadLocalFallback(); 
+                        cleanup();
+                        resolve();
+                    };
+                    
+                    document.body.appendChild(script);
+
+                    function cleanup() {
+                        Swal.close();
+                        delete window[callbackName];
+                        const s = document.getElementById(callbackName);
+                        if (s) s.remove();
                     }
-                    Swal.close();
-                } catch (error) { 
-                    console.warn("Gagal sinkron cloud, menggunakan data lokal:", error);
-                    loadLocalFallback(); 
-                    Swal.close(); 
-                }
+                });
             } else { 
                 loadLocalFallback(); 
             }
@@ -501,7 +518,7 @@
         let isSyncing = false;
         let pendingSync = false;
 
-        // Fungsi baru saveDB yang mengirim payload spesifik sesuai dengan peran untuk menghindari data saling timpa
+        // TEKNIK MENYIMPAN DATA (MENGHINDARI DATA DROP DI GOOGLE APPS SCRIPT)
         async function saveDB(isResetTotal = false) {
             if (!isValidElinaDB(db) && !isResetTotal) {
                 console.error("Mencegah penyimpanan data corrupt/kosong.");
@@ -518,14 +535,12 @@
                 isSyncing = true;
                 showSyncingUI();
                 
-                // Siapkan Payload (Paket Data) berdasarkan Role Login
                 let payload = {};
                 
                 if (isResetTotal) {
                     payload = { action: 'reset_db' };
                 } 
                 else if (session.role === 'wali') {
-                    // WALI KELAS HANYA MENGIRIM DATA KELASNYA SAJA! Anti-timpa!
                     let kls = session.user.kelas;
                     payload = {
                         action: 'update_kelas',
@@ -535,7 +550,6 @@
                     };
                 } 
                 else {
-                    // ADMIN MENGIRIM SEMUA PERUBAHAN (Konfigurasi, Tambah Murid, dsb)
                     payload = {
                         action: 'full_sync',
                         data: db
@@ -543,16 +557,14 @@
                 }
 
                 try {
-                    // MENGGUNAKAN MODE no-cors AGAR TIDAK DIBLOKIR BROWSER HP PADA SAAT POST
+                    // Mengirim sebagai Form-Url-Encoded untuk mencegah "e.postData.contents undefined" di GAS
                     await fetch(SCRIPT_URL, { 
                         method: 'POST', 
-                        mode: 'no-cors', // KUNCI UTAMA: Bypass pemblokiran CORS saat kirim data
-                        headers: { 'Content-Type': 'text/plain' }, 
-                        body: JSON.stringify(payload) 
+                        mode: 'no-cors', 
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
+                        body: 'payload=' + encodeURIComponent(JSON.stringify(payload))
                     });
                     
-                    // Karena menggunakan no-cors, kita tidak bisa mengecek 'response.json()' dari Google
-                    // Kita asumsikan sukses bila tidak ada error koneksi (terlempar ke catch).
                     let el = document.getElementById('sync-indicator');
                     if(el) { 
                         el.innerHTML = '<i class="fas fa-check text-green-500"></i> Tersinkron'; 
