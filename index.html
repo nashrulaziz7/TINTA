@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- META TAG ANTI-CACHE (PENTING AGAR HP SELALU DAPAT UPDATE TERBARU) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>ELINA | E-INFAQ SDIT MUHAMMADIYAH AL KAUTSAR</title>
     
     <!-- Fonts -->
@@ -350,7 +356,7 @@
 
     <!-- JAVASCRIPT SYSTEM LOGIC -->
     <script>
-        // DI SINI LINK WEB GS YANG SUDAH KAMU BERIKAN (PASTIKAN MENGGUNAKAN DEPLOYMENT BARU!)
+        // DI SINI LINK WEB GS YANG SUDAH KAMU BERIKAN
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzCteSplzL-pWZHkZOOFjhqbDq78Yj8zLr6HSy7CiLt8ty4zBk16WiZ1tS4yumuR1Tbrg/exec"; 
         
         let db = { 
@@ -422,50 +428,47 @@
             clockEl.textContent = new Date().toLocaleDateString('id-ID', options) + " WIB";
         }
 
-        // FUNGSI MEMBACA DATA 100% ANTI BLOKIR HP (MENGGUNAKAN JSONP)
+        // FUNGSI MEMBACA DATA MENGGUNAKAN TEKNIK JSONP (ANTI BLOKIR BROWSER HP/CORS)
         function loadCloudDB() {
             return new Promise((resolve) => {
-                // Pastikan URL valid
                 if (!SCRIPT_URL || !SCRIPT_URL.includes("script.google.com")) {
                     loadLocalFallback();
                     resolve();
                     return;
                 }
 
-                Swal.fire({ 
-                    title: 'Menyinkronkan Data...', 
-                    html: 'Membaca basis data SDIT Muhammadiyah Al Kautsar...',
-                    allowOutsideClick: false, 
-                    didOpen: () => { Swal.showLoading(); } 
+                Swal.fire({
+                    title: 'Menyinkronkan Data...',
+                    html: 'Membaca basis data terbaru...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
                 });
 
-                // Membuat nama fungsi unik untuk menangkap data
                 const callbackName = 'elinaJsonpCallback_' + Math.round(100000 * Math.random());
                 
-                // Fungsi ini akan dieksekusi otomatis saat data dari Google tiba
                 window[callbackName] = function(data) {
-                    if (isValidElinaDB(data)) { 
-                        db = data; 
-                        localStorage.setItem('elina_github_db', JSON.stringify(db)); 
+                    if (isValidElinaDB(data)) {
+                        db = data;
+                        localStorage.setItem('elina_github_db', JSON.stringify(db));
                         console.log("Sinkronisasi cloud sukses!");
                     } else {
                         console.warn("Format data cloud tidak valid, menggunakan backup lokal.");
                         loadLocalFallback();
                     }
                     cleanup();
-                    updateLoginDropdowns(); // MEMAKSA DROPDOWN MUNCUL SETELAH DATA MASUK
+                    updateLoginDropdowns();
                     resolve();
                 };
 
-                // Teknik menyuntikkan script tag untuk menembus keamanan Browser HP (CORS Bypass)
                 const script = document.createElement('script');
                 script.id = callbackName;
-                script.src = SCRIPT_URL + "?callback=" + callbackName + "&t=" + new Date().getTime();
+                // Menambahkan parameter 'nocache' yang selalu berbeda (waktu saat ini) 
+                // agar browser dipaksa menarik script segar dari server Google, bukan dari cache.
+                script.src = SCRIPT_URL + "?callback=" + callbackName + "&nocache=" + new Date().getTime();
                 
-                // Jika gagal (misal tidak ada internet)
                 script.onerror = function() {
                     console.warn("Gagal sinkron cloud, menggunakan data lokal.");
-                    loadLocalFallback(); 
+                    loadLocalFallback();
                     cleanup();
                     updateLoginDropdowns();
                     resolve();
@@ -526,7 +529,7 @@
         let isSyncing = false;
         let pendingSync = false;
 
-        // TEKNIK MENYIMPAN DATA (MENGHINDARI DATA DROP DI GOOGLE APPS SCRIPT)
+        // TEKNIK MENYIMPAN DATA MENGGUNAKAN application/x-www-form-urlencoded
         async function saveDB(isResetTotal = false) {
             if (!isValidElinaDB(db) && !isResetTotal) {
                 console.error("Mencegah penyimpanan data corrupt/kosong.");
@@ -565,7 +568,6 @@
                 }
 
                 try {
-                    // Mengirim sebagai Form-Url-Encoded untuk mencegah "e.postData.contents undefined" di GAS
                     await fetch(SCRIPT_URL, { 
                         method: 'POST', 
                         mode: 'no-cors', 
