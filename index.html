@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <!-- META TAG ANTI-CACHE SUPER KUAT -->
+    <!-- META TAG ANTI-CACHE -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -32,7 +32,7 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- INJEKSI PWA MANIFEST OTOMATIS (Supaya tombol Install native muncul) -->
+    <!-- INJEKSI PWA MANIFEST OTOMATIS -->
     <link rel="manifest" id="manifest-placeholder">
     <script>
         const manifestData = {
@@ -90,13 +90,16 @@
 
     <!-- HEADER GLOBAL FIXED -->
     <header class="fixed top-0 left-0 w-full h-[50px] z-[100] bg-white/90 backdrop-blur-md border-b border-gray-200/50 shadow-sm flex items-center justify-between px-4 transition-all duration-300">
-        <div class="flex flex-col items-center absolute left-1/2 -translate-x-1/2">
+        <div class="flex flex-col items-center absolute left-1/2 -translate-x-1/2 w-max">
             <p class="text-[10px] font-bold text-blue-900 tracking-[0.2em] uppercase">ELINA <span class="text-orange-500 font-bold mx-1">|</span> BY ZIVI•AI</p>
             <div id="live-clock" class="text-[8px] font-bold text-gray-500 tracking-wide">Memuat...</div>
         </div>
-        <div class="ml-auto">
-            <button onclick="showInstallPopup()" id="btn-install-header" class="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-2.5 py-1 rounded-full text-[9px] font-black shadow-sm hover:scale-105 transition-transform flex items-center gap-1 hidden">
-                <i class="fas fa-download"></i> <span class="hidden md:inline">Pasang App</span>
+        <div class="ml-auto flex gap-2">
+            <button onclick="manualSyncFromCloud()" id="btn-sync-header" class="bg-blue-50 text-blue-900 border border-blue-200 w-7 h-7 rounded-full flex items-center justify-center hover:bg-blue-100 transition-colors shadow-sm" title="Sinkronkan Data">
+                <i class="fas fa-sync-alt text-[10px]"></i>
+            </button>
+            <button onclick="showInstallPopup()" id="btn-install-header" class="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-2.5 py-1 rounded-full text-[9px] font-black shadow-sm hover:scale-105 transition-transform items-center gap-1 hidden">
+                <i class="fas fa-download"></i> <span class="hidden md:inline">Pasang</span>
             </button>
         </div>
     </header>
@@ -127,6 +130,11 @@
                 </div>
 
                 <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div id="login-data-warning" class="hidden bg-amber-50 border border-amber-200 p-2.5 rounded-xl flex items-start gap-2 shadow-sm">
+                        <i class="fas fa-wifi text-amber-500 mt-0.5"></i>
+                        <p class="text-[9px] font-bold text-amber-700 leading-tight">Data belum tersinkronisasi.<br>Ketuk tombol <i class="fas fa-sync-alt mx-0.5"></i> di sudut kanan atas untuk memuat daftar nama.</p>
+                    </div>
+
                     <div id="form-group-admin" class="hidden space-y-2">
                         <div>
                             <label class="block text-[9px] font-bold text-gray-500 tracking-wider">USERNAME</label>
@@ -281,7 +289,11 @@
                 <button onclick="openPengeluaranModal()" class="btn-click bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl font-bold shadow-sm text-[10px] uppercase tracking-wide"><i class="fas fa-minus-circle mr-1"></i> Catat Pengeluaran</button>
                 <button onclick="viewPengeluaranHistory()" class="btn-click bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 py-2.5 rounded-xl font-bold shadow-sm text-[10px] uppercase tracking-wide"><i class="fas fa-history mr-1"></i> Riwayat Kas</button>
                 <button onclick="manualSave()" class="btn-click bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-bold shadow-md text-[10px] uppercase tracking-wide"><i class="fas fa-save mr-1"></i> Simpan Data</button>
-                <button onclick="openWaliReportMenu()" class="btn-click bg-blue-900 hover:bg-blue-950 text-white py-2.5 rounded-xl font-bold shadow-sm text-[10px] uppercase tracking-wide"><i class="fas fa-print mr-1"></i> Cetak Laporan PDF</button>
+                <button onclick="openWaliReportMenu()" class="btn-click bg-blue-900 hover:bg-blue-950 text-white py-2.5 rounded-xl font-bold shadow-sm text-[10px] uppercase tracking-wide"><i class="fas fa-print mr-1"></i> Cetak PDF</button>
+            </div>
+            
+            <div id="unsaved-warning" class="hidden mb-3 bg-amber-50 border border-amber-200 text-amber-700 px-3 py-2 rounded-xl text-[10px] font-bold flex items-center justify-center shadow-sm">
+                <i class="fas fa-exclamation-triangle mr-2 text-amber-500"></i> Ada perubahan belum tersimpan. Klik "Simpan Data".
             </div>
 
             <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
@@ -337,7 +349,7 @@
 
     </div>
 
-    <!-- PWA INSTALL BANNER BAWAH (HANYA MUNCUL JIKA HP MENDUKUNG INSTALL PWA) -->
+    <!-- PWA INSTALL BANNER -->
     <div id="pwa-install-banner" class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 p-3 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-[100] flex justify-between items-center hidden fade-in">
         <div class="flex items-center gap-3">
             <img src="ELINA.png" alt="Icon" class="w-10 h-10 rounded-lg drop-shadow-sm" onerror="this.onerror=null; this.src='LOGO LOGIN.png';">
@@ -353,7 +365,6 @@
 
     <!-- JAVASCRIPT SYSTEM LOGIC -->
     <script>
-        // LINK WEB GAS SUDAH DIMASUKKAN
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyiX-5qSnusPYAhXxCtNMMAUFmys6paO2EEbO-jfNJOFkPOPPfxTgGpY9Z6Sc2sDlviRA/exec"; 
         
         let db = { 
@@ -364,6 +375,7 @@
         };
         
         let session = { role: null, user: null };
+        let hasUnsavedChanges = false;
         
         // SISTEM PWA INSTALL NATIVE
         let deferredPrompt;
@@ -372,6 +384,8 @@
             deferredPrompt = e; 
             const banner = document.getElementById('pwa-install-banner');
             if(banner) banner.classList.remove('hidden'); 
+            document.getElementById('btn-install-header').classList.remove('hidden');
+            document.getElementById('btn-install-header').classList.add('flex');
         });
         
         function showInstallPopup() {
@@ -380,6 +394,7 @@
                 deferredPrompt.userChoice.then((res) => { 
                     if (res.outcome === 'accepted') {
                         document.getElementById('pwa-install-banner').classList.add('hidden'); 
+                        document.getElementById('btn-install-header').classList.add('hidden');
                     }
                     deferredPrompt = null; 
                 });
@@ -398,7 +413,7 @@
             }
         }
 
-        // FUNGSI PEMBERSIH SPASI & HURUF KECIL (ANTI ERROR DATA DARI EXCEL)
+        // FUNGSI PEMBERSIH SPASI & HURUF KECIL
         const cleanClass = (s) => String(s || "").trim().toUpperCase().replace(/\s+/g, ' ');
         const cleanPresensi = (s) => { let p = String(s || "").trim(); return p.length === 1 ? '0'+p : p; };
         const cleanName = (s) => String(s || "").trim();
@@ -444,16 +459,28 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             initClock(); 
-            await loadCloudDB();
             
             const savedSession = sessionStorage.getItem('elina_session');
             if (savedSession) { 
                 session = JSON.parse(savedSession); 
+            }
+            
+            // Sync data first before rendering correctly
+            await loadCloudDB(false);
+            
+            if (session.user) {
                 routeView(); 
             } else { 
                 setLoginRole('admin'); 
                 routeView(); 
             }
+            
+            // Auto sync when app comes back to foreground
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === 'visible' && !hasUnsavedChanges) {
+                    loadCloudDB(true); // Silent sync
+                }
+            });
         });
 
         function initClock() {
@@ -463,48 +490,89 @@
             clockEl.textContent = new Date().toLocaleDateString('id-ID', options) + " WIB";
         }
 
-        // FUNGSI LOAD DATA BERBASIS STANDAR FETCH (DIKARENAKAN GET PADA GAS DIDUKUNG CORS SECARA DEFAULT)
-        async function loadCloudDB() {
+        // FUNGSI LOAD DATA (DISEMPURNAKAN UNTUK MULTI-DEVICE SYNC)
+        async function loadCloudDB(isSilent = false) {
             if (!SCRIPT_URL || !SCRIPT_URL.includes("script.google.com")) {
-                loadLocalFallback();
+                loadLocalFallback(true);
                 return;
             }
 
-            Swal.fire({
-                title: 'Menyinkronkan Data...',
-                html: 'Membaca basis data SDIT Muhammadiyah Al Kautsar...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
+            if (!isSilent) {
+                Swal.fire({
+                    title: 'Menyinkronkan Data...',
+                    html: 'Menghubungkan ke server SDIT Al Kautsar...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+            } else {
+                showSyncingUI("Memperbarui data...");
+            }
 
             try {
+                // Fetch data dari GAS. Tambahkan timestamp agar tidak di-cache browser.
                 const response = await fetch(SCRIPT_URL + "?action=read&t=" + new Date().getTime());
+                if (!response.ok) throw new Error("Jaringan gagal");
                 const cloudDB = await response.json();
                 
                 if (isValidElinaDB(cloudDB)) {
                     db = cloudDB;
-                    sanitizeDB(); // MENGHAPUS SEMUA SPASI GANDA & MERAPIKAN NAMA KELAS
+                    sanitizeDB();
                     localStorage.setItem('elina_github_db', JSON.stringify(db));
+                    
+                    if (!isSilent) {
+                        Swal.close();
+                    } else {
+                        let el = document.getElementById('sync-indicator');
+                        if(el) { 
+                            el.innerHTML = '<i class="fas fa-check text-green-500"></i> Data Terbaru'; 
+                            el.classList.replace('text-blue-900', 'text-green-600');
+                            setTimeout(hideSyncingUI, 1500); 
+                        }
+                    }
+                    
+                    updateLoginDropdowns();
+                    
+                    // Refresh view jika user sedang login dan tidak ada perubahan tertunda
+                    if (session.user && !hasUnsavedChanges) {
+                        refreshCurrentView();
+                    }
                 } else {
-                    loadLocalFallback();
+                    throw new Error("Format database Cloud tidak valid");
                 }
             } catch (error) {
                 console.error("Gagal sinkron cloud:", error);
-                loadLocalFallback();
+                
+                const hasLocal = loadLocalFallback(false);
+                
+                if (!isSilent) {
+                    Swal.close();
+                    if (hasLocal) {
+                        Swal.fire({icon: 'warning', title: 'Mode Offline', text: 'Gagal terhubung ke server. Anda sedang melihat data lokal terakhir.', timer: 2500, showConfirmButton: false, customClass:{popup:'rounded-2xl'}});
+                    } else {
+                        Swal.fire({icon: 'error', title: 'Koneksi Gagal', text: 'Tidak dapat mengunduh data awal dari server. Pastikan internet Anda aktif lalu muat ulang halaman.', customClass:{popup:'rounded-2xl'}});
+                    }
+                } else {
+                    let el = document.getElementById('sync-indicator');
+                    if(el) { 
+                        el.innerHTML = '<i class="fas fa-wifi text-red-500"></i> Offline Mode'; 
+                        el.classList.replace('text-blue-900', 'text-red-600');
+                        setTimeout(hideSyncingUI, 2000); 
+                    }
+                }
             }
-            
-            Swal.close();
-            updateLoginDropdowns();
         }
 
-        function loadLocalFallback() {
+        function loadLocalFallback(forceDummy = false) {
             const local = localStorage.getItem('elina_github_db');
             const parsedLocal = local ? JSON.parse(local) : null;
             
-            if (parsedLocal && isValidElinaDB(parsedLocal)) { 
+            if (!forceDummy && parsedLocal && isValidElinaDB(parsedLocal)) { 
                 db = parsedLocal; 
                 sanitizeDB();
-            } else {
+                updateLoginDropdowns();
+                return true;
+            } else if (forceDummy || !parsedLocal) {
+                // Fallback terakhir (jika tidak ada data sama sekali di local storage)
                 db.users.wali = [
                     { kelas: '4D', nama: 'Budi Santoso, S.Pd.', kode: '123' },
                     { kelas: '3D', nama: 'Siti Aminah, M.Pd.', kode: '123' }
@@ -512,26 +580,60 @@
                 db.users.murid = [
                     { kelas: '4D', presensi: '01', nama: 'ADEEVA AFSHEEN ABDILLAH', kode: '111' },
                     { kelas: '4D', presensi: '02', nama: 'ALILA KAIA MAULANA', kode: '222' },
-                    { kelas: '3D', presensi: '01', nama: 'AFIZA AZKAYRA SETYAWAN', kode: '333' },
-                    { kelas: '3D', presensi: '02', nama: 'AHNAF HASHIF WIBOWO', kode: '444' }
+                    { kelas: '3D', presensi: '01', nama: 'AFIZA AZKAYRA SETYAWAN', kode: '333' }
                 ];
                 db.config.defaultNominal = { '4D': 7000, '3D': 5000 };
                 db.infaq = {};
                 db.pengeluaran = {};
                 sanitizeDB();
-                saveDB();
+                updateLoginDropdowns();
+                return false;
+            }
+            return false;
+        }
+        
+        async function manualSyncFromCloud() {
+            if (hasUnsavedChanges) {
+                Swal.fire({
+                    title: 'Ada Data Belum Disimpan!',
+                    text: 'Jika Anda memperbarui data dari server sekarang, perubahan checklist Anda yang belum tersimpan akan hilang. Lanjutkan?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Perbarui',
+                    cancelButtonText: 'Batal',
+                    customClass: {popup: 'rounded-2xl w-[90%] max-w-sm'}
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        hasUnsavedChanges = false;
+                        document.getElementById('unsaved-warning').classList.add('hidden');
+                        loadCloudDB(false);
+                    }
+                });
+            } else {
+                await loadCloudDB(false);
             }
         }
 
-        function showSyncingUI() {
+        function refreshCurrentView() {
+            if (session.role === 'admin') {
+                const classes = [...new Set(db.users.wali.map(w => cleanClass(w.kelas)))].sort();
+                if (classes.length > 0) renderAdminClassView();
+            } else if (session.role === 'wali') {
+                renderWaliChecklist();
+            } else if (session.role === 'murid') {
+                renderMuridView();
+            }
+        }
+
+        function showSyncingUI(text = 'Menyinkronkan Cloud...') {
             let el = document.getElementById('sync-indicator');
             if(!el) { 
                 el = document.createElement('div'); 
                 el.id = 'sync-indicator'; 
                 document.body.appendChild(el); 
             }
-            el.innerHTML = '<i class="fas fa-sync fa-spin"></i> Menyinkronkan Cloud...';
-            el.className = 'fixed bottom-4 right-4 bg-white/95 border border-slate-200 px-4 py-2 rounded-full shadow-lg text-[10px] font-bold text-blue-900 flex items-center z-[100] gap-1.5'; 
+            el.innerHTML = `<i class="fas fa-sync fa-spin"></i> ${text}`;
+            el.className = 'fixed bottom-4 right-4 bg-white/95 border border-slate-200 px-4 py-2 rounded-full shadow-lg text-[10px] font-bold text-blue-900 flex items-center z-[100] gap-1.5 transition-all'; 
             el.style.display = 'flex';
         }
 
@@ -546,13 +648,13 @@
         async function saveDB(isResetTotal = false) {
             if (!isValidElinaDB(db) && !isResetTotal) return false;
             
-            sanitizeDB(); // Pastikan bersih sebelum disimpan ke Cloud
+            sanitizeDB(); 
             localStorage.setItem('elina_github_db', JSON.stringify(db));
             
             if (SCRIPT_URL && SCRIPT_URL.includes("script.google.com")) {
                 if (isSyncing) { pendingSync = true; return false; }
                 isSyncing = true;
-                showSyncingUI();
+                showSyncingUI("Menyimpan ke Cloud...");
                 
                 let payload = {};
                 if (isResetTotal) { payload = { action: 'reset_db' }; } 
@@ -572,10 +674,13 @@
                     
                     let el = document.getElementById('sync-indicator');
                     if(el) { 
-                        el.innerHTML = '<i class="fas fa-check text-green-500"></i> Tersinkron'; 
+                        el.innerHTML = '<i class="fas fa-check text-green-500"></i> Tersimpan'; 
                         el.classList.replace('text-blue-900', 'text-green-600'); 
                         setTimeout(hideSyncingUI, 1500); 
                     }
+                    
+                    hasUnsavedChanges = false;
+                    document.getElementById('unsaved-warning').classList.add('hidden');
                     
                     isSyncing = false;
                     if (pendingSync) { pendingSync = false; await saveDB(); }
@@ -583,18 +688,26 @@
                 } catch (error) {
                     let el = document.getElementById('sync-indicator');
                     if(el) { 
-                        el.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500"></i> Offline Mode'; 
+                        el.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500"></i> Gagal Simpan'; 
                         el.classList.replace('text-blue-900', 'text-red-600'); 
-                        setTimeout(hideSyncingUI, 1500); 
+                        setTimeout(hideSyncingUI, 2000); 
                     }
                     isSyncing = false; return false;
                 }
             }
+            
+            hasUnsavedChanges = false;
+            document.getElementById('unsaved-warning').classList.add('hidden');
             return true;
         }
 
         function routeView() {
             ['view-login', 'view-admin', 'view-walikelas', 'view-walimurid'].forEach(id => { document.getElementById(id).classList.add('hidden'); });
+            
+            // Tampilkan tombol sync di header secara permanen
+            const btnSync = document.getElementById('btn-sync-header');
+            if (btnSync) btnSync.classList.remove('hidden');
+
             if (!session.user) { 
                 document.getElementById('view-login').classList.remove('hidden'); 
                 updateLoginDropdowns(); 
@@ -628,21 +741,47 @@
             else if (role === 'wali') lblKode.textContent = "PIN WALI KELAS"; 
             else lblKode.textContent = "PASSWORD ADMINISTRATOR";
             
+            // iOS Auto-Fetch Bypasser: Fetch triggered directly by user click event
+            if ((role === 'wali' || role === 'murid') && (!db.users[role] || db.users[role].length === 0)) {
+                loadCloudDB(true);
+            }
+            
             updateLoginDropdowns(); 
             checkSavedCreds();
         }
 
         function updateLoginDropdowns() {
-            if (currentLoginTab === 'wali') {
-                const kelasSel = document.getElementById('wali-kelas'); 
-                const classes = [...new Set(db.users.wali.map(w => cleanClass(w.kelas)))].sort();
-                kelasSel.innerHTML = '<option value="">--</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
-                document.getElementById('wali-nama').innerHTML = '<option value="">Pilih Wali</option>';
-            } else if (currentLoginTab === 'murid') {
-                const kelasSel = document.getElementById('murid-kelas'); 
-                const classes = [...new Set(db.users.murid.map(m => cleanClass(m.kelas)))].sort();
-                kelasSel.innerHTML = '<option value="">--</option>' + classes.map(c => `<option value="${c}">${c}</option>`).join('');
-                document.getElementById('murid-nama').innerHTML = '<option value="">Pilih Siswa</option>';
+            // Update WALI
+            const waliKelasSel = document.getElementById('wali-kelas');
+            if (waliKelasSel) {
+                const waliClasses = [...new Set(db.users.wali.map(w => cleanClass(w.kelas)))].sort();
+                const currentWaliVal = waliKelasSel.value;
+                waliKelasSel.innerHTML = '<option value="">--</option>' + waliClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+                if (waliClasses.includes(currentWaliVal)) waliKelasSel.value = currentWaliVal;
+                if(!waliKelasSel.value) document.getElementById('wali-nama').innerHTML = '<option value="">Pilih Wali</option>';
+                else populateWaliNames();
+            }
+
+            // Update MURID
+            const muridKelasSel = document.getElementById('murid-kelas');
+            if (muridKelasSel) {
+                const muridClasses = [...new Set(db.users.murid.map(m => cleanClass(m.kelas)))].sort();
+                const currentMuridVal = muridKelasSel.value;
+                muridKelasSel.innerHTML = '<option value="">--</option>' + muridClasses.map(c => `<option value="${c}">${c}</option>`).join('');
+                if (muridClasses.includes(currentMuridVal)) muridKelasSel.value = currentMuridVal;
+                if(!muridKelasSel.value) document.getElementById('murid-nama').innerHTML = '<option value="">Pilih Siswa</option>';
+                else populateMuridNames();
+            }
+
+            // Peringatan jika data masih kosong
+            const isDataEmpty = (!db.users.wali || db.users.wali.length === 0) && (!db.users.murid || db.users.murid.length === 0);
+            const warnEl = document.getElementById('login-data-warning');
+            if (warnEl) {
+                if (isDataEmpty && (currentLoginTab === 'wali' || currentLoginTab === 'murid')) {
+                    warnEl.classList.remove('hidden');
+                } else {
+                    warnEl.classList.add('hidden');
+                }
             }
         }
 
@@ -710,7 +849,7 @@
                 if (match) { loggedInRole = 'wali'; loggedInUser = match; }
             } else if (currentLoginTab === 'murid') {
                 const kls = cleanClass(document.getElementById('murid-kelas').value); 
-                const pres = cleanPresensi(document.getElementById('murid-nama').value); // ⚠️ PERBAIKAN DI SINI: PASTIKAN NO PRESENSI DIBERSIHKAN (DITAMBAH NOL JIKA PERLU)
+                const pres = cleanPresensi(document.getElementById('murid-nama').value);
                 const match = db.users.murid.find(m => cleanClass(m.kelas) === kls && cleanPresensi(m.presensi) === pres && cleanName(m.kode) === kode);
                 if (match) { loggedInRole = 'murid'; loggedInUser = match; }
             }
@@ -738,16 +877,42 @@
                 
                 localStorage.setItem('elina_saved_creds', JSON.stringify(saved)); 
                 document.getElementById('login-kode').value = ''; 
+                hasUnsavedChanges = false; // Reset on new login
                 routeView();
             } else {
                 Swal.fire({ 
                     html: '<div class="text-2xl mb-1">🔒</div><div class="text-xs font-black text-red-600 uppercase">AKSES DITOLAK</div><p class="text-[9px] text-gray-500 mt-1">Username, nomor presensi, atau kode masuk Anda salah.</p>', 
-                    showConfirmButton: false, timer: 1700, customClass:{popup:'rounded-3xl w-[75%] max-w-xs'} 
+                    showConfirmButton: false, timer: 2000, customClass:{popup:'rounded-3xl w-[80%] max-w-xs'} 
                 });
             }
         }
 
-        function logout() { session = { role: null, user: null }; sessionStorage.removeItem('elina_session'); routeView(); }
+        function logout() { 
+            if (hasUnsavedChanges) {
+                Swal.fire({
+                    title: 'Perubahan Belum Disimpan!',
+                    text: 'Anda memiliki data yang belum disimpan ke server. Jika keluar, perubahan akan hilang. Tetap keluar?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Keluar',
+                    cancelButtonText: 'Batal',
+                    customClass: {popup: 'rounded-2xl w-[90%] max-w-sm'}
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        doLogout();
+                    }
+                });
+            } else {
+                doLogout();
+            }
+        }
+        
+        function doLogout() {
+            session = { role: null, user: null }; 
+            hasUnsavedChanges = false;
+            sessionStorage.removeItem('elina_session'); 
+            routeView(); 
+        }
 
         function getNominalKelas(kls) { return db.config.defaultNominal[cleanClass(kls)] || 0; }
         function formatRupiah(angka) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka); }
@@ -768,6 +933,21 @@
             d.setDate(d.getDate() + (5 - d.getDay() + 7) % 7);
             while (d <= endDate) { fridays.push(new Date(d.getTime())); d.setDate(d.getDate() + 7); }
             return fridays;
+        }
+        
+        function markUnsaved() {
+            hasUnsavedChanges = true;
+            document.getElementById('unsaved-warning').classList.remove('hidden');
+        }
+
+        function contactAdmin() {
+            Swal.fire({
+                title: 'Hubungi Admin',
+                text: 'Silakan hubungi Administrator sekolah jika ada kendala sistem.',
+                icon: 'info',
+                confirmButtonText: 'Tutup',
+                customClass: {popup: 'rounded-2xl w-[80%] max-w-sm'}
+            });
         }
 
         // =======================================================
@@ -851,6 +1031,7 @@
         function toggleInfaq(kelas, dateStr, presensi) {
             let current = db.infaq[kelas][dateStr][presensi];
             if (current === 'paid') delete db.infaq[kelas][dateStr][presensi]; else db.infaq[kelas][dateStr][presensi] = 'paid';
+            markUnsaved();
             renderWaliChecklist();
         }
 
@@ -858,6 +1039,7 @@
             const students = db.users.murid.filter(m => cleanClass(m.kelas) === kelas);
             if (isCurrentlyAllLunas) { students.forEach(s => { if (db.infaq[kelas][dateStr][s.presensi] === 'paid') delete db.infaq[kelas][dateStr][s.presensi]; }); } 
             else { students.forEach(s => { db.infaq[kelas][dateStr][s.presensi] = 'paid'; }); }
+            markUnsaved();
             renderWaliChecklist();
         }
 
@@ -865,6 +1047,7 @@
             const students = db.users.murid.filter(m => cleanClass(m.kelas) === kelas);
             if (isCurrentlyLibur) { students.forEach(s => { if (db.infaq[kelas][dateStr][s.presensi] === 'libur') delete db.infaq[kelas][dateStr][s.presensi]; }); } 
             else { students.forEach(s => { db.infaq[kelas][dateStr][s.presensi] = 'libur'; }); }
+            markUnsaved();
             renderWaliChecklist();
         }
 
@@ -1011,9 +1194,14 @@
             const classes = [...new Set(db.users.wali.map(w => cleanClass(w.kelas)))].sort(); 
             const viewSel = document.getElementById('admin-view-class'); 
             const reportSel = document.getElementById('admin-report-class');
+            
+            const currentView = viewSel.value;
+            
             let opts = classes.map(c => `<option value="${c}">Kelas ${c}</option>`).join('');
             viewSel.innerHTML = (classes.length > 0) ? opts : '<option value="">Kosong</option>'; 
             reportSel.innerHTML = '<option value="ALL">Semua Kelas</option>' + opts;
+            
+            if (classes.includes(currentView)) viewSel.value = currentView;
             
             if (classes.length > 0) { renderAdminClassView(); } 
             else {
@@ -1303,8 +1491,9 @@
                     } 
                     
                     Swal.fire({ title: 'Sinkronisasi Spreadsheet...', html: 'Sedang mendaftarkan struktur kelas baru...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-                    sanitizeDB(); // Bersihkan sebelum disimpan
-                    await saveDB(); setupAdminView(); 
+                    sanitizeDB(); 
+                    await saveDB(true); // Kirim ke cloud
+                    setupAdminView(); 
                     Swal.fire({icon:'success', title:'Sinkronisasi Sukses', text: 'Database lokal ELINA berhasil di-update dari file Excel Anda.', customClass:{popup:'rounded-3xl w-[80%]'}}); 
                 } catch (error) { 
                     console.error("Upload Excel system failure:", error); Swal.fire({icon:'error', title:'Format Excel Salah', text: 'Pastikan nama sheet dan kolom persis seperti template.', customClass:{popup:'rounded-3xl w-[70%]'}}); 
