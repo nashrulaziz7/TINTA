@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TINTA - Master Vision</title>
     
-    <!-- Library Wajib SheetJS (hanya 1 library sekarang, lebih enteng!) -->
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
@@ -87,173 +86,87 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ========================================================
-           PDF NATIVE PRINTING SYSTEM (TIDAK ADA LAGI HTML2PDF)
-           SAT SET 0 DETIK, ANTI KOSONG, FULL KERTAS
+           PDF NATIVE PRINTING SYSTEM (BYPASS PREVIEW JADUL)
            ======================================================== */
         
-        /* Saat layar normal (bukan ngeprint), kontainer disembunyikan jauh di luar layar agar gambar KOP tetap bisa dimuat oleh browser tanpa kelihatan mata */
-        #pdf-render-container {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 215.9mm;
-            background-color: white;
-            z-index: -1;
-            display: block; 
-        }
-
-        .pdf-page-container {
-            width: 215.9mm;
-            height: 330.2mm; /* Kertas F4 */
-            background-color: white;
-            color: black;
-            position: relative;
-            box-sizing: border-box;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            page-break-after: always;
-        }
+        #pdf-render-container { display: none; }
         
-        .pdf-kop-atas {
-            width: 100%;
-            height: auto;
-            display: block;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .pdf-kop-bawah {
-            width: 100%;
-            height: auto;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            display: block;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .pdf-content-area {
-            padding: 5mm 15mm; 
-        }
-        
-        .pdf-title-box {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .pdf-title-box h2 { 
-            font-size: 14px; 
-            font-weight: bold; 
-            margin: 0 0 4px 0; 
-            color: #000000; 
-            text-transform: uppercase;
-        }
-        
-        .pdf-title-box p { 
-            font-size: 10px; 
-            color: #333333; 
-            margin: 0; 
-        }
-        
-        .pdf-summary-flex { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 15px; 
-        }
-        
-        .pdf-box { 
-            border: 1px solid #000000;
-            padding: 8px; 
-            text-align: center; 
-            width: 31%; 
-            background-color: #ffffff;
-        }
-        
-        .pdf-box-title { 
-            font-size: 9px; 
-            font-weight: bold; 
-            color: #000000; 
-            display: block; 
-            margin-bottom: 4px; 
-            text-transform: uppercase;
-        }
-        
-        .pdf-box-val { 
-            font-size: 13px; 
-            font-weight: bold; 
-            color: #000000; 
-        }
-        
-        .pdf-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            font-size: 8px; 
-            margin-bottom: 10px;
-        }
-        
-        .pdf-table th, .pdf-table td { 
-            border: 1px solid #000000;
-            padding: 5px 3px; 
-            text-align: center; 
-            color: #000000; 
-        }
-        
-        .pdf-table th { 
-            background-color: #f1f5f9; 
-            font-weight: bold; 
-        }
-        
-        .pdf-table td.text-left { 
-            text-align: left; 
-            padding-left: 6px; 
-        }
-        
-        .pdf-table td.fw-bold { 
-            font-weight: bold; 
-        }
-        
-        .pdf-student-info {
-            margin: 10px 0; 
-            font-size: 11px; 
-            font-weight: bold; 
-            padding: 6px 8px; 
-            background: #ffffff; 
-            border: 1px solid #000000; 
-            display: flex; 
-            gap: 15px;
-        }
-
-        /* 
-         * LOGIKA CETAK NATIVE MAGIS
-         * Saat dialog Print Browser terbuka, sembunyikan semua elemen web,
-         * KECUALI container PDF kita, lalu set margin kertas ke 0 agar full
-         */
         @media print {
-            body { background-color: white; margin: 0; padding: 0; }
-            /* Sembunyikan semua UI aplikasi (Header, Modal, Toast, dll) */
+            body { background-color: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-family: 'Inter', Arial, sans-serif; }
             body > *:not(#pdf-render-container) { display: none !important; }
             
-            /* Tampilkan wujud PDF ke tengah layar kertas */
             #pdf-render-container {
-                position: relative !important;
+                position: absolute !important;
                 left: 0 !important;
                 top: 0 !important;
-                z-index: 9999 !important;
                 display: block !important;
                 width: 100% !important;
+                background-color: white;
             }
             .pdf-page-container {
-                page-break-after: always; /* Memisah halaman antar kelas/siswa sempurna */
-                margin: 0; 
-                border: none;
+                width: 215.9mm;
+                height: 330.2mm;
+                page-break-after: always;
+                margin: 0;
+                padding: 0;
+                position: relative;
+                box-sizing: border-box;
+                overflow: hidden;
+                background-color: white;
             }
-            /* Kunci kertas F4 Mutlak & hilangkan margin putih pinggiran bawaan printer */
             @page {
-                size: 215.9mm 330.2mm; 
-                margin: 0mm; 
+                size: 215.9mm 330.2mm; /* F4 Portrait */
+                margin: 0mm !important; 
             }
+            
+            /* CSS Khusus Desain PDF Instansi */
+            .kop-img { width: 100%; height: auto; display: block; margin: 0; padding: 0; }
+            .kop-footer { width: 100%; height: auto; display: block; position: absolute; bottom: 0; left: 0; }
+            .pdf-content { padding: 0 15mm; position: relative; z-index: 10; margin-top: 15px; }
+            
+            .title-h2 { font-size: 14px; font-weight: 800; margin: 0 0 4px 0; color: #1e3a8a; text-transform: uppercase; }
+            .title-date { font-size: 9px; margin: 0 0 15px 0; color: #64748b; }
+            
+            .summary-flex { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
+            .sum-box { flex: 1; padding: 12px; color: white; border-radius: 0; box-sizing: border-box; }
+            .sum-box-masuk { background-color: #1e3a8a; } /* Biru Tua */
+            .sum-box-keluar { background-color: #f97316; } /* Oranye */
+            .sum-box-saldo { background-color: #10b981; } /* Hijau */
+            .sum-label { font-size: 8px; font-weight: 500; text-transform: uppercase; display: block; margin-bottom: 6px; letter-spacing: 0.5px; }
+            .sum-value { font-size: 14px; font-weight: 800; }
+            
+            .student-badge { background-color: #3b82f6; color: white; padding: 6px 12px; font-size: 10px; font-weight: 700; margin-bottom: 12px; display: inline-block; width: 100%; box-sizing: border-box; }
+            
+            /* Table Rekap Kelas (Admin) */
+            .table-admin { width: 100%; border-collapse: separate; border-spacing: 0 2px; font-size: 8px; text-align: center; }
+            .table-admin th { padding: 0 2px; font-weight: 600; border: none; }
+            .th-pill { background-color: #1e3a8a; color: white; border-radius: 4px; padding: 6px 4px; display: block; white-space: nowrap; }
+            .table-admin td { padding: 6px 4px; color: #475569; border: none; }
+            .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+            .text-left { text-align: left !important; }
+            .val-zero { color: #cbd5e1 !important; }
+            .val-bold { font-weight: 800; color: #0f172a; }
+            
+            /* Table Persiswa (Walas) */
+            .table-siswa { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 15px; text-align: center; }
+            .table-siswa th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+            .table-siswa td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+            .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+            .pill-lunas { background-color: #22c55e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 7px; font-weight: 800; }
+            .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 3px 8px; border-radius: 12px; font-size: 7px; font-weight: 600; }
+            .row-total td { background-color: #f1f5f9 !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; }
+            
+            .table-pengeluaran { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
+            .table-pengeluaran th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+            .table-pengeluaran td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+            .table-pengeluaran tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+            .pengeluaran-val { color: #dc2626; font-weight: 700; text-align: right; }
         }
+
+        /* Loading Screen untuk PDF */
+        #pdf-loading-screen { position: fixed; inset: 0; background-color: white; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        #pdf-loading-screen.active { opacity: 1; pointer-events: auto; }
+        .spinner { width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid #1e3a8a; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -289,7 +202,6 @@
                     <img src="TINTA.png" alt="Logo TINTA" class="w-[200px] h-auto object-contain drop-shadow-lg" onerror="this.src='https://via.placeholder.com/200?text=TINTA'">
                 </div>
                 <p class="text-[8px] sm:text-[9px] font-bold tracking-[0.15em] text-slate-500 mt-1 uppercase text-center w-full whitespace-nowrap">Tabungan Infaq Terpadu Al Kautsar</p>
-                <div id="sync-status" class="mt-2 text-[9px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full border border-blue-100 hidden"></div>
             </div>
 
             <div id="mainCard" class="w-full main-card p-4 sm:p-6 pb-6">
@@ -639,7 +551,14 @@
         </div>
     </div>
 
-    <!-- CONTAINER RENDER PDF (Hanya Muncul Saat Native Print Diaktifkan) -->
+    <!-- LAYAR LOADING PDF FULL -->
+    <div id="pdf-loading-screen">
+        <div class="spinner"></div>
+        <h2 class="text-2xl font-black text-[#1e3a8a] mb-2">MENYIAPKAN DOKUMEN...</h2>
+        <p class="text-sm font-bold text-slate-500">Mohon jangan tutup aplikasi, memproses PDF kualitas tinggi.</p>
+    </div>
+
+    <!-- CONTAINER RENDER PDF -->
     <div id="pdf-render-container"></div>
 
     <script>
@@ -654,20 +573,19 @@
             let currentDate = new Date(2025, 6, 4); // Juli 2025
             while(currentDate.getDay() !== 5) { currentDate.setDate(currentDate.getDate() + 1); } 
             
-            // Nama bulan standar untuk Header PDF 
             const monthNames = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
+            const longMonthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             
             for(let i=0; i<52; i++) { 
                 const mIdx = currentDate.getMonth();
-                // Koreksi Ags agar sinkron
-                const mKey = monthNames.includes("Agt") && mIdx === 7 ? "Agt" : monthNames.find(m => ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][mIdx].startsWith(m)) || "Jul";
+                const mKey = monthNames.includes("Agt") && mIdx === 7 ? "Agt" : monthNames.find(m => longMonthNames[mIdx].startsWith(m)) || "Jul";
                 
                 const yy = String(currentDate.getFullYear()).slice(-2);
                 academicWeeks.push({ 
                     dateStr: `Jum, ${currentDate.getDate()}`, 
                     monthStr: `${mKey} ${yy}`, 
                     monthKey: mKey, 
-                    monthLong: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"][mIdx] + " " + currentDate.getFullYear(), 
+                    monthLong: longMonthNames[mIdx] + " " + currentDate.getFullYear(), 
                     dateNum: String(currentDate.getDate()).padStart(2, '0'), 
                     id: i 
                 });
@@ -700,7 +618,6 @@
             let htmlSelect = '<option value="">Pilih Kelas</option>'; DAFTAR_KELAS.forEach(k => htmlSelect += `<option value="${k}">${k}</option>`);
             selectSummary.innerHTML = htmlSelect;
             
-            // SEDOT DATA AKUN SAJA SAAT BUKA APLIKASI (SAT SET)
             await loadMasterDataInBackground();
         }
 
@@ -711,7 +628,7 @@
                     if (res.master.walas) {
                         res.master.walas.forEach(w => { 
                             DB.guru[w.kelas] = w.nama; 
-                            DB.walasPassword[w.kelas] = w.password; // INI KUNCI AGAR PASSWORD WALAS SESUAI GAS!
+                            DB.walasPassword[w.kelas] = w.password; // KUNCI WALAS
                             if (w.nominal) DB.nominalDefault[w.kelas] = parseInt(w.nominal); 
                             if (w.kelas && !DAFTAR_KELAS.includes(w.kelas)) DAFTAR_KELAS.push(w.kelas); 
                         });
@@ -733,9 +650,6 @@
         }
 
         async function fetchKelasData(kelas) {
-            // Jika data checklist sudah ada, tidak usah fetch lagi (hemat waktu)
-            if(DB.siswa[kelas] && DB.siswa[kelas].length > 0 && checklistState[kelas]) return true; 
-            
             const res = await fetchGAS({ action: "getKelasData", kelas: kelas });
             if (res.status === "success" && res.data) {
                 DB.pengeluaran[kelas] = res.data.pengeluaran || 0; DB.riwayatPengeluaran[kelas] = res.data.riwayatPengeluaran || []; 
@@ -749,7 +663,6 @@
                         newSiswaList.push({ nama: ds.nama, pin: '123456', no: ds.no, infaq: ds.infaq }); 
                     }
                 });
-                // Urutkan siswa berdasarkan nomor presensi agar rapi
                 newSiswaList.sort((a,b) => parseInt(a.no) - parseInt(b.no));
                 DB.siswa[kelas] = newSiswaList;
                 
@@ -760,36 +673,37 @@
             return false;
         }
 
-        // --- DASHBOARD ADMIN LOGIC ---
-        async function updateDashboardView() {
+        function updateDashboardView() {
             const kelas = document.getElementById('summary-kelas-select').value; const container = document.getElementById('tabel-siswa-container'); const labelKelas = document.getElementById('label-kelas-aktif'); document.getElementById('search-siswa').value = ''; 
             if(!kelas) { document.getElementById('stat-masuk').innerText = 'Rp 0'; document.getElementById('stat-keluar').innerText = 'Rp 0'; document.getElementById('stat-saldo').innerText = 'Rp 0'; labelKelas.innerText = '--'; container.innerHTML = `<div class="p-4 text-center text-slate-400 text-[10px] font-bold">Pilih kelas di tabel ringkasan atas.</div>`; return; }
             
             labelKelas.innerText = kelas + " (Memuat...)";
-            await fetchKelasData(kelas); 
-            labelKelas.innerText = kelas;
-            
-            const dataKelas = DB.siswa[kelas] || []; let totalMasuk = 0;
-            dataKelas.forEach((s, i) => {
-                let infaqSiswa = 0;
-                if(checklistState[kelas] && checklistState[kelas][i]) { const checks = Object.values(checklistState[kelas][i]).filter(v => v === 1).length; infaqSiswa = checks * (DB.nominalDefault[kelas] || 0); }
-                s.infaq = infaqSiswa; totalMasuk += infaqSiswa;
-            });
-            let totalKeluar = DB.pengeluaran[kelas] || 0; let saldo = totalMasuk - totalKeluar;
-            document.getElementById('stat-masuk').innerText = "Rp " + formatRp(totalMasuk); document.getElementById('stat-keluar').innerText = "Rp " + formatRp(totalKeluar); document.getElementById('stat-saldo').innerText = "Rp " + formatRp(saldo);
+            fetchKelasData(kelas).then(() => {
+                labelKelas.innerText = kelas;
+                const dataKelas = DB.siswa[kelas] || []; let totalMasuk = 0;
+                dataKelas.forEach((s, i) => {
+                    let infaqSiswa = 0;
+                    if(checklistState[kelas] && checklistState[kelas][i]) { const checks = Object.values(checklistState[kelas][i]).filter(v => v === 1).length; infaqSiswa = checks * (DB.nominalDefault[kelas] || 0); }
+                    s.infaq = infaqSiswa; totalMasuk += infaqSiswa;
+                });
+                let totalKeluar = DB.pengeluaran[kelas] || 0; let saldo = totalMasuk - totalKeluar;
+                document.getElementById('stat-masuk').innerText = "Rp " + formatRp(totalMasuk); document.getElementById('stat-keluar').innerText = "Rp " + formatRp(totalKeluar); document.getElementById('stat-saldo').innerText = "Rp " + formatRp(saldo);
 
-            if(dataKelas.length === 0) { container.innerHTML = `<div class="p-4 text-center text-slate-400 text-[10px] font-bold">Belum ada data siswa.</div>`; return; }
-            let html = '';
-            dataKelas.forEach((s, idx) => {
-                const isLunas = s.infaq > 0; const colorClass = isLunas ? 'text-green-600' : 'text-slate-400';
-                html += `<div class="grid grid-cols-6 px-4 py-4 item-siswa-admin transition hover:bg-slate-50"><span class="col-span-1 font-black text-slate-400">${String(s.no || idx+1).padStart(2, '0')}</span><span class="col-span-3 font-bold text-slate-800 nama-siswa-admin">${s.nama || s.class}</span><span class="col-span-2 text-right font-black ${colorClass}">Rp ${formatRp(s.infaq)}</span></div>`;
+                if(dataKelas.length === 0) { container.innerHTML = `<div class="p-4 text-center text-slate-400 text-[10px] font-bold">Belum ada data siswa.</div>`; return; }
+                let html = '';
+                dataKelas.forEach((s, idx) => {
+                    const isLunas = s.infaq > 0; const colorClass = isLunas ? 'text-green-600' : 'text-slate-400';
+                    html += `<div class="grid grid-cols-6 px-4 py-4 item-siswa-admin transition hover:bg-slate-50"><span class="col-span-1 font-black text-slate-400">${String(s.no || idx+1).padStart(2, '0')}</span><span class="col-span-3 font-bold text-slate-800 nama-siswa-admin">${s.nama || s.class}</span><span class="col-span-2 text-right font-black ${colorClass}">Rp ${formatRp(s.infaq)}</span></div>`;
+                });
+                container.innerHTML = html;
             });
-            container.innerHTML = html;
         }
 
         function cariSiswa() { const input = document.getElementById('search-siswa').value.toLowerCase(); const items = document.querySelectorAll('.item-siswa-admin'); items.forEach(item => { item.style.display = item.querySelector('.nama-siswa-admin').innerText.toLowerCase().includes(input) ? '' : 'none'; }); }
 
-        // --- SISTEM CETAK PDF CANGGIH (NATIVE PRINT) ---
+        // ==========================================
+        // SISTEM CETAK PDF NATIVE (DESAIN IDENTIK)
+        // ==========================================
         function checkHighlight(cb) {
             const label = cb.closest('label'); const indicator = label.querySelector('.input-indicator');
             if (cb.checked) {
@@ -884,37 +798,31 @@
             modal.classList.add('active');
         }
 
-        // ==========================================
-        // EKSEKUSI NATIVE PRINT MAGIS (0 DETIK!)
-        // ==========================================
-        function executeNativePrint(filename, htmlContent) {
+        async function executeNativePrint(filename, htmlContent) {
+            closeModal();
             const container = document.getElementById('pdf-render-container');
+            const loadingScreen = document.getElementById('pdf-loading-screen');
+            
             container.innerHTML = htmlContent;
-
-            // Simpan title asli, ganti sementara untuk menyuntikkan nama file di jendela Save to PDF
             const originalTitle = document.title;
             document.title = filename;
 
-            showToast("Membuka Jendela Simpan PDF...", "fa-print", "text-blue-500");
+            loadingScreen.classList.add('active');
 
-            // Beri jeda 1 detik agar browser selesai merender gambar KOP dari memori
             setTimeout(() => {
                 window.print();
                 
-                // Kembalikan ke kondisi semula setelah jendela print tertutup
+                loadingScreen.classList.remove('active');
                 document.title = originalTitle;
                 container.innerHTML = '';
-            }, 1000);
+            }, 1000); 
         }
 
         async function prosesCetakAdmin() {
             const cbs = document.querySelectorAll('.cb-admin-print:checked');
             if (cbs.length === 0) return showToast("Pilih minimal 1 kelas!", "fa-xmark", "text-red-500");
-            closeModal(); 
-            showToast("Menyiapkan dokumen...", "fa-circle-notch fa-spin", "text-blue-500");
             
             let filename = cbs.length > 1 ? 'Laporan_Rekap_Infaq_Semua_Kelas' : `Laporan_Rekap_Infaq_Kelas_${cbs[0].value}`;
-
             let finalHTML = '';
             for (let i = 0; i < cbs.length; i++) { 
                 finalHTML += await generateClassRecapHTML(cbs[i].value); 
@@ -923,9 +831,6 @@
         }
 
         async function prosesCetakWalasRekap() {
-            closeModal(); 
-            showToast("Menyiapkan dokumen...", "fa-circle-notch fa-spin", "text-blue-500");
-            
             let filename = `Laporan_Rekap_Infaq_Kelas_${kelasWalasAktif}`;
             let finalHTML = await generateClassRecapHTML(kelasWalasAktif);
             executeNativePrint(filename, finalHTML);
@@ -934,12 +839,11 @@
         async function prosesCetakWalasSiswa() {
             const cbs = document.querySelectorAll('.cb-walas-print:checked');
             if (cbs.length === 0) return showToast("Pilih minimal 1 siswa!", "fa-xmark", "text-red-500");
-            closeModal(); 
-            showToast("Menyiapkan dokumen...", "fa-circle-notch fa-spin", "text-blue-500");
             
+            let studentNameClean = DB.siswa[kelasWalasAktif][parseInt(cbs[0].value)].nama.replace(/[^a-zA-Z0-9]/g, '_');
             let filename = cbs.length > 1 
-                ? `Laporan_Infaq_Beberapa_Siswa_${kelasWalasAktif}` 
-                : `Laporan_Infaq_${DB.siswa[kelasWalasAktif][parseInt(cbs[0].value)].nama}_Kelas_${kelasWalasAktif}`;
+                ? `Laporan_Infaq_Beberapa_Siswa_Kelas_${kelasWalasAktif}` 
+                : `Laporan_Infaq_${studentNameClean}_Kelas_${kelasWalasAktif}`;
 
             let finalHTML = '';
             for (let i = 0; i < cbs.length; i++) { 
@@ -949,7 +853,7 @@
         }
 
         // ==========================================
-        // GENERATOR HTML KHUSUS PDF (Sesuai Desain Asli F4 Potret)
+        // GENERATOR HTML PDF DESAIN MUTLAK 100%
         // ==========================================
         async function generateClassRecapHTML(kelas) {
             await fetchKelasData(kelas);
@@ -960,13 +864,11 @@
             let tableRows = '';
             
             const monthHeaders = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
-
-            // Render minimal 30 baris agar pas 1 halaman penuh
             const rowCount = Math.max(30, dataSiswa.length);
             
             for(let i=0; i<rowCount; i++) {
                 const s = dataSiswa[i];
-                let rowHtml = `<tr><td class="fw-bold">${String(i+1).padStart(2, '0')}</td>`;
+                let rowHtml = `<tr><td style="border: none;">${String(i+1).padStart(2, '0')}</td>`;
                 
                 if(s) {
                     const checks = checklistState[kelas][i] || Array(52).fill(0);
@@ -985,11 +887,15 @@
                     rowHtml += `<td class="text-left">${s.nama}</td>`;
                     monthHeaders.forEach(m => {
                         let val = monthlyData[m] === 0 ? "0" : formatRp(monthlyData[m]);
-                        rowHtml += `<td>${val}</td>`;
+                        let valClass = monthlyData[m] === 0 ? "val-zero" : "";
+                        rowHtml += `<td class="${valClass}">${val}</td>`;
                     });
-                    rowHtml += `<td class="fw-bold">${totalSiswa === 0 ? "0" : formatRp(totalSiswa)}</td></tr>`;
+                    let totalStr = totalSiswa === 0 ? "0" : formatRp(totalSiswa);
+                    rowHtml += `<td class="val-bold">${totalStr}</td></tr>`;
                 } else {
-                    rowHtml += `<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
+                    rowHtml += `<td class="text-left"></td>`;
+                    monthHeaders.forEach(m => { rowHtml += `<td></td>`; });
+                    rowHtml += `<td></td></tr>`;
                 }
                 tableRows += rowHtml;
             }
@@ -997,45 +903,42 @@
             const saldo = totalMasukKelas - totalKeluar;
             
             return `
-                <div class="pdf-page-container">
-                    <img src="KOP TINTA ATAS PUTIH.jpg" class="pdf-kop-atas" onerror="this.src='https://via.placeholder.com/816x150?text=KOP+ATAS+GITHUB'">
-                    <div class="pdf-content-area">
-                        <div class="pdf-title-box">
-                            <h2>LAPORAN REKAP ADMINISTRATOR INFAQ - KELAS ${kelas}</h2>
-                            <p>Dicetak Oleh Administrator Sekolah pada: ${new Date().toLocaleDateString('id-ID')} WIB</p>
+            <div class="pdf-page-container">
+                <img src="KOP TINTA ATAS PUTIH.jpg" class="kop-img">
+                <div class="pdf-content">
+                    <h2 class="title-h2">LAPORAN REKAP ADMINISTRATOR INFAQ - KELAS ${kelas}</h2>
+                    <p class="title-date">Dicetak Oleh Administrator Sekolah pada: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} WIB</p>
+                    
+                    <div class="summary-flex">
+                        <div class="sum-box sum-box-masuk">
+                            <span class="sum-label">TOTAL MASUK KELAS</span>
+                            <span class="sum-value">Rp ${formatRp(totalMasukKelas)}</span>
                         </div>
-                        
-                        <div class="pdf-summary-flex">
-                            <div class="pdf-box">
-                                <span class="pdf-box-title">TOTAL MASUK KELAS</span>
-                                <span class="pdf-box-val">Rp ${formatRp(totalMasukKelas)}</span>
-                            </div>
-                            <div class="pdf-box">
-                                <span class="pdf-box-title">TOTAL KELUAR KELAS</span>
-                                <span class="pdf-box-val">Rp ${formatRp(totalKeluar)}</span>
-                            </div>
-                            <div class="pdf-box">
-                                <span class="pdf-box-title">SISA SALDO KAS KELAS</span>
-                                <span class="pdf-box-val">Rp ${formatRp(saldo)}</span>
-                            </div>
+                        <div class="sum-box sum-box-keluar">
+                            <span class="sum-label">TOTAL KELUAR KELAS</span>
+                            <span class="sum-value">Rp ${formatRp(totalKeluar)}</span>
                         </div>
-                        
-                        <table class="pdf-table">
-                            <thead>
-                                <tr>
-                                    <th style="width: 4%;">No</th>
-                                    <th class="text-left" style="width: 22%;">Nama Siswa</th>
-                                    <th>Jul</th><th>Agt</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th>
-                                    <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th>
-                                    <th style="width: 8%;">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
-                        <p style="font-size: 8px; font-weight: bold; text-align: center; margin-top: 10px;">Sistem Infaq Sekolah Digital TINTA Cetakan Sah Terverifikasi Sistem Otomatis</p>
+                        <div class="sum-box sum-box-saldo">
+                            <span class="sum-label">SISA SALDO KAS KELAS</span>
+                            <span class="sum-value">Rp ${formatRp(saldo)}</span>
+                        </div>
                     </div>
-                    <img src="KOP TINTA BAWAH.png" class="pdf-kop-bawah" onerror="this.src='https://via.placeholder.com/816x100?text=KOP+BAWAH+GITHUB'">
+                    
+                    <table class="table-admin">
+                        <thead>
+                            <tr>
+                                <th style="width: 3%;"><div class="th-pill">No</div></th>
+                                <th style="width: 17%; text-align: left;"><div class="th-pill" style="text-align: left; padding-left: 6px;">Nama Siswa</div></th>
+                                ${monthHeaders.map(m => `<th><div class="th-pill">${m}</div></th>`).join('')}
+                                <th style="width: 8%;"><div class="th-pill">Total</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
                 </div>
+                <p style="font-size: 8px; font-style: italic; color: #94a3b8; text-align: left; margin-top: 15px; padding-left: 15mm; font-weight: normal;">Sistem Infaq Sekolah Digital TINTA - Cetakan Sah Terverifikasi Sistem Otomatis</p>
+                <img src="KOP TINTA BAWAH.png" class="kop-footer">
+            </div>
             `;
         }
 
@@ -1060,87 +963,99 @@
             academicWeeks.forEach(w => {
                 const mKey = w.monthKey;
                 if (monthData[mKey]) {
-                    const status = checks[w.id]; let label = "";
-                    if(status === 1) { label = "LUNAS"; monthData[mKey].total += nominal; } else if(status === 2) { label = "LIBUR"; }
-                    monthData[mKey].weeks.push(label);
+                    const status = checks[w.id]; let labelHtml = `<span class="pill-empty">-</span>`;
+                    if(status === 1) { labelHtml = `<span class="pill-lunas">LUNAS</span>`; monthData[mKey].total += nominal; } 
+                    monthData[mKey].weeks.push(labelHtml);
                 }
             });
 
             let tableRows = '';
             months.forEach(m => {
                 const d = monthData[m];
+                let yearLabel = (m==="Jan"||m==="Feb"||m==="Mar"||m==="Apr"||m==="Mei"||m==="Jun") ? "2026" : "2025";
+                let totalRowStr = d.total === 0 ? `<span style="color:#2563eb; font-weight:800;">0</span>` : `<span style="color:#2563eb; font-weight:800;">${formatRp(d.total)}</span>`;
+                
                 tableRows += `<tr>
-                    <td class="text-left fw-bold">${m} 2025/2026</td>
-                    <td>${d.weeks[0]||''}</td><td>${d.weeks[1]||''}</td><td>${d.weeks[2]||''}</td>
-                    <td>${d.weeks[3]||''}</td><td>${d.weeks[4]||''}</td>
-                    <td class="fw-bold">${d.total === 0 ? "0" : formatRp(d.total)}</td>
+                    <td style="text-align: left; font-weight: 700; color: #0f172a;">${m} ${yearLabel}</td>
+                    <td>${d.weeks[0]||`<span class="pill-empty">-</span>`}</td>
+                    <td>${d.weeks[1]||`<span class="pill-empty">-</span>`}</td>
+                    <td>${d.weeks[2]||`<span class="pill-empty">-</span>`}</td>
+                    <td>${d.weeks[3]||`<span class="pill-empty">-</span>`}</td>
+                    <td>${d.weeks[4]||`<span class="pill-empty">-</span>`}</td>
+                    <td>${totalRowStr}</td>
                 </tr>`;
             });
             
             let totalAnanda = Object.values(checks).filter(v => v===1).length * nominal;
-            tableRows += `<tr>
-                <td colspan="6" class="text-left fw-bold" style="background-color: #f1f5f9;">TOTAL KESELURUHAN INFAQ ANANDA</td>
-                <td class="fw-bold" style="background-color: #f1f5f9;">${formatRp(totalAnanda)}</td>
+            tableRows += `<tr class="row-total">
+                <td colspan="6" style="text-align: left; padding: 12px 5px;">TOTAL KESELURUHAN</td>
+                <td style="color: #22c55e;">${formatRp(totalAnanda)}</td>
             </tr>`;
 
             let expRows = ''; const riwayat = DB.riwayatPengeluaran[kelas] || [];
             if(riwayat.length === 0) { 
-                expRows = `<tr><td colspan="3">Belum ada pengeluaran kelas.</td></tr>`; 
+                expRows = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic;">Belum ada pengeluaran kelas.</td></tr>`; 
             } else { 
                 riwayat.forEach(r => { 
-                    expRows += `<tr><td>${r.date || r.fullDate}</td><td class="text-left">${r.ket}</td><td class="fw-bold">${formatRp(r.amount)}</td></tr>`; 
+                    expRows += `<tr><td>${r.date || r.fullDate}</td><td style="text-align: left;">${r.ket}</td><td class="pengeluaran-val">${formatRp(r.amount)}</td></tr>`; 
                 }); 
             }
 
             return `
-                <div class="pdf-page-container">
-                    <img src="KOP TINTA ATAS PUTIH.jpg" class="pdf-kop-atas" onerror="this.src='https://via.placeholder.com/816x150?text=KOP+ATAS+GITHUB'">
-                    <div class="pdf-content-area">
-                        <div class="pdf-title-box">
-                            <h2>LAPORAN KEUANGAN INFAQ</h2>
-                            <p>Dicetak pada: ${new Date().toLocaleDateString('id-ID')} WIB</p>
+            <div class="pdf-page-container">
+                <img src="KOP TINTA ATAS PUTIH.jpg" class="kop-img">
+                <div class="pdf-content">
+                    <h2 class="title-h2">LAPORAN KEUANGAN INFAQ - KELAS ${kelas}</h2>
+                    <p class="title-date">Dicetak pada: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} pukul ${String(new Date().getHours()).padStart(2,'0')}.${String(new Date().getMinutes()).padStart(2,'0')} WIB</p>
+                    
+                    <div class="summary-flex">
+                        <div class="sum-box sum-box-masuk">
+                            <span class="sum-label">TOTAL MASUK KELAS</span>
+                            <span class="sum-value">Rp ${formatRp(totalMasukKelas)}</span>
                         </div>
-                        
-                        <div class="pdf-summary-flex">
-                            <div class="pdf-box">
-                                <span class="pdf-box-title">TOTAL MASUK KELAS</span>
-                                <span class="pdf-box-val">Rp ${formatRp(totalMasukKelas)}</span>
-                            </div>
-                            <div class="pdf-box" style="width: 38%;">
-                                <span class="pdf-box-title" style="background-color: #000; color: #fff; padding: 2px 4px; display: inline-block;">KELAS ${kelas}</span>
-                                <span class="pdf-box-title" style="margin-top: 4px;">TOTAL KELUAR KELAS</span>
-                                <span class="pdf-box-val">Rp ${formatRp(totalKeluar)}</span>
-                            </div>
-                            <div class="pdf-box">
-                                <span class="pdf-box-title">SISA SALDO KELAS</span>
-                                <span class="pdf-box-val">Rp ${formatRp(saldo)}</span>
-                            </div>
+                        <div class="sum-box sum-box-keluar">
+                            <span class="sum-label">TOTAL KELUAR KELAS</span>
+                            <span class="sum-value">Rp ${formatRp(totalKeluar)}</span>
                         </div>
-                        
-                        <div class="pdf-student-info">
-                            <span>No: ${String(s.no || siswaIdx+1).padStart(2, '0')}</span>
-                            <span>Nama Siswa: <span>${s.nama}</span></span>
+                        <div class="sum-box sum-box-saldo">
+                            <span class="sum-label">SISA SALDO KELAS</span>
+                            <span class="sum-value">Rp ${formatRp(saldo)}</span>
                         </div>
-                        
-                        <table class="pdf-table">
-                            <thead>
-                                <tr>
-                                    <th class="text-left" style="width: 20%;">Bulan</th>
-                                    <th>Pekan 1</th><th>Pekan 2</th><th>Pekan 3</th><th>Pekan 4</th><th>Pekan 5</th>
-                                    <th style="width: 15%;">Total (Rp)</th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableRows}</tbody>
-                        </table>
-                        
-                        <h3 style="font-size: 11px; font-weight: bold; margin-top: 15px; margin-bottom: 5px; color: #000;">Daftar Pengeluaran Kelas:</h3>
-                        <table class="pdf-table" style="width: 70%;">
-                            <thead><tr><th style="width: 25%;">Tanggal</th><th class="text-left">Keterangan Pengeluaran</th><th style="width: 25%;">Nominal (Rp)</th></tr></thead>
-                            <tbody>${expRows}</tbody>
-                        </table>
                     </div>
-                    <img src="KOP TINTA BAWAH.png" class="pdf-kop-bawah" onerror="this.src='https://via.placeholder.com/816x100?text=KOP+BAWAH+GITHUB'">
+                    
+                    <div class="student-badge">
+                        No: ${String(s.no || siswaIdx+1).padStart(2, '0')} &nbsp;|&nbsp; Nama Siswa: ${s.nama}
+                    </div>
+                    
+                    <table class="table-siswa">
+                        <thead>
+                            <tr>
+                                <th style="width: 18%; text-align: left;">Bulan</th>
+                                <th>Pekan 1</th>
+                                <th>Pekan 2</th>
+                                <th>Pekan 3</th>
+                                <th>Pekan 4</th>
+                                <th>Pekan 5</th>
+                                <th style="width: 15%;">Total (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                    
+                    <div style="font-size: 11px; font-weight: 800; margin-bottom: 8px; color: #0f172a; margin-top: 15px;">Daftar Pengeluaran Kelas:</div>
+                    <table class="table-pengeluaran">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%; text-align: left;">Tanggal</th>
+                                <th style="text-align: left;">Keterangan Pengeluaran</th>
+                                <th style="width: 25%; text-align: right;">Nominal (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody>${expRows}</tbody>
+                    </table>
                 </div>
+                <img src="KOP TINTA BAWAH.png" class="kop-footer">
+            </div>
             `;
         }
 
@@ -1224,7 +1139,6 @@
 
             if(triggerGlobalStats) calcStatsWalas();
             
-            // Sat set simpan belakang layar
             const payload = { action: "saveKelasData", kelas: kelasWalasAktif, pengeluaranTotal: DB.pengeluaran[kelasWalasAktif] || 0, riwayatPengeluaran: DB.riwayatPengeluaran[kelasWalasAktif] || [], siswaData: DB.siswa[kelasWalasAktif] || [], checklistState: checklistState[kelasWalasAktif] || {}, nominalKelas: DB.nominalDefault[kelasWalasAktif] || 50000 };
             fetchGAS(payload);
         }
@@ -1348,7 +1262,8 @@
             
             if (!DB.riwayatPengeluaran[kelasWalasAktif]) DB.riwayatPengeluaran[kelasWalasAktif] = [];
             const d = new Date(tgl); const mm = String(d.getMonth() + 1).padStart(2, '0'); const yy = String(d.getFullYear()).slice(-2); const shortDate = `${mm}/${yy}`;
-            validRows.forEach(r => { DB.riwayatPengeluaran[kelasWalasAktif].push({ amount: parseInt(r.nom), ket: r.ket, date: shortDate, fullDate: tgl }); });
+            const fullDateStr = `${String(d.getDate()).padStart(2,'0')} ${['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()]} ${d.getFullYear()}`;
+            validRows.forEach(r => { DB.riwayatPengeluaran[kelasWalasAktif].push({ amount: parseInt(r.nom), ket: r.ket, date: shortDate, fullDate: fullDateStr }); });
             DB.pengeluaran[kelasWalasAktif] = (DB.pengeluaran[kelasWalasAktif] || 0) + total;
             calcStatsWalas(); closeModal(); showToast("Pengeluaran dicatat", "fa-check", "text-green-500"); 
             
