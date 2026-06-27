@@ -126,7 +126,7 @@
             .title-h2 { font-size: 14px; font-weight: 800; margin: 0 0 4px 0; color: #1e3a8a; text-transform: uppercase; font-family: Arial, sans-serif; }
             .title-date { font-size: 9px; margin: 0 0 15px 0; color: #64748b; font-family: Arial, sans-serif;}
             
-            .summary-flex { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 4px; }
+            .summary-flex { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 4px; }
             .sum-box { flex: 1; padding: 12px 10px; color: white; border-radius: 0; box-sizing: border-box; }
             .sum-box-masuk { background-color: #2563eb; } 
             .sum-box-keluar { background-color: #f97316; } 
@@ -134,7 +134,42 @@
             .sum-label { font-size: 7px; font-weight: 400; text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
             .sum-value { font-size: 15px; font-weight: normal; }
             
-            .student-badge { background-color: #2563eb; color: white; padding: 6px 12px; font-size: 10px; font-weight: 700; margin-bottom: 12px; display: inline-block; width: 100%; box-sizing: border-box; }
+            .legend-container {
+                display: flex; gap: 12px; align-items: center; margin-bottom: 12px;
+                background-color: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; width: fit-content;
+            }
+            .legend-item { font-size: 9px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; }
+            .legend-box { width: 12px; height: 12px; border-radius: 3px; }
+
+            .student-badge { 
+                background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+                color: white; 
+                padding: 8px 14px; 
+                font-size: 11px; 
+                font-weight: 800; 
+                margin-bottom: 12px; 
+                display: block; 
+                width: 100%; 
+                box-sizing: border-box; 
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                border-left: 6px solid #fbbf24;
+            }
+
+            .nama-siswa-pill { 
+                background: #eff6ff;
+                color: #1e3a8a; 
+                padding: 4px 8px; 
+                border-radius: 6px; 
+                font-weight: 800; 
+                display: inline-block; 
+                border-left: 4px solid #3b82f6;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 140px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            }
             
             /* Table Rekap Kelas (Admin) */
             .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 8px; text-align: center; }
@@ -151,8 +186,9 @@
             .table-siswa th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
             .table-siswa td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
             .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-            .pill-lunas { background-color: #22c55e; color: white; padding: 3px 8px; border-radius: 12px; font-size: 7px; font-weight: 800; }
-            .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 3px 8px; border-radius: 12px; font-size: 7px; font-weight: 600; }
+            .pill-lunas { background-color: #22c55e; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-libur { background-color: #ef4444; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #cbd5e1; text-align: center; width: 36px; }
             .row-total td { background-color: #f1f5f9 !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; }
             
             .table-pengeluaran { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
@@ -521,8 +557,8 @@
 
     <!-- FUN POPUP (SWEET ALERT CUSTOM) -->
     <div id="fun-popup-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div id="fun-popup-card" class="bg-white rounded-3xl p-6 pt-10 shadow-2xl max-w-[290px] w-full transform scale-75 opacity-0 transition-all duration-400 text-center relative border-[3px]">
-            <div id="fun-popup-icon" class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] z-10 whitespace-nowrap animate-bounce flex gap-1">🚀</div>
+        <div id="fun-popup-card" class="bg-white rounded-3xl p-6 pt-8 max-w-[280px] w-full transform scale-75 opacity-0 transition-all duration-300 text-center relative mt-8 border-2">
+            <div id="fun-popup-icon" class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] z-10 whitespace-nowrap animate-bounce">🚀</div>
             <h3 id="fun-popup-title" class="text-[17px] font-black text-slate-800 mb-1 mt-2">Judul</h3>
             <p id="fun-popup-msg" class="text-[11px] font-bold text-slate-500 mb-5 leading-relaxed">Pesan</p>
             <button onclick="closeFunPop()" id="fun-popup-btn" class="w-full py-3.5 rounded-xl font-black text-[12px] text-white shadow-lg transition transform active:scale-95">OKE</button>
@@ -812,7 +848,7 @@
 
         async function prosesCetakAdmin() {
             const cbs = document.querySelectorAll('.cb-admin-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Cetak Apaan Nih?', ['Centang dulu dong kelas yang mau dicetak! 🖨️', 'Pilih minimal satu kelas bosku!']);
+            if (cbs.length === 0) return sweetPop('warning', 'Cetak Apaan Nih?', 'Centang dulu dong kelas yang mau dicetak! 🖨️');
             
             let filename = cbs.length > 1 ? 'Laporan_Rekap_Infaq_Semua_Kelas' : `Laporan_Rekap_Infaq_Kelas_${cbs[0].value}`;
             let finalHTML = '';
@@ -828,7 +864,7 @@
 
         async function prosesCetakWalasSiswa() {
             const cbs = document.querySelectorAll('.cb-walas-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Gimana mau cetak kalau siswanya belum dicentang? 🖨️', 'Dicontreng dulu ya nama siswanya!']);
+            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', 'Gimana mau cetak kalau siswanya belum dicentang? 🖨️');
             
             let studentNameClean = DB.siswa[kelasWalasAktif][parseInt(cbs[0].value)].nama.replace(/[^a-zA-Z0-9]/g, '_');
             let filename = cbs.length > 1 
@@ -872,7 +908,7 @@
                     });
                     totalMasukKelas += totalSiswa;
 
-                    rowHtml += `<td class="text-left">${s.nama}</td>`;
+                    rowHtml += `<td class="text-left"><div class="nama-siswa-pill">${s.nama}</div></td>`;
                     monthHeaders.forEach(m => {
                         let val = monthlyData[m] === 0 ? "0" : (monthlyData[m]/1000).toString(); // Angka simpel
                         let valClass = monthlyData[m] === 0 ? "val-zero" : "";
@@ -910,6 +946,13 @@
                             <span class="sum-label">SISA SALDO KAS KELAS</span>
                             <span class="sum-value">Rp ${formatRp(saldo)}</span>
                         </div>
+                    </div>
+
+                    <div class="legend-container">
+                        <span style="font-size: 8px; font-weight: 900; color: #1e293b; margin-right: 4px;">KETERANGAN STATUS:</span>
+                        <div class="legend-item"><div class="legend-box" style="background-color: #22c55e;"></div> Infaq (Masuk)</div>
+                        <div class="legend-item"><div class="legend-box" style="background-color: #ef4444;"></div> Libur</div>
+                        <div class="legend-item"><div class="legend-box" style="background-color: #f1f5f9; border: 1px solid #cbd5e1;"></div> Belum Infaq</div>
                     </div>
                     
                     <table class="table-admin">
@@ -951,8 +994,16 @@
             academicWeeks.forEach(w => {
                 const mKey = w.monthKey;
                 if (monthData[mKey]) {
-                    const status = checks[w.id]; let labelHtml = `<span class="pill-empty">-</span>`;
-                    if(status === 1) { labelHtml = `<span class="pill-lunas">LUNAS</span>`; monthData[mKey].total += nominal; } 
+                    const status = checks[w.id]; 
+                    let labelHtml = `<span class="pill-empty">-</span>`;
+                    
+                    if(status === 1) { 
+                        labelHtml = `<span class="pill-lunas">LUNAS</span>`; 
+                        monthData[mKey].total += nominal; 
+                    } else if (status === 2) {
+                        labelHtml = `<span class="pill-libur">LIBUR</span>`;
+                    }
+                    
                     monthData[mKey].weeks.push(labelHtml);
                 }
             });
@@ -1009,6 +1060,13 @@
                             <span class="sum-label">SISA SALDO KELAS</span>
                             <span class="sum-value">Rp ${formatRp(saldo)}</span>
                         </div>
+                    </div>
+
+                    <div class="legend-container">
+                        <span style="font-size: 8px; font-weight: 900; color: #1e293b; margin-right: 4px;">KETERANGAN STATUS:</span>
+                        <div class="legend-item"><div class="legend-box" style="background-color: #22c55e;"></div> Infaq (Masuk)</div>
+                        <div class="legend-item"><div class="legend-box" style="background-color: #ef4444;"></div> Libur</div>
+                        <div class="legend-item"><div class="legend-box" style="background-color: #f1f5f9; border: 1px solid #cbd5e1;"></div> Belum Infaq</div>
                     </div>
                     
                     <div class="student-badge">
@@ -1157,7 +1215,7 @@
                 dataSiswa.forEach((_, i) => { checklistState[kelasWalasAktif][i] = new Array(52).fill(0); });
                 DB.pengeluaran[kelasWalasAktif] = 0; DB.riwayatPengeluaran[kelasWalasAktif] = []; tempPengeluaranRows = [];
                 renderChecklistWalas(); calcStatsWalas(); 
-                sweetPop("success", "Sistem Direset!", ["Layar udah bersih, langsung tembak ke server!", "Berhasil direset total bos!"]);
+                sweetPop("success", "Sistem Direset!", "Layar udah bersih, langsung tembak ke server!");
                 const payload = { action: "saveKelasData", kelas: kelasWalasAktif, pengeluaranTotal: 0, riwayatPengeluaran: [], siswaData: DB.siswa[kelasWalasAktif] || [], checklistState: checklistState[kelasWalasAktif] || {}, nominalKelas: DB.nominalDefault[kelasWalasAktif] || 50000 };
                 fetchGAS(payload);
             });
@@ -1246,14 +1304,14 @@
         function simpanPengeluaran(btn) {
             const total = hitungTotalPengeluaran(); const tgl = document.getElementById('pengeluaran-tgl').value;
             let validRows = tempPengeluaranRows.filter(r => r.ket.trim() !== '' && r.nom !== '');
-            if (validRows.length === 0) return sweetPop('warning', 'Masih Kosong Nih!', ['Jangan pelit-pelit ngetik dong, diisi dulu datanya! ✍️', 'Isi dulu detail pengeluarannya bosku!']);
+            if (validRows.length === 0) return sweetPop('warning', 'Masih Kosong Nih!', 'Jangan pelit-pelit ngetik dong, diisi dulu datanya! ✍️');
             
             if (!DB.riwayatPengeluaran[kelasWalasAktif]) DB.riwayatPengeluaran[kelasWalasAktif] = [];
             const d = new Date(tgl); const mm = String(d.getMonth() + 1).padStart(2, '0'); const yy = String(d.getFullYear()).slice(-2); const shortDate = `${mm}/${yy}`;
             const fullDateStr = `${String(d.getDate()).padStart(2,'0')} ${['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][d.getMonth()]} ${d.getFullYear()}`;
             validRows.forEach(r => { DB.riwayatPengeluaran[kelasWalasAktif].push({ amount: parseInt(r.nom), ket: r.ket, date: shortDate, fullDate: fullDateStr }); });
             DB.pengeluaran[kelasWalasAktif] = (DB.pengeluaran[kelasWalasAktif] || 0) + total;
-            calcStatsWalas(); closeModal(); sweetPop('success', 'Tercatat Rapi!', ['Pengeluaran udah masuk buku kas, aman bos! 💸', 'Beres, data pengeluaran tersimpan rapi!']); 
+            calcStatsWalas(); closeModal(); sweetPop('success', 'Tercatat Rapi!', 'Pengeluaran udah masuk buku kas, aman bos! 💸'); 
             
             fetchGAS({ action: "saveKelasData", kelas: kelasWalasAktif, pengeluaranTotal: DB.pengeluaran[kelasWalasAktif] || 0, riwayatPengeluaran: DB.riwayatPengeluaran[kelasWalasAktif] || [], siswaData: DB.siswa[kelasWalasAktif] || [], checklistState: checklistState[kelasWalasAktif] || {}, nominalKelas: DB.nominalDefault[kelasWalasAktif] || 50000 });
         }
@@ -1279,7 +1337,7 @@
         function kosongkanRiwayat() {
             customConfirm("Semua riwayat pengeluaran akan dihapus secara permanen. Lanjutkan?", () => {
                 DB.riwayatPengeluaran[kelasWalasAktif] = []; DB.pengeluaran[kelasWalasAktif] = 0;
-                calcStatsWalas(); renderRiwayatList(); closeModal(); sweetPop('success', 'Riwayat Dihapus!', ['Catatan kas kosong, dompet fresh lagi nih! 💸', 'Riwayat pengeluaran sukses dibersihkan!']);
+                calcStatsWalas(); renderRiwayatList(); closeModal(); sweetPop('success', 'Riwayat Dihapus!', 'Catatan kas kosong, dompet fresh lagi nih! 💸');
                 fetchGAS({ action: "saveKelasData", kelas: kelasWalasAktif, pengeluaranTotal: 0, riwayatPengeluaran: [], siswaData: DB.siswa[kelasWalasAktif] || [], checklistState: checklistState[kelasWalasAktif] || {}, nominalKelas: DB.nominalDefault[kelasWalasAktif] || 50000 });
             });
         }
@@ -1306,7 +1364,7 @@
                 case 'nominal':
                     title.innerText = "SET NOMINAL INFAQ"; 
                     let listNominalHtml = ''; DAFTAR_KELAS.forEach((k, idx) => { listNominalHtml += `<div class="flex justify-between bg-slate-50 border border-slate-200 p-2.5 rounded-lg"><span class="text-[12px] font-black text-slate-800 w-1/2 pl-1">${idx + 1}. Kelas ${k}</span><div class="relative w-1/2 max-w-[140px]"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-bold">Rp</span><input type="number" class="w-full bg-white border border-slate-200 rounded p-2 pl-7 text-[12px] font-black outline-none focus:border-blue-500 text-right" value="${DB.nominalDefault[k] || 0}"></div></div>`; });
-                    html = `<div class="flex flex-col h-full space-y-4"><div class="flex-1 overflow-y-auto space-y-2 custom-scrollbar max-h-[40vh]">${listNominalHtml}</div><button onclick="closeModal(); sweetPop('success', 'Mantap!', ['Pengaturan Nominal udah kesimpan rapi! 👍', 'Sip, nominal infaq udah di-update!']);" class="w-full bg-[#1e3a8a] text-white font-black py-3.5 rounded-xl text-[12px] mt-2">SIMPAN PENGATURAN</button></div>`;
+                    html = `<div class="flex flex-col h-full space-y-4"><div class="flex-1 overflow-y-auto space-y-2 custom-scrollbar max-h-[40vh]">${listNominalHtml}</div><button onclick="closeModal(); sweetPop('success', 'Mantap!', 'Pengaturan Nominal udah kesimpan rapi! 👍');" class="w-full bg-[#1e3a8a] text-white font-black py-3.5 rounded-xl text-[12px] mt-2">SIMPAN PENGATURAN</button></div>`;
                     break;
                 case 'akun':
                     title.innerText = "MANAJEMEN AKUN"; 
@@ -1329,13 +1387,13 @@
                 let dataWalas = []; if(workbook.Sheets["DATA_WALAS"]) { dataWalas = XLSX.utils.sheet_to_json(workbook.Sheets["DATA_WALAS"]); }
                 let dataSiswa = []; if(workbook.Sheets["DATA_SISWA"]) { dataSiswa = XLSX.utils.sheet_to_json(workbook.Sheets["DATA_SISWA"]); }
                 excelPayload = { action: "uploadMaster", dataWalas: dataWalas.map(w => ({kelas: w.KELAS, nama: w['NAMA GURU'], password: w.PASSWORD, nominal: w.NOMINAL || 50000})), dataSiswa: dataSiswa.map(s => ({kelas: s.KELAS, no_presensi: s['NO PRESENSI'], nama: s['NAMA SISWA'], password: s.PASSWORD})) };
-                sweetPop('success', 'File Ditemukan!', ['Dokumen udah siap dieksekusi bos!', 'File aman, siap disinkronisasi!']);
+                sweetPop('success', 'File Ditemukan!', 'Dokumen udah siap dieksekusi bos!');
             };
             reader.readAsArrayBuffer(file);
         }
 
         async function prosesSyncExcel(btn) {
-            if(!excelPayload) return sweetPop('error', 'Kosong Nih!', ['Pilih file Excelnya dulu dong, masa sinkron udara? 😂', 'Upload filenya dulu boss!']);
+            if(!excelPayload) return sweetPop('error', 'Kosong Nih!', 'Pilih file Excelnya dulu dong, masa sinkron udara? 😂');
             
             const texts = ["MENGUNGGAH...", "MENYUSUN KELAS...", "MENYIMPAN DATA..."];
             let tIdx = 0;
@@ -1352,8 +1410,8 @@
             
             if(res.status === 'success') {
                 if (excelPayload.dataWalas) { excelPayload.dataWalas.forEach(w => { if(w.nominal) DB.nominalDefault[w.kelas] = parseInt(w.nominal) || 50000; }); }
-                sweetPop('success', 'Beres Bos!', ['Data master udah sinkron semua, siap gas! 🎉', 'Mantul, data berhasil diunggah ke server!']); closeModal();
-            } else { sweetPop('error', 'Yah Gagal...', ['Gagal Sinkronisasi nih, periksa koneksi internet ya! 😭', 'Waduh putus di jalan, coba lagi deh!']); }
+                sweetPop('success', 'Beres Bos!', 'Data master udah sinkron semua, siap gas! 🎉'); closeModal();
+            } else { sweetPop('error', 'Yah Gagal...', 'Gagal Sinkronisasi nih, periksa koneksi! 😭'); }
             
             btn.innerHTML = `SINKRONISASI SEKARANG`; btn.disabled = false;
         }
@@ -1364,7 +1422,7 @@
             
             if (subType === 'admin') { 
                 title.innerText = "AKUN ADMINISTRATOR"; 
-                html += `<div><input type="password" class="w-full border border-slate-200 focus:border-blue-500 outline-none rounded-xl p-3 text-center font-black tracking-widest text-[14px]" placeholder="PIN BARU"></div><button onclick="closeModal(); sweetPop('success', 'Siap!', ['Perubahan diamankan bos!', 'Sandi admin udah diupdate.']);" class="w-full bg-[#1e3a8a] text-white font-black py-3.5 rounded-xl mt-4">SIMPAN PERUBAHAN</button>`; 
+                html += `<div><input type="password" class="w-full border border-slate-200 focus:border-blue-500 outline-none rounded-xl p-3 text-center font-black tracking-widest text-[14px]" placeholder="PIN BARU"></div><button onclick="closeModal(); sweetPop('success', 'Siap!', 'Perubahan diamankan bos!');" class="w-full bg-[#1e3a8a] text-white font-black py-3.5 rounded-xl mt-4">SIMPAN PERUBAHAN</button>`; 
             } 
             else if (subType === 'walas') { 
                 title.innerText = "AKUN WALI KELAS"; 
@@ -1436,10 +1494,10 @@
             const kInput = document.getElementById('new-walas-kelas').value.trim().toUpperCase();
             const n = document.getElementById('new-walas-nama').value.trim();
             const p = document.getElementById('new-walas-pin').value.trim();
-            if(!kInput || !n || !p) return sweetPop('warning', 'Eits!', ['Diisi lengkap dulu dong, masa ada yang kosong? 👀', 'Waduh, formnya ada yang belum diisi nih!']);
+            if(!kInput || !n || !p) return sweetPop('warning', 'Eits!', 'Diisi lengkap dulu dong, masa ada yang kosong? 👀');
             
-            if(DB.guru[kInput]) return sweetPop('error', 'Waduh Kembar!', [`Kelas ${kInput} udah ada gurunya lho! Edit di daftar bawah aja. 👯‍♂️`]);
-            for(let kelasLain in DB.guru) { if(kelasLain !== kInput && DB.guru[kelasLain] && DB.guru[kelasLain].toLowerCase() === n.toLowerCase()) return sweetPop('error', 'Waduh Kembar!', [`Guru ini udah ngajar di Kelas ${kelasLain}! 👯‍♂️`]); }
+            if(DB.guru[kInput]) return sweetPop('error', 'Waduh Kembar!', `Kelas ${kInput} udah ada gurunya lho! Edit di daftar bawah aja. 👯‍♂️`);
+            for(let kelasLain in DB.guru) { if(kelasLain !== kInput && DB.guru[kelasLain] && DB.guru[kelasLain].toLowerCase() === n.toLowerCase()) return sweetPop('error', 'Waduh Kembar!', `Guru ini udah ngajar di Kelas ${kelasLain}! 👯‍♂️`); }
 
             DB.guru[kInput] = n; 
             if(!DB.walasPassword) DB.walasPassword = {};
@@ -1448,7 +1506,7 @@
             if(!DAFTAR_KELAS.includes(kInput)) { DAFTAR_KELAS.push(kInput); }
             
             document.getElementById('new-walas-kelas').value = ''; document.getElementById('new-walas-nama').value = ''; document.getElementById('new-walas-pin').value = '';
-            renderListWalas(); sweetPop('success', 'Mantap!', ['Wali Kelas baru udah terdaftar! Jangan lupa Simpan ke Server! 🎉']);
+            renderListWalas(); sweetPop('success', 'Mantap!', 'Wali Kelas baru udah terdaftar! Jangan lupa Simpan ke Server! 🎉');
         }
 
         function hapusWalas(k) { 
@@ -1512,12 +1570,12 @@
 
         function tambahSiswaAkun() {
             const kelas = document.getElementById('edit-siswa-kelas').value; const noPresensi = document.getElementById('new-siswa-no').value; const nama = document.getElementById('new-siswa-nama').value; const pin = document.getElementById('new-siswa-pin').value;
-            if(!kelas || !nama || !pin || !noPresensi) return sweetPop('warning', 'Masih Kosong Nih!', ['Diisi lengkap dulu dong, masa ada yang kosong? 👀', 'Jangan ada yang kelewatan ya isiannya!']);
+            if(!kelas || !nama || !pin || !noPresensi) return sweetPop('warning', 'Masih Kosong Nih!', 'Diisi lengkap dulu dong, masa ada yang kosong? 👀');
             if(!DB.siswa[kelas]) DB.siswa[kelas] = [];
             
             const noInt = parseInt(noPresensi); const namaTrim = nama.trim(); const namaLower = namaTrim.toLowerCase();
-            if(DB.siswa[kelas].some(s => parseInt(s.no) === noInt)) return sweetPop('error', 'Waduh Kembar!', [`Nomor Presensi ${noInt} udah terpakai! Ganti yang lain! 👯‍♂️`]);
-            if(DB.siswa[kelas].some(s => (s.nama || "").toLowerCase() === namaLower)) return sweetPop('error', 'Waduh Kembar!', [`Siswa bernama "${namaTrim}" udah terdaftar di kelas ini! 👯‍♂️`]);
+            if(DB.siswa[kelas].some(s => parseInt(s.no) === noInt)) return sweetPop('error', 'Waduh Kembar!', `Nomor Presensi ${noInt} udah terpakai! Ganti yang lain! 👯‍♂️`);
+            if(DB.siswa[kelas].some(s => (s.nama || "").toLowerCase() === namaLower)) return sweetPop('error', 'Waduh Kembar!', `Siswa bernama "${namaTrim}" udah terdaftar di kelas ini! 👯‍♂️`);
 
             DB.siswa[kelas].push({nama: namaTrim, pin: pin, no: noPresensi, infaq: 0});
             DB.siswa[kelas].sort((a,b) => parseInt(a.no) - parseInt(b.no));
@@ -1526,23 +1584,23 @@
             
             document.getElementById('new-siswa-no').value = ''; document.getElementById('new-siswa-nama').value = ''; document.getElementById('new-siswa-pin').value = '';
             renderSiswaEdit(kelas); if(document.getElementById('summary-kelas-select').value === kelas) updateDashboardView(); if(kelasWalasAktif === kelas) { renderChecklistWalas(); calcStatsWalas(); }
-            sweetPop('success', 'Siswa Masuk!', ['Siswa baru udah tercatat, Jangan lupa Simpan ke Server! 🎉', 'Sip, siswa berhasil dimasukkan ke daftar!']);
+            sweetPop('success', 'Siswa Masuk!', 'Siswa baru udah tercatat, Jangan lupa Simpan ke Server! 🎉');
         }
 
         function simpanDataMasterKeServer() {
             showToast("Menyimpan ke Server...");
             let dataWalas = []; DAFTAR_KELAS.forEach(k => { if(DB.guru[k]) dataWalas.push({ kelas: k, nama: DB.guru[k], password: (DB.walasPassword && DB.walasPassword[k]) ? DB.walasPassword[k] : "123456", nominal: DB.nominalDefault[k] || 50000 }); });
             let dataSiswa = []; for (let k in DB.siswa) { DB.siswa[k].forEach((s, idx) => { dataSiswa.push({ kelas: k, no_presensi: s.no || (idx+1), nama: s.nama, password: s.pin || "123456" }); }); }
-            fetchGAS({ action: "uploadMaster", dataWalas: dataWalas, dataSiswa: dataSiswa }).then(()=> sweetPop('success', 'Mantap!', ['Data Master udah berhasil diamankan di Server! 🎉', 'Aman boss, data udah sinkron!']));
+            fetchGAS({ action: "uploadMaster", dataWalas: dataWalas, dataSiswa: dataSiswa }).then(()=> sweetPop('success', 'Mantap!', 'Data Master udah berhasil diamankan di Server! 🎉'));
         }
 
         function closeModal() { document.getElementById('global-modal').classList.remove('active'); document.getElementById('modal-title').classList.replace('text-red-600', 'text-[#1e3a8a]'); }
         
         function prosesReset() { 
-            if(document.getElementById('reset-confirm').value !== 'RESET') return sweetPop('error', 'Salah Ketik!', ['Ketik RESET yang bener dong biar afdol! 😜', 'Coba ketik lagi tulisan RESET-nya boss!']); 
+            if(document.getElementById('reset-confirm').value !== 'RESET') return sweetPop('error', 'Salah Ketik!', 'Ketik RESET yang bener dong biar afdol! 😜'); 
             for(let k in DB.siswa) { DB.siswa[k]=[]; DB.pengeluaran[k]=0; DB.riwayatPengeluaran[k]=[]; checklistState[k]={}; } 
             updateDashboardView(); closeModal(); 
-            sweetPop('success', 'Tersapu Bersih!', ['Sistem kembali suci seperti bayi baru lahir! 👼', 'Data udah bersih semua!']); 
+            sweetPop('success', 'Tersapu Bersih!', 'Sistem kembali suci seperti bayi baru lahir! 👼'); 
         }
 
         async function globalRefresh() {
@@ -1578,23 +1636,24 @@
                 msgEl.innerText = msg;
             }
 
-            card.className = "bg-white rounded-3xl p-6 pt-10 shadow-2xl max-w-[290px] w-full transform scale-75 opacity-0 transition-all duration-400 text-center relative border-[3px]";
-            
+            card.className = "bg-white rounded-3xl p-6 pt-8 max-w-[280px] w-full transform scale-75 opacity-0 transition-all duration-300 text-center relative mt-8 border-2";
+            icon.className = "absolute -top-8 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] z-10 whitespace-nowrap animate-bounce";
+
             const successPool = [
-                { emojis: "😎🔥", glow: "shadow-[0_0_40px_rgba(34,197,94,0.5)] border-green-400", btnClass: "bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-600 hover:to-emerald-500", btnText: "MENYALA ABANGKU! 🚀" },
-                { emojis: "🚀✨", glow: "shadow-[0_0_40px_rgba(59,130,246,0.5)] border-blue-400", btnClass: "bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500", btnText: "GACOR KANG! ⚡" },
-                { emojis: "🏆🎉", glow: "shadow-[0_0_40px_rgba(234,179,8,0.5)] border-yellow-400", btnClass: "bg-gradient-to-r from-yellow-500 to-amber-400 hover:from-yellow-600 hover:to-amber-500", btnText: "GOKIL PARAH! 🤘" }
+                { emojis: "😎🔥", glow: "border-green-400 shadow-[0_0_40px_rgba(74,222,128,0.5)]", btnClass: "bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.4)]", btnText: "MENYALA ABANGKU! 🚀" },
+                { emojis: "🚀✨", glow: "border-blue-400 shadow-[0_0_40px_rgba(96,165,250,0.5)]", btnClass: "bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-[0_4px_15px_rgba(59,130,246,0.4)]", btnText: "GACOR KANG! ⚡" },
+                { emojis: "🏆🎉", glow: "border-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.5)]", btnClass: "bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 shadow-[0_4px_15px_rgba(234,179,8,0.4)]", btnText: "GOKIL PARAH! 🤘" }
             ];
 
             const errorPool = [
-                { emojis: "🫵🤣", glow: "shadow-[0_0_40px_rgba(239,68,68,0.5)] border-red-500", btnClass: "bg-gradient-to-r from-red-500 to-rose-400 hover:from-red-600 hover:to-rose-500", btnText: "YAHAHAHA LAWAK LU! 🤡" },
-                { emojis: "🙈💦", glow: "shadow-[0_0_40px_rgba(244,63,94,0.5)] border-rose-500", btnClass: "bg-gradient-to-r from-rose-500 to-pink-400 hover:from-rose-600 hover:to-pink-500", btnText: "YAH KELESET BOS! 😅" },
-                { emojis: "😅🔧", glow: "shadow-[0_0_40px_rgba(100,116,139,0.5)] border-slate-500", btnClass: "bg-gradient-to-r from-slate-600 to-slate-400 hover:from-slate-700 hover:to-slate-500", btnText: "CEK LAGI DONG! 🛠️" }
+                { emojis: "🫵🤣", glow: "border-red-400 shadow-[0_0_40px_rgba(248,113,113,0.5)]", btnClass: "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-[0_4px_15px_rgba(239,68,68,0.4)]", btnText: "YAHAHAHA LAWAK LU! 🤡" },
+                { emojis: "🙈💦", glow: "border-rose-400 shadow-[0_0_40px_rgba(251,113,133,0.5)]", btnClass: "bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 shadow-[0_4px_15px_rgba(244,63,94,0.4)]", btnText: "YAH KELESET BOS! 😅" },
+                { emojis: "😅🔧", glow: "border-slate-400 shadow-[0_0_40px_rgba(148,163,184,0.5)]", btnClass: "bg-gradient-to-r from-slate-500 to-slate-700 hover:from-slate-600 hover:to-slate-800 shadow-[0_4px_15px_rgba(100,116,139,0.4)]", btnText: "CEK LAGI DONG! 🛠️" }
             ];
 
             const warningPool = [
-                { emojis: "🧐🚩", glow: "shadow-[0_0_40px_rgba(249,115,22,0.5)] border-orange-400", btnClass: "bg-gradient-to-r from-orange-500 to-amber-400 hover:from-orange-600 hover:to-amber-500", btnText: "SIAP LAKSANAKAN! 🫡" },
-                { emojis: "🤔🚨", glow: "shadow-[0_0_40px_rgba(245,158,11,0.5)] border-amber-500", btnClass: "bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500", btnText: "NGEREM DULU MANG! 🛑" }
+                { emojis: "🧐🚩", glow: "border-orange-400 shadow-[0_0_40px_rgba(251,146,60,0.5)]", btnClass: "bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-[0_4px_15px_rgba(249,115,22,0.4)]", btnText: "SIAP LAKSANAKAN! 🫡" },
+                { emojis: "🤔🚨", glow: "border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.5)]", btnClass: "bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 shadow-[0_4px_15px_rgba(245,158,11,0.4)]", btnText: "NGEREM DULU MANG! 🛑" }
             ];
 
             let selectedTheme;
@@ -1602,18 +1661,14 @@
             else if (type === 'error') selectedTheme = errorPool[Math.floor(Math.random() * errorPool.length)];
             else selectedTheme = warningPool[Math.floor(Math.random() * warningPool.length)];
 
-            icon.innerHTML = selectedTheme.emojis;
-            icon.className = "absolute -top-10 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] animate-bounce flex gap-1 z-10 whitespace-nowrap";
+            icon.innerText = selectedTheme.emojis;
             card.classList.add(...selectedTheme.glow.split(' '));
             
-            btn.className = `w-full py-3.5 rounded-xl font-black text-[12px] tracking-wider text-white shadow-lg transition transform active:scale-95 ${selectedTheme.btnClass}`;
+            btn.className = `w-full py-3.5 rounded-xl font-black text-[12px] text-white transition transform active:scale-95 ${selectedTheme.btnClass}`;
             btn.innerText = selectedTheme.btnText;
 
             overlay.classList.remove('opacity-0', 'pointer-events-none');
-            setTimeout(() => { 
-                card.classList.remove('scale-75', 'opacity-0'); 
-                card.classList.add('scale-100', 'opacity-100'); 
-            }, 10);
+            setTimeout(() => { card.classList.remove('scale-75', 'opacity-0'); card.classList.add('scale-100', 'opacity-100'); }, 10);
         }
 
         function closeFunPop() {
