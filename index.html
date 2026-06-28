@@ -6,7 +6,6 @@
     <title>TINTA - Master Vision</title>
     
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -86,113 +85,114 @@
         .dynamic-input-row { animation: slideDown 0.3s ease; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ========================================================
-           PDF HTML2PDF RENDER STYLES (LEVEL DEWA ANTI BLANK)
-           ======================================================== */
-        #pdf-render-container { 
-            position: absolute; 
-            top: 0; 
-            left: 0;
-            width: 215.9mm; /* Kunci ukuran kertas F4 */
-            background-color: white; 
-            z-index: 999998; /* Di bawah layar loading putih raksasa */
-            display: none; /* Akan diubah jadi block saat proses render via JS */
-        }
+        #pdf-render-container { display: none; }
         
-        .pdf-page-container {
-            width: 215.9mm;
-            height: 330.2mm; /* F4 Portrait Mutlak */
-            margin: 0;
-            padding: 0;
-            position: relative;
-            box-sizing: border-box;
-            overflow: hidden;
-            background-color: white;
-            page-break-after: always;
-            font-family: Arial, sans-serif;
-            color: #0f172a;
-        }
-        
-        .kop-img { width: 100%; height: auto; display: block; margin: 0; padding: 0; border: none; outline: none; }
-        .kop-footer { width: 100%; height: auto; display: block; position: absolute; bottom: 0; left: 0; }
-        .pdf-content { padding: 0 15mm; position: relative; z-index: 10; margin-top: 15px; }
-        
-        .title-h2 { font-size: 14px; font-weight: 800; margin: 0 0 4px 0; color: #1e3a8a; text-transform: uppercase; font-family: Arial, sans-serif; }
-        .title-date { font-size: 9px; margin: 0 0 15px 0; color: #64748b; font-family: Arial, sans-serif;}
-        
-        .summary-flex { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 4px; }
-        .sum-box { flex: 1; padding: 12px 10px; color: white; border-radius: 0; box-sizing: border-box; }
-        .sum-box-masuk { background-color: #2563eb; } 
-        .sum-box-keluar { background-color: #f97316; } 
-        .sum-box-saldo { background-color: #10b981; } 
-        .sum-label { font-size: 7px; font-weight: 400; text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
-        .sum-value { font-size: 15px; font-weight: normal; }
-        
-        .legend-container {
-            display: flex; gap: 12px; align-items: center; margin-bottom: 12px;
-            background-color: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; width: fit-content;
-        }
-        .legend-item { font-size: 9px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; }
-        .legend-box { width: 12px; height: 12px; border-radius: 3px; }
+        @media print {
+            body { background-color: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-family: Arial, sans-serif; }
+            body > *:not(#pdf-render-container) { display: none !important; }
+            
+            #pdf-render-container {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                display: block !important;
+                width: 100% !important;
+                background-color: white;
+            }
+            .pdf-page-container {
+                width: 215.9mm;
+                height: 330.2mm; /* F4 Portrait */
+                page-break-after: always;
+                margin: 0;
+                padding: 0;
+                position: relative;
+                box-sizing: border-box;
+                overflow: hidden;
+                background-color: white;
+            }
+            @page {
+                size: 215.9mm 330.2mm; /* F4 Portrait */
+                margin: 0mm !important; 
+            }
+            
+            .kop-img { width: 100%; height: auto; display: block; margin: 0; padding: 0; border: none; outline: none; }
+            .kop-footer { width: 100%; height: auto; display: block; position: absolute; bottom: 0; left: 0; }
+            .pdf-content { padding: 0 15mm; position: relative; z-index: 10; margin-top: 15px; }
+            
+            .title-h2 { font-size: 14px; font-weight: 800; margin: 0 0 4px 0; color: #1e3a8a; text-transform: uppercase; font-family: Arial, sans-serif; }
+            .title-date { font-size: 9px; margin: 0 0 15px 0; color: #64748b; font-family: Arial, sans-serif;}
+            
+            .summary-flex { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 4px; }
+            .sum-box { flex: 1; padding: 12px 10px; color: white; border-radius: 0; box-sizing: border-box; }
+            .sum-box-masuk { background-color: #2563eb; } 
+            .sum-box-keluar { background-color: #f97316; } 
+            .sum-box-saldo { background-color: #10b981; } 
+            .sum-label { font-size: 7px; font-weight: 400; text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
+            .sum-value { font-size: 15px; font-weight: normal; }
+            
+            .legend-container {
+                display: flex; gap: 12px; align-items: center; margin-bottom: 12px;
+                background-color: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; width: fit-content;
+            }
+            .legend-item { font-size: 9px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; }
+            .legend-box { width: 12px; height: 12px; border-radius: 3px; }
 
-        .student-badge { 
-            background: linear-gradient(90deg, #1e3a8a, #3b82f6);
-            color: white; 
-            padding: 8px 14px; 
-            font-size: 11px; 
-            font-weight: 800; 
-            margin-bottom: 12px; 
-            display: block; 
-            width: 100%; 
-            box-sizing: border-box; 
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-left: 6px solid #fbbf24;
-        }
+            .student-badge { 
+                background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+                color: white; 
+                padding: 8px 14px; 
+                font-size: 11px; 
+                font-weight: 800; 
+                margin-bottom: 12px; 
+                display: block; 
+                width: 100%; 
+                box-sizing: border-box; 
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                border-left: 6px solid #fbbf24;
+            }
 
-        .nama-siswa-pill { 
-            background: #eff6ff;
-            color: #1e3a8a; 
-            padding: 4px 8px; 
-            border-radius: 6px; 
-            font-weight: 800; 
-            display: inline-block; 
-            border-left: 4px solid #3b82f6;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 140px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            .nama-siswa-pill { 
+                background: #eff6ff;
+                color: #1e3a8a; 
+                padding: 4px 8px; 
+                border-radius: 6px; 
+                font-weight: 800; 
+                display: inline-block; 
+                border-left: 4px solid #3b82f6;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 140px;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            }
+            
+            /* Table Rekap Kelas (Admin) */
+            .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 8px; text-align: center; border: 1px solid #e2e8f0; }
+            .table-admin th { padding: 6px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 4px; }
+            .table-admin td { padding: 5px 2px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; }
+            .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+            .table-admin tbody tr:nth-child(odd) td { background-color: white !important; }
+            .text-left { text-align: left !important; padding-left: 8px !important; }
+            .val-zero { color: #cbd5e1 !important; }
+            .val-bold { font-weight: 800; color: #1e3a8a; }
+            
+            /* Table Persiswa (Walas) */
+            .table-siswa { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 15px; text-align: center; }
+            .table-siswa th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+            .table-siswa td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+            .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+            .pill-lunas { background-color: #22c55e; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-libur { background-color: #ef4444; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #cbd5e1; text-align: center; width: 36px; }
+            .row-total td { background-color: #f1f5f9 !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; }
+            
+            .table-pengeluaran { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
+            .table-pengeluaran th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+            .table-pengeluaran td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+            .table-pengeluaran tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+            .pengeluaran-val { color: #dc2626; font-weight: 700; text-align: right; }
         }
-        
-        /* Table Rekap Kelas (Admin) */
-        .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 8px; text-align: center; border: 1px solid #e2e8f0; }
-        .table-admin th { padding: 6px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 4px; }
-        .table-admin td { padding: 5px 2px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; }
-        .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-        .table-admin tbody tr:nth-child(odd) td { background-color: white !important; }
-        .text-left { text-align: left !important; padding-left: 8px !important; }
-        .val-zero { color: #cbd5e1 !important; }
-        .val-bold { font-weight: 800; color: #1e3a8a; }
-        
-        /* Table Persiswa (Walas) */
-        .table-siswa { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 15px; text-align: center; }
-        .table-siswa th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
-        .table-siswa td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
-        .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-        
-        /* Pil Status Presisi */
-        .pill-lunas { background-color: #22c55e; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-        .pill-libur { background-color: #ef4444; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-        .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #cbd5e1; text-align: center; width: 36px; }
-        
-        .row-total td { background-color: #f1f5f9 !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; }
-        
-        .table-pengeluaran { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
-        .table-pengeluaran th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
-        .table-pengeluaran td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
-        .table-pengeluaran tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-        .pengeluaran-val { color: #dc2626; font-weight: 700; text-align: right; }
     </style>
 </head>
 <body>
@@ -340,7 +340,6 @@
         </div>
     </div>
 
-
     <!-- VIEW 2: ADMIN -->
     <div id="view-dashboard-admin" class="hidden w-full min-h-[100dvh] pb-8 relative origin-top pt-[60px]" style="background-color: #f1f5f9;">
         <main class="relative max-w-md mx-auto w-full">
@@ -428,7 +427,6 @@
             </div>
         </main>
     </div>
-
 
     <!-- VIEW 3: WALAS -->
     <div id="view-dashboard-walas" class="hidden w-full min-h-[100dvh] pb-8 relative origin-top font-['Inter'] pt-[60px]" style="background-color: #f8fafc;">
@@ -587,18 +585,18 @@
         </div>
     </div>
 
-    <!-- LOADING SCREEN PDF LEVEL DEWA -->
-    <div id="pdf-loading-overlay" class="fixed inset-0 bg-white z-[999999] hidden flex-col justify-center items-center opacity-0 transition-opacity duration-300 pointer-events-none">
-        <div class="loader w-14 h-14 border-[4px] border-slate-200 border-t-[#1e3a8a] rounded-full animate-spin mb-5"></div>
-        <h2 class="text-xl font-black text-[#1e3a8a] tracking-widest animate-pulse">MENYIAPKAN DOKUMEN...</h2>
-        <p class="text-[11px] font-bold text-slate-500 mt-2 text-center px-4">Mohon jangan tutup aplikasi, sedang merender PDF kecepatan tinggi.</p>
-    </div>
-
-    <!-- CONTAINER RENDER PDF LEVEL DEWA -->
+    <!-- CONTAINER RENDER PDF -->
     <div id="pdf-render-container"></div>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwcBuNRtC9EUE8YYeRw6yB9CJvy9peqVl_2n6WU8AyyGIuPFXoZcSxYMXS0tq_fyasXxw/exec";
+
+        // ==========================================
+        // PENGATURAN KOP GITHUB (UBAH LINK INI JIKA KOP TIDAK MUNCUL)
+        // ==========================================
+        const KOP_ATAS_URL = "KOP TINTA ATAS PUTIH.jpg"; // Ganti dengan link RAW GitHub Anda
+        const KOP_BAWAH_URL = "KOP TINTA BAWAH.png"; // Ganti dengan link RAW GitHub Anda
+        // ==========================================
 
         const DAFTAR_KELAS = ["1A", "1B", "1C", "1D", "1 ICP A", "1 ICP B", "2A", "2B", "2C", "2D", "2 ICP A", "2 ICP B", "3A", "3B", "3C", "3D", "3 ICP A", "4A", "4B", "4C", "4D", "5A", "5B", "5C", "5D", "6A", "6B", "6C", "6D"];
         const DB = { guru: {}, nominalDefault: {}, siswa: {}, pengeluaran: {}, riwayatPengeluaran: {}, walasPassword: {} };
@@ -738,7 +736,7 @@
         function cariSiswa() { const input = document.getElementById('search-siswa').value.toLowerCase(); const items = document.querySelectorAll('.item-siswa-admin'); items.forEach(item => { item.style.display = item.querySelector('.nama-siswa-admin').innerText.toLowerCase().includes(input) ? '' : 'none'; }); }
 
         // ==========================================
-        // SISTEM DIRECT DOWNLOAD PDF LEVEL DEWA
+        // SISTEM CETAK PDF NATIVE (DESAIN IDENTIK MUTLAK + JURUS ANTI BLANK)
         // ==========================================
         function checkHighlight(cb) {
             const label = cb.closest('label'); const indicator = label.querySelector('.input-indicator');
@@ -789,7 +787,7 @@
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-3">
                         ${listHtml}
                     </div>
-                    <button onclick="prosesCetakAdmin()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> UNDUH PDF SEKARANG</button>
+                    <button onclick="prosesCetakAdmin()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> CETAK PDF</button>
                 </div>
             `;
             modal.classList.add('active');
@@ -817,7 +815,7 @@
 
             body.innerHTML = `
                 <div class="flex flex-col h-full max-h-[70vh]">
-                    <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[11px] mb-4 shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> 1. UNDUH REKAP SELURUH KELAS</button>
+                    <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[11px] mb-4 shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> 1. CETAK REKAP SELURUH KELAS</button>
                     <div class="border-t border-slate-200 my-2 relative">
                         <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-[10px] font-black text-slate-400">ATAU CETAK PERSISWA</span>
                     </div>
@@ -828,125 +826,94 @@
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-3">
                         ${listSiswa || '<p class="text-center text-[10px] font-bold text-slate-400">Belum ada siswa</p>'}
                     </div>
-                    <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> 2. UNDUH LAPORAN SISWA</button>
+                    <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> 2. CETAK LAPORAN SISWA</button>
                 </div>
             `;
             modal.classList.add('active');
         }
 
-        // MESIN DIRECT DOWNLOAD HTML2PDF LEVEL DEWA (ANTI BLANK)
-        async function executeDirectDownload(filename, htmlContent) {
+        async function executeNativePrint(filename, htmlContent) {
             closeModal();
             
-            const loader = document.getElementById('pdf-loading-overlay');
-            loader.classList.remove('hidden');
-            loader.classList.remove('opacity-0', 'pointer-events-none');
-            loader.classList.add('opacity-100', 'pointer-events-auto');
-            
-            // Beri waktu UI memunculkan loader
-            await new Promise(r => setTimeout(r, 100));
+            // Tampilkan pop up loading yang gaul
+            sweetPop('warning', 'Sabar Bosku! 🚀', ['Lagi nunggu KOP Resmi merapat...', 'Tahan bentar, lagi nempelin KOP ke kertas F4! 📄']);
             
             const container = document.getElementById('pdf-render-container');
             container.innerHTML = htmlContent;
-            container.style.display = 'block'; // PAKSA MUNCUL DI DOM
             
-            // JURUS DEWA 1: Reset Scroll (Mencegah html2canvas motong layar)
-            window.scrollTo(0, 0);
+            const originalTitle = document.title;
+            document.title = filename;
 
-            // JURUS DEWA 2: Preload semua gambar (Wajib 100% loaded)
-            const images = Array.from(container.getElementsByTagName('img'));
-            await Promise.all(images.map(img => {
-                if (img.complete) return Promise.resolve();
-                return new Promise(resolve => {
-                    img.onload = resolve;
-                    img.onerror = resolve; // Lanjut walau error biar gak stuck
-                });
-            }));
+            // JURUS DEWA: Menunggu semua gambar KOP termuat 100%
+            const images = container.querySelectorAll('img');
+            let loadedImages = 0;
             
-            // JURUS DEWA 3: Tunggu Browser Rendering 600ms
-            await new Promise(r => setTimeout(r, 600));
+            if (images.length === 0) {
+                triggerPrint();
+                return;
+            }
 
-            // JURUS DEWA 4: Matikan overflow-x di body (Bug paling parah html2canvas)
-            const originalOverflow = document.body.style.overflowX;
-            document.body.style.overflowX = 'visible';
+            Array.from(images).forEach(img => {
+                if (img.complete) {
+                    checkImageLoad();
+                } else {
+                    img.addEventListener('load', checkImageLoad);
+                    img.addEventListener('error', checkImageLoad); // Tetap lanjut meski gagal agar tidak nyangkut
+                }
+            });
 
-            const opt = {
-                margin:       0,
-                filename:     filename + '.pdf',
-                image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    logging: false, 
-                    scrollY: 0,
-                    scrollX: 0
-                },
-                jsPDF:        { unit: 'mm', format: [215.9, 330.2], orientation: 'portrait' }
-            };
-            
-            try {
-                await html2pdf().set(opt).from(container).save();
-                sweetPop('success', 'PDF Berhasil Diunduh!', 'File PDF mendarat mulus tanpa cacat! 😎🚀');
-            } catch (err) {
-                sweetPop('error', 'Waduh Gagal', 'Sistem PDF lagi pusing. Coba lagi bos! 😭');
-            } finally {
-                // Kembalikan semuanya ke semula
-                container.style.display = 'none';
-                container.innerHTML = '';
-                document.body.style.overflowX = originalOverflow;
-                
-                loader.classList.add('opacity-0', 'pointer-events-none');
-                loader.classList.remove('opacity-100', 'pointer-events-auto');
-                setTimeout(() => loader.classList.add('hidden'), 300);
+            function checkImageLoad() {
+                loadedImages++;
+                if (loadedImages === images.length) {
+                    setTimeout(triggerPrint, 500); // Beri jeda 0.5 detik untuk browser menggambar
+                }
+            }
+
+            function triggerPrint() {
+                closeFunPop(); // Tutup pop up loading
+                setTimeout(() => {
+                    window.print();
+                    document.title = originalTitle;
+                    container.innerHTML = '';
+                }, 300);
             }
         }
 
         async function prosesCetakAdmin() {
             const cbs = document.querySelectorAll('.cb-admin-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Pilih Dulu Bos!', 'Centang dulu dong kelas yang mau di-download! 🖨️');
+            if (cbs.length === 0) return sweetPop('warning', 'Cetak Apaan Nih?', ['Centang dulu dong kelas yang mau dicetak! 🖨️']);
             
             let filename = cbs.length > 1 ? 'Laporan_Rekap_Infaq_Semua_Kelas' : `Laporan_Rekap_Infaq_Kelas_${cbs[0].value}`;
             let finalHTML = '';
-            
-            showToast("Mengambil data terbaru...");
-            for (let i = 0; i < cbs.length; i++) { 
-                await fetchKelasData(cbs[i].value); // Panggil 1x per kelas
-                finalHTML += generateClassRecapHTML(cbs[i].value); // Generate Instan
-            }
-            executeDirectDownload(filename, finalHTML);
+            for (let i = 0; i < cbs.length; i++) { finalHTML += await generateClassRecapHTML(cbs[i].value); }
+            executeNativePrint(filename, finalHTML);
         }
 
         async function prosesCetakWalasRekap() {
             let filename = `Laporan_Rekap_Infaq_Kelas_${kelasWalasAktif}`;
-            showToast("Memuat laporan kelas...");
-            await fetchKelasData(kelasWalasAktif); 
-            let finalHTML = generateClassRecapHTML(kelasWalasAktif); 
-            executeDirectDownload(filename, finalHTML);
+            let finalHTML = await generateClassRecapHTML(kelasWalasAktif);
+            executeNativePrint(filename, finalHTML);
         }
 
         async function prosesCetakWalasSiswa() {
             const cbs = document.querySelectorAll('.cb-walas-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', 'Gimana mau cetak kalau siswanya belum dicentang bos? 🖨️');
+            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Gimana mau cetak kalau siswanya belum dicentang? 🖨️']);
             
             let studentNameClean = DB.siswa[kelasWalasAktif][parseInt(cbs[0].value)].nama.replace(/[^a-zA-Z0-9]/g, '_');
             let filename = cbs.length > 1 
                 ? `Laporan_Infaq_Beberapa_Siswa_Kelas_${kelasWalasAktif}` 
                 : `Laporan_Infaq_${studentNameClean}_Kelas_${kelasWalasAktif}`;
 
-            showToast("Memuat laporan siswa...");
-            await fetchKelasData(kelasWalasAktif); 
-            
             let finalHTML = '';
-            for (let i = 0; i < cbs.length; i++) { 
-                finalHTML += generateStudentReportHTML(kelasWalasAktif, parseInt(cbs[i].value)); 
-            }
-            executeDirectDownload(filename, finalHTML);
+            for (let i = 0; i < cbs.length; i++) { finalHTML += await generateStudentReportHTML(kelasWalasAktif, parseInt(cbs[i].value)); }
+            executeNativePrint(filename, finalHTML);
         }
 
         // ==========================================
-        // GENERATOR HTML PDF DESAIN PRESISI
+        // GENERATOR HTML PDF DESAIN MUTLAK IDENTIK 100%
         // ==========================================
-        function generateClassRecapHTML(kelas) {
+        async function generateClassRecapHTML(kelas) {
+            await fetchKelasData(kelas);
             const dataSiswa = DB.siswa[kelas] || []; 
             const nominal = DB.nominalDefault[kelas] || 0; 
             const totalKeluar = DB.pengeluaran[kelas] || 0;
@@ -954,7 +921,7 @@
             let tableRows = '';
             
             const monthHeaders = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
-            const rowCount = Math.max(30, dataSiswa.length); 
+            const rowCount = Math.max(30, dataSiswa.length); // Paksa isi sampai bawah agar rapi
             
             for(let i=0; i<rowCount; i++) {
                 const s = dataSiswa[i];
@@ -976,7 +943,7 @@
 
                     rowHtml += `<td class="text-left"><div class="nama-siswa-pill">${s.nama}</div></td>`;
                     monthHeaders.forEach(m => {
-                        let val = monthlyData[m] === 0 ? "0" : (monthlyData[m]/1000).toString(); 
+                        let val = monthlyData[m] === 0 ? "0" : (monthlyData[m]/1000).toString(); // Angka simpel
                         let valClass = monthlyData[m] === 0 ? "val-zero" : "";
                         rowHtml += `<td class="${valClass}">${val}</td>`;
                     });
@@ -993,8 +960,8 @@
             const saldo = totalMasukKelas - totalKeluar;
             
             return `
-            <div class="pdf-page-container html2pdf__page-break">
-                <img src="KOP TINTA ATAS PUTIH.jpg" class="kop-img">
+            <div class="pdf-page-container">
+                <img src="${KOP_ATAS_URL}" class="kop-img" onerror="console.warn('Gagal muat KOP Atas')">
                 <div class="pdf-content">
                     <h2 class="title-h2">LAPORAN REKAP ADMINISTRATOR INFAQ - KELAS ${kelas}</h2>
                     <p class="title-date">Dicetak Oleh Administrator Sekolah pada: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} WIB</p>
@@ -1034,12 +1001,13 @@
                     </table>
                 </div>
                 <p style="font-size: 8px; font-style: italic; color: #94a3b8; text-align: left; margin-top: 15px; padding-left: 15mm; font-weight: normal;">Sistem Infaq Sekolah Digital TINTA - Cetakan Sah Terverifikasi Sistem Otomatis</p>
-                <img src="KOP TINTA BAWAH.png" class="kop-footer">
+                <img src="${KOP_BAWAH_URL}" class="kop-footer" onerror="console.warn('Gagal muat KOP Bawah')">
             </div>
             `;
         }
 
-        function generateStudentReportHTML(kelas, siswaIdx) {
+        async function generateStudentReportHTML(kelas, siswaIdx) {
+            await fetchKelasData(kelas);
             const s = DB.siswa[kelas][siswaIdx]; 
             const nominal = DB.nominalDefault[kelas] || 0; 
             const checks = checklistState[kelas][siswaIdx] || new Array(52).fill(0);
@@ -1106,8 +1074,8 @@
             }
 
             return `
-            <div class="pdf-page-container html2pdf__page-break">
-                <img src="KOP TINTA ATAS PUTIH.jpg" class="kop-img">
+            <div class="pdf-page-container">
+                <img src="${KOP_ATAS_URL}" class="kop-img" onerror="console.warn('Gagal muat KOP Atas')">
                 <div class="pdf-content">
                     <h2 class="title-h2">LAPORAN KEUANGAN INFAQ - KELAS ${kelas}</h2>
                     <p class="title-date">Dicetak pada: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} pukul ${String(new Date().getHours()).padStart(2,'0')}.${String(new Date().getMinutes()).padStart(2,'0')} WIB</p>
@@ -1165,12 +1133,11 @@
                         <tbody>${expRows}</tbody>
                     </table>
                 </div>
-                <img src="KOP TINTA BAWAH.png" class="kop-footer">
+                <img src="${KOP_BAWAH_URL}" class="kop-footer" onerror="console.warn('Gagal muat KOP Bawah')">
             </div>
             `;
         }
 
-        // --- DASHBOARD WALI KELAS LOGIC ---
         function initDashboardWalas(kelas) {
             kelasWalasAktif = kelas;
             document.getElementById('walas-nama-guru').innerText = "Wali Kelas: " + (DB.guru[kelas] || "Guru"); document.getElementById('walas-nama-kelas').innerText = `KELAS ${kelas.toUpperCase()}`;
@@ -1293,7 +1260,6 @@
             document.getElementById('walas-stat-masuk').innerText = "Rp " + formatRp(totalMasuk); document.getElementById('walas-stat-keluar').innerText = "Rp " + formatRp(totalKeluar); document.getElementById('walas-stat-saldo').innerText = "Rp " + formatRp(saldo);
         }
 
-        // --- DASHBOARD WALI MURID LOGIC ---
         function initDashboardWarid(kelas, idxSiswa) {
             kelasWaridAktif = kelas; siswaWaridIdx = idxSiswa; const student = DB.siswa[kelas][idxSiswa];
             document.getElementById('warid-nama-siswa').innerText = student.nama || student.class; document.getElementById('warid-info-siswa').innerText = `Kelas ${kelas} | No Presensi: ${String(student.no || idxSiswa+1).padStart(2, '0')}`;
@@ -1807,7 +1773,7 @@
             }
 
             if (isSuccess) {
-                // EKSEKUSI LANGSUNG KECEPATAN CAHAYA
+                // EKSEKUSI LANGSUNG KECEPATAN CAHAYA (NO DELAY!)
                 btn.innerHTML = originalContent; btn.disabled = false;
                 if (roleName === 'Wali Kelas') DB.guru[selectedKelasWalas] = namaGuru;
 
