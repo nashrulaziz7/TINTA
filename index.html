@@ -58,14 +58,14 @@
         .walas-btn-action:active { transform: scale(0.95); }
         
         .table-container { max-height: 420px; overflow-y: auto; overflow-x: auto; position: relative; background: white; }
-        .z-head { position: sticky; top: 0; z-index: 30; background-color: #f8fafc; background-clip: padding-box; border-bottom: 1px solid #e2e8f0; }
+        .z-head { position: sticky; top: 0; z-index: 30; background-clip: padding-box; border-bottom: 1px solid #e2e8f0; }
         .z-col { position: sticky; z-index: 20; background-color: #ffffff; background-clip: padding-box; border-bottom: 1px solid #f1f5f9; }
         .z-intersect { position: sticky; top: 0; z-index: 40; background-color: #f8fafc; background-clip: padding-box; border-bottom: 1px solid #e2e8f0; }
         
         /* FIX MUTLAK ANTI BOCOR STICKY COLUMN */
         .pos-no { left: 0; width: 22px; min-width: 22px; max-width: 22px; }
         .pos-nama { left: 22px; width: 105px; min-width: 105px; max-width: 105px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .pos-total { left: 127px; width: 55px; min-width: 55px; max-width: 55px; box-shadow: inset -1px 0 0 #e2e8f0, 2px 0 4px -2px rgba(0,0,0,0.08); }
+        .pos-total { left: 127px; width: 55px; min-width: 55px; max-width: 55px; box-shadow: inset -1px 0 0 #e2e8f0, 2px 0 4px -2px rgba(0,0,0,0.08); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .walas-tr .z-col { transition: background-color 0.2s; }
         .walas-tr .z-col.pos-total { background-color: #f4f7fb; }
@@ -183,14 +183,14 @@
             .val-zero { color: #cbd5e1 !important; }
             .val-bold { font-weight: 800; color: #1e3a8a; }
             
-            /* Table Persiswa (Walas) */
+            /* Table Persiswa (Walas) - UPDATE 2 KOLOM */
             .table-siswa { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 15px; text-align: center; }
-            .table-siswa th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
-            .table-siswa td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+            .table-siswa th { padding: 8px 3px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+            .table-siswa td { padding: 6px 3px; color: #334155; border-bottom: 1px solid #f1f5f9; }
             .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-            .pill-lunas { background-color: #22c55e; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-            .pill-libur { background-color: #ef4444; color: white; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-            .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 4px; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #cbd5e1; text-align: center; width: 36px; }
+            .pill-lunas { background-color: #22c55e; color: white; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-libur { background-color: #ef4444; color: white; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #cbd5e1; text-align: center; width: 36px; }
             .row-total td { background-color: #f1f5f9 !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; }
             
             .table-pengeluaran { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
@@ -605,11 +605,9 @@
 
         let academicWeeks = [];
         function generateAcademicWeeks() {
-            academicWeeks = [];
-            let now = new Date();
-            // Jika saat ini belum bulan Juli, artinya tahun ajaran dimulai tahun kemarin.
-            let startYear = now.getMonth() < 6 ? now.getFullYear() - 1 : now.getFullYear();
-            let currentDate = new Date(startYear, 6, 1); // 1 Juli
+            let currentDate = new Date(); // Ambil tahun saat ini otomatis
+            let startYear = currentDate.getMonth() < 6 ? currentDate.getFullYear() - 1 : currentDate.getFullYear();
+            currentDate = new Date(startYear, 6, 1); // Mulai dari 1 Juli
             while(currentDate.getDay() !== 5) { currentDate.setDate(currentDate.getDate() + 1); } // Cari Jumat Pertama
             
             const monthNames = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
@@ -618,19 +616,17 @@
             for(let i=0; i<52; i++) { 
                 const mIdx = currentDate.getMonth();
                 const mKey = monthNames.includes("Agt") && mIdx === 7 ? "Agt" : monthNames.find(m => longMonthNames[mIdx].startsWith(m)) || "Jul";
+                
                 const yy = String(currentDate.getFullYear()).slice(-2);
-                
-                // Deteksi apakah minggu depan pindah bulan (Untuk Garis Tebal)
-                let nextWeek = new Date(currentDate);
-                nextWeek.setDate(nextWeek.getDate() + 7);
-                let isLast = nextWeek.getMonth() !== mIdx;
-                
+                let nextWeek = new Date(currentDate); nextWeek.setDate(nextWeek.getDate() + 7);
+                let isLast = nextWeek.getMonth() !== mIdx; // Deteksi jika ini pekan terakhir di bulan tersebut
+
                 academicWeeks.push({ 
                     dateStr: `Jum, ${currentDate.getDate()}`, 
                     monthStr: `${mKey} ${yy}`, 
                     monthKey: mKey, 
                     monthLong: longMonthNames[mIdx] + " " + currentDate.getFullYear(), 
-                    dateNum: String(currentDate.getDate()).padStart(2, '0'),
+                    dateNum: String(currentDate.getDate()).padStart(2, '0'), 
                     isLastWeek: isLast,
                     id: i 
                 });
@@ -646,7 +642,7 @@
             if(angka === 0 || !angka) return "0";
             return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(angka); 
         }
-        
+
         function getMonthBg(monthKey) {
             const m = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
             const colors = ["bg-red-50", "bg-orange-50", "bg-amber-50", "bg-green-50", "bg-emerald-50", "bg-teal-50", "bg-cyan-50", "bg-sky-50", "bg-blue-50", "bg-indigo-50", "bg-purple-50", "bg-fuchsia-50"];
@@ -805,7 +801,7 @@
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-3">
                         ${listHtml}
                     </div>
-                    <button onclick="prosesCetakAdmin()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> Pilihan Cetak</button>
+                    <button onclick="prosesCetakAdmin()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> CETAK REKAP KELAS</button>
                 </div>
             `;
             modal.classList.add('active');
@@ -833,128 +829,38 @@
 
             body.innerHTML = `
                 <div class="flex flex-col h-full max-h-[70vh]">
-                    <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[11px] mb-4 shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> 1. CETAK REKAP SELURUH KELAS</button>
-                    <div class="border-t border-slate-200 my-2 relative">
-                        <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-[10px] font-black text-slate-400">ATAU CETAK PERSISWA</span>
-                    </div>
-                    <div class="mt-4 mb-3 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div class="mb-3 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-sm">
                         <span class="text-[11px] font-black text-slate-700">PILIH SEMUA SISWA</span>
                         <input type="checkbox" class="w-5 h-5 accent-orange-600 rounded cursor-pointer" onchange="toggleAllWalasPrint(this.checked)">
                     </div>
-                    <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-3">
+                    <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-3 border-b border-slate-100 pb-2">
                         ${listSiswa || '<p class="text-center text-[10px] font-bold text-slate-400">Belum ada siswa</p>'}
                     </div>
-                    <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> 2. CETAK LAPORAN SISWA</button>
+                    <div class="flex gap-2">
+                        <button onclick="prosesCetakWalasRekap()" class="flex-1 bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[10px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-table"></i> CETAK REKAP</button>
+                        <button onclick="prosesCetakWalasSiswa()" class="flex-1 bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[10px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2"><i class="fa-solid fa-file-pdf"></i> LAPORAN INDIVIDU</button>
+                    </div>
                 </div>
             `;
             modal.classList.add('active');
         }
 
-        function executeNativePrint(filename, htmlContent) {
+        async function executeNativePrint(filename, htmlContent) {
             closeModal();
             const container = document.getElementById('pdf-render-container');
-            container.innerHTML = htmlContent;
             
+            container.innerHTML = htmlContent;
             const originalTitle = document.title;
             document.title = filename;
 
-            const images = container.querySelectorAll('img');
-            let loadedImages = 0;
-            
-            function triggerPrint() {
-                try {
-                    const newWindow = window.open('', '_blank');
-                    if (!newWindow) {
-                        sweetPop('warning', 'Terblokir Canvas!', ['Wah, Tab Baru diblokir sama browser nih! Coba buka aplikasi ini di Tab Baru (ikon kanan atas layar ini) ya, biar cetaknya mulus! 🚀']);
-                        document.title = originalTitle;
-                        container.innerHTML = '';
-                        return;
-                    }
-                    
-                    newWindow.document.write(`
-                        <html>
-                            <head>
-                                <title>${filename}</title>
-                                <style>
-                                    @page { size: 215.9mm 330.2mm; margin: 0mm !important; }
-                                    body { margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-family: Arial, sans-serif; background-color: white; }
-                                    .pdf-page-container { width: 215.9mm; height: 330.2mm; page-break-after: always; margin: 0; padding: 0; position: relative; box-sizing: border-box; overflow: hidden; background-color: white; }
-                                    .kop-img { width: 100%; height: auto; display: block; margin: 0; padding: 0; border: none; outline: none; }
-                                    .kop-footer { width: 100%; height: auto; display: block; position: absolute; bottom: 0; left: 0; }
-                                    .pdf-content { padding: 0 15mm; position: relative; z-index: 10; margin-top: 15px; }
-                                    .title-h2 { font-size: 14px; font-weight: 800; margin: 0 0 4px 0; color: #1e3a8a; text-transform: uppercase; font-family: Arial, sans-serif; }
-                                    .title-date { font-size: 9px; margin: 0 0 15px 0; color: #64748b; font-family: Arial, sans-serif;}
-                                    .summary-flex { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 4px; }
-                                    .sum-box { flex: 1; padding: 12px 10px; color: white; border-radius: 0; box-sizing: border-box; }
-                                    .sum-box-masuk { background-color: #2563eb; } 
-                                    .sum-box-keluar { background-color: #f97316; } 
-                                    .sum-box-saldo { background-color: #10b981; } 
-                                    .sum-label { font-size: 7px; font-weight: 400; text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
-                                    .sum-value { font-size: 15px; font-weight: normal; }
-                                    .legend-container { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; background-color: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; width: fit-content; }
-                                    .legend-item { font-size: 9px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; }
-                                    .legend-box { width: 12px; height: 12px; border-radius: 3px; }
-                                    .student-badge { background: linear-gradient(90deg, #1e3a8a, #3b82f6); color: white; padding: 8px 14px; font-size: 11px; font-weight: 800; margin-bottom: 12px; display: block; width: 100%; box-sizing: border-box; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 6px solid #fbbf24; }
-                                    .nama-siswa-pill { background: #eff6ff; color: #1e3a8a; padding: 4px 8px; border-radius: 6px; font-weight: 800; display: inline-block; border-left: 4px solid #3b82f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-                                    .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 8px; text-align: center; border: 1px solid #e2e8f0; }
-                                    .table-admin th { padding: 6px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 4px; }
-                                    .table-admin td { padding: 5px 2px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; }
-                                    .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-                                    .table-admin tbody tr:nth-child(odd) td { background-color: white !important; }
-                                    .text-left { text-align: left !important; padding-left: 8px !important; }
-                                    .val-zero { color: #cbd5e1 !important; }
-                                    .val-bold { font-weight: 800; color: #1e3a8a; }
-                                    .table-siswa { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 15px; text-align: center; }
-                                    .table-siswa th { padding: 8px 3px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
-                                    .table-siswa td { padding: 6px 3px; color: #334155; border-bottom: 1px solid #f1f5f9; }
-                                    .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-                                    .pill-lunas { background-color: #22c55e; color: white; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-                                    .pill-libur { background-color: #ef4444; color: white; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-                                    .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #cbd5e1; text-align: center; width: 36px; }
-                                    .row-total td { background-color: #f1f5f9 !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; }
-                                    .table-pengeluaran { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
-                                    .table-pengeluaran th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
-                                    .table-pengeluaran td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
-                                    .table-pengeluaran tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
-                                    .pengeluaran-val { color: #dc2626; font-weight: 700; text-align: right; }
-                                </style>
-                            </head>
-                            <body>
-                                ${htmlContent}
-                                <script>
-                                    window.onload = function() {
-                                        setTimeout(function() {
-                                            window.print();
-                                            window.close();
-                                        }, 300);
-                                    };
-                                <\/script>
-                            </body>
-                        </html>
-                    `);
-                    newWindow.document.close();
-                } catch (e) {
-                    sweetPop('error', 'Cetak Gagal', 'Sistem gagal membuka tab baru untuk mencetak.');
-                }
+            sweetPop('success', 'Menyiapkan Dokumen...', ['Sistem sedang menata kertas dan memuat gambar KOP. Mohon tunggu sebentar! 🚀', 'Sabar ya bosku, kertas PDF lagi dirapihin nih! ⚡']);
+
+            setTimeout(() => {
+                window.print();
                 document.title = originalTitle;
                 container.innerHTML = '';
-            }
-
-            if (images.length === 0) {
-                triggerPrint();
-            } else {
-                Array.from(images).forEach(img => {
-                    if (img.complete) {
-                        loadedImages++;
-                        if (loadedImages === images.length) triggerPrint();
-                    } else {
-                        img.onload = img.onerror = () => {
-                            loadedImages++;
-                            if (loadedImages === images.length) triggerPrint();
-                        };
-                    }
-                });
-            }
+                closeFunPop();
+            }, 800); 
         }
 
         async function prosesCetakAdmin() {
@@ -968,14 +874,19 @@
         }
 
         async function prosesCetakWalasRekap() {
+            const cbs = document.querySelectorAll('.cb-walas-print:checked');
+            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Centang minimal 1 siswa untuk dicetak rekapnya! 🖨️']);
+
+            let indices = Array.from(cbs).map(cb => parseInt(cb.value));
             let filename = `Laporan_Rekap_Infaq_Kelas_${kelasWalasAktif}`;
-            let finalHTML = await generateClassRecapHTML(kelasWalasAktif);
+            
+            let finalHTML = await generateClassRecapHTML(kelasWalasAktif, indices);
             executeNativePrint(filename, finalHTML);
         }
 
         async function prosesCetakWalasSiswa() {
             const cbs = document.querySelectorAll('.cb-walas-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Gimana mau cetak kalau siswanya belum dicentang bos? 🖨️']);
+            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Gimana mau cetak kalau siswanya belum dicentang? 🖨️']);
             
             let studentNameClean = DB.siswa[kelasWalasAktif][parseInt(cbs[0].value)].nama.replace(/[^a-zA-Z0-9]/g, '_');
             let filename = cbs.length > 1 
@@ -983,30 +894,42 @@
                 : `Laporan_Infaq_${studentNameClean}_Kelas_${kelasWalasAktif}`;
 
             let finalHTML = '';
-            for (let i = 0; i < cbs.length; i++) { finalHTML += await generateStudentReportHTML(kelasWalasAktif, parseInt(cbs[i].value)); }
+            for (let i = 0; i < cbs.length; i++) { 
+                finalHTML += generateStudentReportHTML(kelasWalasAktif, parseInt(cbs[i].value)); 
+            }
             executeNativePrint(filename, finalHTML);
         }
 
         // ==========================================
-        // GENERATOR HTML PDF 
+        // GENERATOR HTML PDF DESAIN MUTLAK IDENTIK 100%
         // ==========================================
-        async function generateClassRecapHTML(kelas) {
+        async function generateClassRecapHTML(kelas, selectedIndices = null) {
             await fetchKelasData(kelas);
             const dataSiswa = DB.siswa[kelas] || []; 
             const nominal = DB.nominalDefault[kelas] || 0; 
             const totalKeluar = DB.pengeluaran[kelas] || 0;
-            let totalMasukKelas = 0; 
+            
+            let totalMasukKelasKeseluruhan = 0; 
+            dataSiswa.forEach((_, idx) => {
+                const cAll = checklistState[kelas][idx] || new Array(52).fill(0);
+                totalMasukKelasKeseluruhan += Object.values(cAll).filter(v => v === 1).length * nominal;
+            });
+
             let tableRows = '';
-            
             const monthHeaders = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
-            const rowCount = Math.max(30, dataSiswa.length); 
             
-            for(let i=0; i<rowCount; i++) {
-                const s = dataSiswa[i];
-                let rowHtml = `<tr><td>${String(i+1).padStart(2, '0')}</td>`;
-                
+            let indicesToPrint = [];
+            if (selectedIndices && selectedIndices.length > 0) {
+                indicesToPrint = selectedIndices;
+            } else {
+                for(let i=0; i<dataSiswa.length; i++) indicesToPrint.push(i);
+            }
+            
+            indicesToPrint.forEach(idx => {
+                const s = dataSiswa[idx];
                 if(s) {
-                    const checks = checklistState[kelas][i] || new Array(52).fill(0);
+                    let rowHtml = `<tr><td>${String(idx+1).padStart(2, '0')}</td>`;
+                    const checks = checklistState[kelas][idx] || new Array(52).fill(0);
                     let totalSiswa = 0;
                     let monthlyData = {"Jul":0, "Agt":0, "Sep":0, "Okt":0, "Nov":0, "Des":0, "Jan":0, "Feb":0, "Mar":0, "Apr":0, "Mei":0, "Jun":0};
                     
@@ -1017,7 +940,6 @@
                             totalSiswa += nominal; 
                         }
                     });
-                    totalMasukKelas += totalSiswa;
 
                     rowHtml += `<td class="text-left"><div class="nama-siswa-pill">${s.nama}</div></td>`;
                     monthHeaders.forEach(m => {
@@ -1027,15 +949,15 @@
                     });
                     let totalStr = totalSiswa === 0 ? "0" : formatRp(totalSiswa);
                     rowHtml += `<td class="val-bold">${totalStr}</td></tr>`;
-                } else {
-                    rowHtml += `<td class="text-left"></td>`;
-                    monthHeaders.forEach(m => { rowHtml += `<td></td>`; });
-                    rowHtml += `<td></td></tr>`;
+                    tableRows += rowHtml;
                 }
-                tableRows += rowHtml;
+            });
+
+            if (tableRows === '') {
+                tableRows = `<tr><td colspan="14" style="padding: 20px; text-align: center; color: #94a3b8; font-style: italic;">Tidak ada data siswa yang dipilih.</td></tr>`;
             }
 
-            const saldo = totalMasukKelas - totalKeluar;
+            const saldo = totalMasukKelasKeseluruhan - totalKeluar;
             
             return `
             <div class="pdf-page-container">
@@ -1047,7 +969,7 @@
                     <div class="summary-flex">
                         <div class="sum-box sum-box-masuk">
                             <span class="sum-label">TOTAL MASUK KELAS</span>
-                            <span class="sum-value">Rp ${formatRp(totalMasukKelas)}</span>
+                            <span class="sum-value">Rp ${formatRp(totalMasukKelasKeseluruhan)}</span>
                         </div>
                         <div class="sum-box sum-box-keluar">
                             <span class="sum-label">TOTAL KELUAR KELAS</span>
@@ -1084,8 +1006,7 @@
             `;
         }
 
-        async function generateStudentReportHTML(kelas, siswaIdx) {
-            await fetchKelasData(kelas);
+        function generateStudentReportHTML(kelas, siswaIdx) {
             const s = DB.siswa[kelas][siswaIdx]; 
             const nominal = DB.nominalDefault[kelas] || 0; 
             const checks = checklistState[kelas][siswaIdx] || new Array(52).fill(0);
@@ -1124,7 +1045,7 @@
                 let yearLabel = (m==="Jan"||m==="Feb"||m==="Mar"||m==="Apr"||m==="Mei"||m==="Jun") ? "2026" : "2025";
                 let totalRowStr = d.total === 0 ? `<span style="color:#2563eb; font-weight:800;">0</span>` : `<span style="color:#2563eb; font-weight:800;">${formatRp(d.total)}</span>`;
                 return `<tr>
-                    <td style="text-align: left; font-weight: 800; color: #0f172a;">${m} ${yearLabel}</td>
+                    <td style="text-align: left; font-weight: 800; color: #0f172a;">${m} <span style="font-size:7px; color:#64748b;">${yearLabel}</span></td>
                     <td>${d.weeks[0]||`<span class="pill-empty">-</span>`}</td>
                     <td>${d.weeks[1]||`<span class="pill-empty">-</span>`}</td>
                     <td>${d.weeks[2]||`<span class="pill-empty">-</span>`}</td>
@@ -1149,7 +1070,6 @@
             } else { 
                 let mid = Math.ceil(riwayat.length / 2);
                 riwayat.forEach((r, i) => { 
-                    // Trik shape tanggal dinamis sesuai bulan
                     let m = r.date.split('/')[0];
                     let monthColors = {"07":"#fef2f2", "08":"#fff7ed", "09":"#fffbeb", "10":"#f0fdf4", "11":"#ecfdf5", "12":"#f0fdfa", "01":"#ecfeff", "02":"#f0f9ff", "03":"#eff6ff", "04":"#eef2ff", "05":"#faf5ff", "06":"#fdf4ff"};
                     let textColors = {"07":"#ef4444", "08":"#f97316", "09":"#f59e0b", "10":"#22c55e", "11":"#10b981", "12":"#14b8a6", "01":"#06b6d4", "02":"#0ea5e9", "03":"#3b82f6", "04":"#6366f1", "05":"#a855f7", "06":"#d946ef"};
@@ -1164,7 +1084,7 @@
             const tableHeaderInfaq = `
                 <thead>
                     <tr>
-                        <th style="width: 20%; text-align: left;">Bulan</th>
+                        <th style="width: 15%; text-align: left;">Bulan</th>
                         <th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th>
                         <th style="width: 15%;">Total</th>
                     </tr>
@@ -1212,7 +1132,7 @@
                         No: ${String(s.no || siswaIdx+1).padStart(2, '0')} &nbsp;|&nbsp; Nama Siswa: ${s.nama}
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; gap: 8px; position: relative;">
+                    <div style="display: flex; justify-content: space-between; gap: 12px; position: relative;">
                         <!-- Divider Tengah -->
                         <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; background: linear-gradient(to bottom, transparent, #e2e8f0 5%, #e2e8f0 95%, transparent); transform: translateX(-50%);"></div>
                         <div style="width: 48%;">
@@ -1232,13 +1152,13 @@
                     <table class="table-siswa" style="margin-top: 2px;">
                         <tr class="row-total">
                             <td style="text-align: left; padding: 10px 8px;">TOTAL KESELURUHAN INFAQ ANANDA</td>
-                            <td style="color: #22c55e; text-align: right; padding-right: 15px; width: 25%;">${formatRp(totalAnanda)}</td>
+                            <td style="color: #22c55e; text-align: right; padding-right: 15px; width: 25%; font-size: 11px;">${formatRp(totalAnanda)}</td>
                         </tr>
                     </table>
                     
                     <div style="font-size: 11px; font-weight: 800; margin-bottom: 6px; color: #0f172a; margin-top: 10px; border-left: 3px solid #ea580c; padding-left: 6px;">Daftar Pengeluaran Kelas:</div>
                     
-                    <div style="display: flex; justify-content: space-between; gap: 8px; position: relative;">
+                    <div style="display: flex; justify-content: space-between; gap: 12px; position: relative;">
                         <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; background: linear-gradient(to bottom, transparent, #e2e8f0 5%, #e2e8f0 95%, transparent); transform: translateX(-50%);"></div>
                         <div style="width: 48%;">
                             <table class="table-pengeluaran">
