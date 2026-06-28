@@ -176,7 +176,7 @@
             /* Table Rekap Kelas (Admin) */
             .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 8px; text-align: center; border: 1px solid #e2e8f0; }
             .table-admin th { padding: 6px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 4px; }
-            .table-admin td { padding: 5px 2px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; }
+            .table-admin td { padding: 4px 2px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; }
             .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
             .table-admin tbody tr:nth-child(odd) td { background-color: white !important; }
             .text-left { text-align: left !important; padding-left: 8px !important; }
@@ -643,6 +643,7 @@
             return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(angka); 
         }
 
+        // WARNA PASTEL CERIA PER BULAN
         function getMonthBg(monthKey) {
             const m = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
             const colors = ["bg-red-50", "bg-orange-50", "bg-amber-50", "bg-green-50", "bg-emerald-50", "bg-teal-50", "bg-cyan-50", "bg-sky-50", "bg-blue-50", "bg-indigo-50", "bg-purple-50", "bg-fuchsia-50"];
@@ -750,7 +751,7 @@
         function cariSiswa() { const input = document.getElementById('search-siswa').value.toLowerCase(); const items = document.querySelectorAll('.item-siswa-admin'); items.forEach(item => { item.style.display = item.querySelector('.nama-siswa-admin').innerText.toLowerCase().includes(input) ? '' : 'none'; }); }
 
         // ==========================================
-        // SISTEM CETAK PDF NATIVE (DESAIN IDENTIK MUTLAK)
+        // SISTEM CETAK PDF NATIVE (DESAIN IDENTIK MUTLAK 2 HALAMAN)
         // ==========================================
         function checkHighlight(cb) {
             const label = cb.closest('label'); const indicator = label.querySelector('.input-indicator');
@@ -836,30 +837,55 @@
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-3 border-b border-slate-100 pb-2">
                         ${listSiswa || '<p class="text-center text-[10px] font-bold text-slate-400">Belum ada siswa</p>'}
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="prosesCetakWalasRekap()" class="flex-1 bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[10px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-table"></i> CETAK REKAP</button>
-                        <button onclick="prosesCetakWalasSiswa()" class="flex-1 bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[10px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2"><i class="fa-solid fa-file-pdf"></i> LAPORAN INDIVIDU</button>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="prosesCetakWalasRekap()" class="flex-1 bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[10px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-table"></i> 1. CETAK REKAP KELAS</button>
+                        <button onclick="prosesCetakWalasSiswa()" class="flex-1 bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[10px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2"><i class="fa-solid fa-file-pdf"></i> 2. CETAK LAPORAN SISWA</button>
                     </div>
                 </div>
             `;
             modal.classList.add('active');
         }
 
+        // FUNGSI PRELOADER GAMBAR: Menjamin KOP 100% Ter-load Sebelum Print
+        function preloadImagesAndPrint() {
+            return new Promise((resolve) => {
+                let img1 = new Image(); let img2 = new Image(); let loaded = 0;
+                const checkDone = () => { loaded++; if(loaded === 2) resolve(); };
+                img1.onload = checkDone; img1.onerror = checkDone; img1.src = "KOP TINTA ATAS PUTIH.jpg";
+                img2.onload = checkDone; img2.onerror = checkDone; img2.src = "KOP TINTA BAWAH.png";
+            });
+        }
+
         async function executeNativePrint(filename, htmlContent) {
             closeModal();
             const container = document.getElementById('pdf-render-container');
-            
             container.innerHTML = htmlContent;
             const originalTitle = document.title;
             document.title = filename;
 
-            sweetPop('success', 'Menyiapkan Dokumen...', ['Sistem sedang menata kertas dan memuat gambar KOP. Mohon tunggu sebentar! 🚀', 'Sabar ya bosku, kertas PDF lagi dirapihin nih! ⚡']);
+            sweetPop('success', 'Menyiapkan Dokumen...', ['Sistem sedang menata kertas dan memastikan KOP terpasang sempurna. Mohon tunggu! 🚀', 'Sabar ya bosku, tabel sedang dirapihkan! ⚡']);
+
+            // TUNGGU KOP TER-LOAD 100% BARU PRINT
+            await preloadImagesAndPrint();
 
             setTimeout(() => {
-                window.print();
-                document.title = originalTitle;
-                container.innerHTML = '';
-                closeFunPop();
+                try {
+                    window.print();
+                    document.title = originalTitle;
+                    container.innerHTML = '';
+                    closeFunPop();
+                } catch(e) {
+                    // FALLBACK JIKA DIBLOKIR CANVAS (BUKA TAB BARU)
+                    const newWin = window.open('', '_blank');
+                    if(newWin) {
+                        newWin.document.write(`<html><head><title>${filename}</title><style>${document.querySelector('style').innerHTML}</style></head><body onload="window.print(); window.close();">${htmlContent}</body></html>`);
+                        newWin.document.close();
+                        document.title = originalTitle; container.innerHTML = ''; closeFunPop();
+                    } else {
+                        sweetPop('warning', 'Terblokir Canvas!', ['Wah, Tab Barunya diblokir browser. Coba buka TINTA di tab baru (Fullscreen) lalu cetak lagi ya! 🛑']);
+                        document.title = originalTitle; container.innerHTML = '';
+                    }
+                }
             }, 800); 
         }
 
@@ -901,7 +927,7 @@
         }
 
         // ==========================================
-        // GENERATOR HTML PDF DESAIN MUTLAK IDENTIK 100%
+        // GENERATOR HTML PDF 
         // ==========================================
         async function generateClassRecapHTML(kelas, selectedIndices = null) {
             await fetchKelasData(kelas);
@@ -928,7 +954,7 @@
             indicesToPrint.forEach(idx => {
                 const s = dataSiswa[idx];
                 if(s) {
-                    let rowHtml = `<tr><td>${String(idx+1).padStart(2, '0')}</td>`;
+                    let rowHtml = `<tr><td>${String(s.no || idx+1).padStart(2, '0')}</td>`;
                     const checks = checklistState[kelas][idx] || new Array(52).fill(0);
                     let totalSiswa = 0;
                     let monthlyData = {"Jul":0, "Agt":0, "Sep":0, "Okt":0, "Nov":0, "Des":0, "Jan":0, "Feb":0, "Mar":0, "Apr":0, "Mei":0, "Jun":0};
@@ -959,7 +985,37 @@
 
             const saldo = totalMasukKelasKeseluruhan - totalKeluar;
             
+            // BUILD EXPENSE ROWS FOR PAGE 2
+            let expRowsLeft = ''; let expRowsRight = ''; 
+            const riwayat = DB.riwayatPengeluaran[kelas] || [];
+            if(riwayat.length === 0) { 
+                expRowsLeft = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic;">Belum ada pengeluaran kelas.</td></tr>`; 
+                expRowsRight = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic;">-</td></tr>`; 
+            } else { 
+                let mid = Math.ceil(riwayat.length / 2);
+                riwayat.forEach((r, i) => { 
+                    let m = r.date.split('/')[0];
+                    let monthColors = {"07":"#fef2f2", "08":"#fff7ed", "09":"#fffbeb", "10":"#f0fdf4", "11":"#ecfdf5", "12":"#f0fdfa", "01":"#ecfeff", "02":"#f0f9ff", "03":"#eff6ff", "04":"#eef2ff", "05":"#faf5ff", "06":"#fdf4ff"};
+                    let textColors = {"07":"#ef4444", "08":"#f97316", "09":"#f59e0b", "10":"#22c55e", "11":"#10b981", "12":"#14b8a6", "01":"#06b6d4", "02":"#0ea5e9", "03":"#3b82f6", "04":"#6366f1", "05":"#a855f7", "06":"#d946ef"};
+                    let bgC = monthColors[m] || "#f1f5f9"; let txC = textColors[m] || "#64748b";
+                    
+                    let dateBadge = `<div style="background-color: ${bgC}; color: ${txC}; padding: 4px 6px; border-radius: 6px; font-weight: 800; font-size: 7px; display: inline-block;">${r.date || r.fullDate}</div>`;
+                    let rHtml = `<tr><td>${dateBadge}</td><td style="text-align: left;">${r.ket}</td><td class="pengeluaran-val">${formatRp(r.amount)}</td></tr>`; 
+                    if(i < mid) expRowsLeft += rHtml; else expRowsRight += rHtml;
+                }); 
+            }
+
+            const tableHeaderExp = `
+                <thead>
+                    <tr>
+                        <th style="width: 25%; text-align: left;">Tanggal</th>
+                        <th style="text-align: left;">Keterangan Pengeluaran</th>
+                        <th style="width: 25%; text-align: right;">Nominal (Rp)</th>
+                    </tr>
+                </thead>`;
+
             return `
+            <!-- HALAMAN 1: REKAP SISWA -->
             <div class="pdf-page-container">
                 <img src="KOP TINTA ATAS PUTIH.jpg" class="kop-img">
                 <div class="pdf-content">
@@ -1000,7 +1056,35 @@
                         <tbody>${tableRows}</tbody>
                     </table>
                 </div>
-                <p style="font-size: 8px; font-style: italic; color: #94a3b8; text-align: left; margin-top: 15px; padding-left: 15mm; font-weight: normal;">Sistem Infaq Sekolah Digital TINTA - Cetakan Sah Terverifikasi Sistem Otomatis</p>
+                <img src="KOP TINTA BAWAH.png" class="kop-footer">
+            </div>
+
+            <!-- HALAMAN 2: PENGELUARAN KELAS -->
+            <div class="pdf-page-container">
+                <img src="KOP TINTA ATAS PUTIH.jpg" class="kop-img">
+                <div class="pdf-content">
+                    <h2 class="title-h2">RINCIAN PENGELUARAN KAS - KELAS ${kelas}</h2>
+                    <p class="title-date">Dicetak Oleh Administrator Sekolah pada: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} WIB</p>
+                    
+                    <div style="font-size: 11px; font-weight: 800; margin-bottom: 6px; color: #0f172a; margin-top: 10px; border-left: 3px solid #ea580c; padding-left: 6px;">Daftar Pengeluaran Kelas (${kelas}):</div>
+                    
+                    <div style="display: flex; justify-content: space-between; gap: 12px; position: relative;">
+                        <!-- Divider Tengah -->
+                        <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; background: linear-gradient(to bottom, transparent, #e2e8f0 5%, #e2e8f0 95%, transparent); transform: translateX(-50%);"></div>
+                        <div style="width: 48%;">
+                            <table class="table-pengeluaran">
+                                ${tableHeaderExp}
+                                <tbody>${expRowsLeft}</tbody>
+                            </table>
+                        </div>
+                        <div style="width: 48%;">
+                            <table class="table-pengeluaran">
+                                ${tableHeaderExp}
+                                <tbody>${expRowsRight}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
                 <img src="KOP TINTA BAWAH.png" class="kop-footer">
             </div>
             `;
@@ -1075,7 +1159,7 @@
                     let textColors = {"07":"#ef4444", "08":"#f97316", "09":"#f59e0b", "10":"#22c55e", "11":"#10b981", "12":"#14b8a6", "01":"#06b6d4", "02":"#0ea5e9", "03":"#3b82f6", "04":"#6366f1", "05":"#a855f7", "06":"#d946ef"};
                     let bgC = monthColors[m] || "#f1f5f9"; let txC = textColors[m] || "#64748b";
                     
-                    let dateBadge = `<div style="background-color: ${bgC}; color: ${txC}; padding: 4px 6px; border-radius: 6px; font-weight: 800; font-size: 7px; display: inline-block;">${r.date}</div>`;
+                    let dateBadge = `<div style="background-color: ${bgC}; color: ${txC}; padding: 4px 6px; border-radius: 6px; font-weight: 800; font-size: 7px; display: inline-block;">${r.date || r.fullDate}</div>`;
                     let rHtml = `<tr><td>${dateBadge}</td><td style="text-align: left;">${r.ket}</td><td class="pengeluaran-val">${formatRp(r.amount)}</td></tr>`; 
                     if(i < mid) expRowsLeft += rHtml; else expRowsRight += rHtml;
                 }); 
@@ -1820,7 +1904,6 @@
             }
 
             if (isSuccess) {
-                // EKSEKUSI LANGSUNG KECEPATAN CAHAYA (NO DELAY!)
                 btn.innerHTML = originalContent; btn.disabled = false;
                 if (roleName === 'Wali Kelas') DB.guru[selectedKelasWalas] = namaGuru;
 
@@ -1855,7 +1938,6 @@
         }
 
         function logoutApp(viewId) {
-            // LOGOUT LANGSUNG (NO DELAY!)
             const loginView = document.getElementById('view-login'); const dashView = document.getElementById(viewId); const btnRefresh = document.getElementById('btn-global-refresh');
             dashView.classList.add('hidden'); loginView.classList.remove('hidden'); btnRefresh.classList.add('hidden');
             document.body.style.backgroundColor = '#f8fafc';
