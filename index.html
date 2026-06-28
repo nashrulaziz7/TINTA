@@ -61,9 +61,11 @@
         .z-head { position: sticky; top: 0; z-index: 30; background-color: #f8fafc; background-clip: padding-box; border-bottom: 1px solid #e2e8f0; }
         .z-col { position: sticky; z-index: 20; background-color: #ffffff; background-clip: padding-box; border-bottom: 1px solid #f1f5f9; }
         .z-intersect { position: sticky; top: 0; z-index: 40; background-color: #f8fafc; background-clip: padding-box; border-bottom: 1px solid #e2e8f0; }
-        .pos-no { left: 0; width: 22px; min-width: 22px; }
-        .pos-nama { left: 22px; width: 105px; min-width: 105px; }
-        .pos-total { left: 127px; width: 55px; min-width: 55px; box-shadow: inset -1px 0 0 #e2e8f0, 2px 0 4px -2px rgba(0,0,0,0.08); }
+        
+        /* FIX MUTLAK ANTI BOCOR STICKY COLUMN */
+        .pos-no { left: 0; width: 22px; min-width: 22px; max-width: 22px; }
+        .pos-nama { left: 22px; width: 105px; min-width: 105px; max-width: 105px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pos-total { left: 127px; width: 55px; min-width: 55px; max-width: 55px; box-shadow: inset -1px 0 0 #e2e8f0, 2px 0 4px -2px rgba(0,0,0,0.08); }
 
         .walas-tr .z-col { transition: background-color 0.2s; }
         .walas-tr .z-col.pos-total { background-color: #f4f7fb; }
@@ -557,11 +559,11 @@
 
     <!-- FUN POPUP (SWEET ALERT CUSTOM) -->
     <div id="fun-popup-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[99999] flex justify-center items-center opacity-0 pointer-events-none transition-opacity duration-300 px-4">
-        <div id="fun-popup-card" class="bg-white rounded-[2rem] p-6 pt-10 max-w-[290px] w-full transform scale-75 opacity-0 transition-all duration-400 text-center relative border-[3px]">
-            <div id="fun-popup-icon" class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] animate-bounce flex gap-1 z-10 whitespace-nowrap"></div>
-            <h3 id="fun-popup-title" class="text-[18px] font-black text-slate-800 mb-2 mt-1">Judul</h3>
-            <p id="fun-popup-msg" class="text-[12px] font-bold text-slate-500 mb-6 leading-relaxed px-2">Pesan</p>
-            <button onclick="closeFunPop()" id="fun-popup-btn" class="w-full py-3.5 rounded-xl font-black text-[12px] tracking-wider text-white shadow-lg transition transform active:scale-95">OKE</button>
+        <div id="fun-popup-card" class="bg-white rounded-3xl p-6 pt-8 max-w-[280px] w-full transform scale-75 opacity-0 transition-all duration-300 text-center relative mt-8 border-2">
+            <div id="fun-popup-icon" class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] z-10 whitespace-nowrap animate-bounce">🚀</div>
+            <h3 id="fun-popup-title" class="text-[17px] font-black text-slate-800 mb-1 mt-2">Judul</h3>
+            <p id="fun-popup-msg" class="text-[11px] font-bold text-slate-500 mb-5 leading-relaxed">Pesan</p>
+            <button onclick="closeFunPop()" id="fun-popup-btn" class="w-full py-3.5 rounded-xl font-black text-[12px] text-white shadow-lg transition transform active:scale-95">OKE</button>
         </div>
     </div>
 
@@ -603,8 +605,12 @@
 
         let academicWeeks = [];
         function generateAcademicWeeks() {
-            let currentDate = new Date(2025, 6, 4); // Juli 2025
-            while(currentDate.getDay() !== 5) { currentDate.setDate(currentDate.getDate() + 1); } 
+            academicWeeks = [];
+            let now = new Date();
+            // Jika saat ini belum bulan Juli, artinya tahun ajaran dimulai tahun kemarin.
+            let startYear = now.getMonth() < 6 ? now.getFullYear() - 1 : now.getFullYear();
+            let currentDate = new Date(startYear, 6, 1); // 1 Juli
+            while(currentDate.getDay() !== 5) { currentDate.setDate(currentDate.getDate() + 1); } // Cari Jumat Pertama
             
             const monthNames = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
             const longMonthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
@@ -612,14 +618,20 @@
             for(let i=0; i<52; i++) { 
                 const mIdx = currentDate.getMonth();
                 const mKey = monthNames.includes("Agt") && mIdx === 7 ? "Agt" : monthNames.find(m => longMonthNames[mIdx].startsWith(m)) || "Jul";
-                
                 const yy = String(currentDate.getFullYear()).slice(-2);
+                
+                // Deteksi apakah minggu depan pindah bulan (Untuk Garis Tebal)
+                let nextWeek = new Date(currentDate);
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                let isLast = nextWeek.getMonth() !== mIdx;
+                
                 academicWeeks.push({ 
                     dateStr: `Jum, ${currentDate.getDate()}`, 
                     monthStr: `${mKey} ${yy}`, 
                     monthKey: mKey, 
                     monthLong: longMonthNames[mIdx] + " " + currentDate.getFullYear(), 
-                    dateNum: String(currentDate.getDate()).padStart(2, '0'), 
+                    dateNum: String(currentDate.getDate()).padStart(2, '0'),
+                    isLastWeek: isLast,
                     id: i 
                 });
                 currentDate.setDate(currentDate.getDate() + 7);
@@ -633,6 +645,13 @@
         function formatRp(angka) { 
             if(angka === 0 || !angka) return "0";
             return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(angka); 
+        }
+        
+        function getMonthBg(monthKey) {
+            const m = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
+            const colors = ["bg-red-50", "bg-orange-50", "bg-amber-50", "bg-green-50", "bg-emerald-50", "bg-teal-50", "bg-cyan-50", "bg-sky-50", "bg-blue-50", "bg-indigo-50", "bg-purple-50", "bg-fuchsia-50"];
+            const idx = m.indexOf(monthKey);
+            return idx !== -1 ? colors[idx] : "bg-white";
         }
 
         async function fetchGAS(payload) {
@@ -735,7 +754,7 @@
         function cariSiswa() { const input = document.getElementById('search-siswa').value.toLowerCase(); const items = document.querySelectorAll('.item-siswa-admin'); items.forEach(item => { item.style.display = item.querySelector('.nama-siswa-admin').innerText.toLowerCase().includes(input) ? '' : 'none'; }); }
 
         // ==========================================
-        // SISTEM CETAK PDF NATIVE 
+        // SISTEM CETAK PDF NATIVE (DESAIN IDENTIK MUTLAK)
         // ==========================================
         function checkHighlight(cb) {
             const label = cb.closest('label'); const indicator = label.querySelector('.input-indicator');
@@ -786,7 +805,7 @@
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-3">
                         ${listHtml}
                     </div>
-                    <button onclick="prosesCetakAdmin()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> CETAK PDF</button>
+                    <button onclick="prosesCetakAdmin()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> Pilihan Cetak</button>
                 </div>
             `;
             modal.classList.add('active');
@@ -831,10 +850,8 @@
             modal.classList.add('active');
         }
 
-        async function executeNativePrint(filename, htmlContent) {
+        function executeNativePrint(filename, htmlContent) {
             closeModal();
-            sweetPop('warning', 'Sabar Bosku! 🚀', ['Lagi nunggu KOP Resmi merapat...', 'Tahan bentar, lagi nempelin KOP ke kertas F4! 📄']);
-            
             const container = document.getElementById('pdf-render-container');
             container.innerHTML = htmlContent;
             
@@ -844,40 +861,105 @@
             const images = container.querySelectorAll('img');
             let loadedImages = 0;
             
+            function triggerPrint() {
+                try {
+                    const newWindow = window.open('', '_blank');
+                    if (!newWindow) {
+                        sweetPop('warning', 'Terblokir Canvas!', ['Wah, Tab Baru diblokir sama browser nih! Coba buka aplikasi ini di Tab Baru (ikon kanan atas layar ini) ya, biar cetaknya mulus! 🚀']);
+                        document.title = originalTitle;
+                        container.innerHTML = '';
+                        return;
+                    }
+                    
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>${filename}</title>
+                                <style>
+                                    @page { size: 215.9mm 330.2mm; margin: 0mm !important; }
+                                    body { margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-family: Arial, sans-serif; background-color: white; }
+                                    .pdf-page-container { width: 215.9mm; height: 330.2mm; page-break-after: always; margin: 0; padding: 0; position: relative; box-sizing: border-box; overflow: hidden; background-color: white; }
+                                    .kop-img { width: 100%; height: auto; display: block; margin: 0; padding: 0; border: none; outline: none; }
+                                    .kop-footer { width: 100%; height: auto; display: block; position: absolute; bottom: 0; left: 0; }
+                                    .pdf-content { padding: 0 15mm; position: relative; z-index: 10; margin-top: 15px; }
+                                    .title-h2 { font-size: 14px; font-weight: 800; margin: 0 0 4px 0; color: #1e3a8a; text-transform: uppercase; font-family: Arial, sans-serif; }
+                                    .title-date { font-size: 9px; margin: 0 0 15px 0; color: #64748b; font-family: Arial, sans-serif;}
+                                    .summary-flex { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 4px; }
+                                    .sum-box { flex: 1; padding: 12px 10px; color: white; border-radius: 0; box-sizing: border-box; }
+                                    .sum-box-masuk { background-color: #2563eb; } 
+                                    .sum-box-keluar { background-color: #f97316; } 
+                                    .sum-box-saldo { background-color: #10b981; } 
+                                    .sum-label { font-size: 7px; font-weight: 400; text-transform: uppercase; display: block; margin-bottom: 4px; letter-spacing: 0.5px; }
+                                    .sum-value { font-size: 15px; font-weight: normal; }
+                                    .legend-container { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; background-color: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0; width: fit-content; }
+                                    .legend-item { font-size: 9px; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 4px; }
+                                    .legend-box { width: 12px; height: 12px; border-radius: 3px; }
+                                    .student-badge { background: linear-gradient(90deg, #1e3a8a, #3b82f6); color: white; padding: 8px 14px; font-size: 11px; font-weight: 800; margin-bottom: 12px; display: block; width: 100%; box-sizing: border-box; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 6px solid #fbbf24; }
+                                    .nama-siswa-pill { background: #eff6ff; color: #1e3a8a; padding: 4px 8px; border-radius: 6px; font-weight: 800; display: inline-block; border-left: 4px solid #3b82f6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+                                    .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 8px; text-align: center; border: 1px solid #e2e8f0; }
+                                    .table-admin th { padding: 6px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 4px; }
+                                    .table-admin td { padding: 5px 2px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; }
+                                    .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+                                    .table-admin tbody tr:nth-child(odd) td { background-color: white !important; }
+                                    .text-left { text-align: left !important; padding-left: 8px !important; }
+                                    .val-zero { color: #cbd5e1 !important; }
+                                    .val-bold { font-weight: 800; color: #1e3a8a; }
+                                    .table-siswa { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 15px; text-align: center; }
+                                    .table-siswa th { padding: 8px 3px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+                                    .table-siswa td { padding: 6px 3px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+                                    .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+                                    .pill-lunas { background-color: #22c55e; color: white; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+                                    .pill-libur { background-color: #ef4444; color: white; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+                                    .pill-empty { background-color: #f1f5f9; color: #94a3b8; padding: 4px 0; border-radius: 4px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #cbd5e1; text-align: center; width: 36px; }
+                                    .row-total td { background-color: #f1f5f9 !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; }
+                                    .table-pengeluaran { width: 100%; border-collapse: collapse; font-size: 9px; text-align: left; }
+                                    .table-pengeluaran th { padding: 8px 5px; color: #475569; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+                                    .table-pengeluaran td { padding: 8px 5px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+                                    .table-pengeluaran tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
+                                    .pengeluaran-val { color: #dc2626; font-weight: 700; text-align: right; }
+                                </style>
+                            </head>
+                            <body>
+                                ${htmlContent}
+                                <script>
+                                    window.onload = function() {
+                                        setTimeout(function() {
+                                            window.print();
+                                            window.close();
+                                        }, 300);
+                                    };
+                                <\/script>
+                            </body>
+                        </html>
+                    `);
+                    newWindow.document.close();
+                } catch (e) {
+                    sweetPop('error', 'Cetak Gagal', 'Sistem gagal membuka tab baru untuk mencetak.');
+                }
+                document.title = originalTitle;
+                container.innerHTML = '';
+            }
+
             if (images.length === 0) {
                 triggerPrint();
-                return;
-            }
-
-            Array.from(images).forEach(img => {
-                if (img.complete) {
-                    checkImageLoad();
-                } else {
-                    img.addEventListener('load', checkImageLoad);
-                    img.addEventListener('error', checkImageLoad);
-                }
-            });
-
-            function checkImageLoad() {
-                loadedImages++;
-                if (loadedImages === images.length) {
-                    setTimeout(triggerPrint, 500); 
-                }
-            }
-
-            function triggerPrint() {
-                closeFunPop(); 
-                setTimeout(() => {
-                    window.print();
-                    document.title = originalTitle;
-                    container.innerHTML = '';
-                }, 300);
+            } else {
+                Array.from(images).forEach(img => {
+                    if (img.complete) {
+                        loadedImages++;
+                        if (loadedImages === images.length) triggerPrint();
+                    } else {
+                        img.onload = img.onerror = () => {
+                            loadedImages++;
+                            if (loadedImages === images.length) triggerPrint();
+                        };
+                    }
+                });
             }
         }
 
         async function prosesCetakAdmin() {
             const cbs = document.querySelectorAll('.cb-admin-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Cetak Apaan Nih?', 'Centang dulu dong kelas yang mau dicetak! 🖨️');
+            if (cbs.length === 0) return sweetPop('warning', 'Pilih Dulu Bos!', ['Centang dulu dong kelas yang mau dicetak! 🖨️']);
             
             let filename = cbs.length > 1 ? 'Laporan_Rekap_Infaq_Semua_Kelas' : `Laporan_Rekap_Infaq_Kelas_${cbs[0].value}`;
             let finalHTML = '';
@@ -893,7 +975,7 @@
 
         async function prosesCetakWalasSiswa() {
             const cbs = document.querySelectorAll('.cb-walas-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', 'Gimana mau cetak kalau siswanya belum dicentang? 🖨️');
+            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Gimana mau cetak kalau siswanya belum dicentang bos? 🖨️']);
             
             let studentNameClean = DB.siswa[kelasWalasAktif][parseInt(cbs[0].value)].nama.replace(/[^a-zA-Z0-9]/g, '_');
             let filename = cbs.length > 1 
@@ -905,6 +987,9 @@
             executeNativePrint(filename, finalHTML);
         }
 
+        // ==========================================
+        // GENERATOR HTML PDF 
+        // ==========================================
         async function generateClassRecapHTML(kelas) {
             await fetchKelasData(kelas);
             const dataSiswa = DB.siswa[kelas] || []; 
@@ -1064,7 +1149,14 @@
             } else { 
                 let mid = Math.ceil(riwayat.length / 2);
                 riwayat.forEach((r, i) => { 
-                    let rHtml = `<tr><td>${r.date || r.fullDate}</td><td style="text-align: left;">${r.ket}</td><td class="pengeluaran-val">${formatRp(r.amount)}</td></tr>`; 
+                    // Trik shape tanggal dinamis sesuai bulan
+                    let m = r.date.split('/')[0];
+                    let monthColors = {"07":"#fef2f2", "08":"#fff7ed", "09":"#fffbeb", "10":"#f0fdf4", "11":"#ecfdf5", "12":"#f0fdfa", "01":"#ecfeff", "02":"#f0f9ff", "03":"#eff6ff", "04":"#eef2ff", "05":"#faf5ff", "06":"#fdf4ff"};
+                    let textColors = {"07":"#ef4444", "08":"#f97316", "09":"#f59e0b", "10":"#22c55e", "11":"#10b981", "12":"#14b8a6", "01":"#06b6d4", "02":"#0ea5e9", "03":"#3b82f6", "04":"#6366f1", "05":"#a855f7", "06":"#d946ef"};
+                    let bgC = monthColors[m] || "#f1f5f9"; let txC = textColors[m] || "#64748b";
+                    
+                    let dateBadge = `<div style="background-color: ${bgC}; color: ${txC}; padding: 4px 6px; border-radius: 6px; font-weight: 800; font-size: 7px; display: inline-block;">${r.date}</div>`;
+                    let rHtml = `<tr><td>${dateBadge}</td><td style="text-align: left;">${r.ket}</td><td class="pengeluaran-val">${formatRp(r.amount)}</td></tr>`; 
                     if(i < mid) expRowsLeft += rHtml; else expRowsRight += rHtml;
                 }); 
             }
@@ -1120,14 +1212,16 @@
                         No: ${String(s.no || siswaIdx+1).padStart(2, '0')} &nbsp;|&nbsp; Nama Siswa: ${s.nama}
                     </div>
                     
-                    <div style="display: flex; justify-content: space-between; gap: 8px;">
-                        <div style="width: 49.5%;">
+                    <div style="display: flex; justify-content: space-between; gap: 8px; position: relative;">
+                        <!-- Divider Tengah -->
+                        <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; background: linear-gradient(to bottom, transparent, #e2e8f0 5%, #e2e8f0 95%, transparent); transform: translateX(-50%);"></div>
+                        <div style="width: 48%;">
                             <table class="table-siswa">
                                 ${tableHeaderInfaq}
                                 <tbody>${sem1Rows}</tbody>
                             </table>
                         </div>
-                        <div style="width: 49.5%;">
+                        <div style="width: 48%;">
                             <table class="table-siswa">
                                 ${tableHeaderInfaq}
                                 <tbody>${sem2Rows}</tbody>
@@ -1144,14 +1238,15 @@
                     
                     <div style="font-size: 11px; font-weight: 800; margin-bottom: 6px; color: #0f172a; margin-top: 10px; border-left: 3px solid #ea580c; padding-left: 6px;">Daftar Pengeluaran Kelas:</div>
                     
-                    <div style="display: flex; justify-content: space-between; gap: 8px;">
-                        <div style="width: 49.5%;">
+                    <div style="display: flex; justify-content: space-between; gap: 8px; position: relative;">
+                        <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; background: linear-gradient(to bottom, transparent, #e2e8f0 5%, #e2e8f0 95%, transparent); transform: translateX(-50%);"></div>
+                        <div style="width: 48%;">
                             <table class="table-pengeluaran">
                                 ${tableHeaderExp}
                                 <tbody>${expRowsLeft}</tbody>
                             </table>
                         </div>
-                        <div style="width: 49.5%;">
+                        <div style="width: 48%;">
                             <table class="table-pengeluaran">
                                 ${tableHeaderExp}
                                 <tbody>${expRowsRight}</tbody>
@@ -1171,7 +1266,9 @@
             const trHead = document.getElementById('walas-table-header-row');
             let htmlHead = `<th class="py-2.5 px-1 text-center z-intersect pos-no bg-[#f8fafc]">NO</th><th class="py-2.5 px-1 z-intersect pos-nama bg-[#f8fafc] uppercase text-left">NAMA LENGKAP</th><th class="py-2.5 px-0 text-center text-[#1e3a8a] z-intersect pos-total bg-[#eff6ff] uppercase">TOT</th>`;
             academicWeeks.forEach(week => {
-                htmlHead += `<th class="py-1.5 px-0.5 text-center border-r border-slate-200 border-b border-t-0 min-w-[42px] align-top z-head"><div class="text-[7px] font-black text-slate-400 uppercase mb-0.5">${week.monthStr}</div><div class="text-[8px] font-bold text-slate-800 mb-1.5">${week.dateStr}</div><div class="flex justify-center gap-0.5"><button onclick="checkAll(${week.id})" class="w-[14px] h-[14px] rounded border border-green-200 text-green-500 flex items-center justify-center bg-green-50 hover:bg-green-100 transition"><i class="fa-solid fa-check text-[6px]"></i></button><button onclick="crossAll(${week.id})" class="w-[14px] h-[14px] rounded border border-red-200 text-red-500 flex items-center justify-center bg-red-50 hover:bg-red-100 transition"><i class="fa-solid fa-xmark text-[6px]"></i></button></div></th>`;
+                const bgClass = getMonthBg(week.monthKey);
+                const borderClass = week.isLastWeek ? "border-r-2 border-r-slate-300" : "border-r border-r-slate-200";
+                htmlHead += `<th class="py-1.5 px-0.5 text-center ${borderClass} border-b border-t-0 min-w-[42px] align-top z-head ${bgClass}"><div class="text-[7px] font-black text-slate-400 uppercase mb-0.5">${week.monthStr}</div><div class="text-[8px] font-bold text-slate-800 mb-1.5">${week.dateStr}</div><div class="flex justify-center gap-0.5"><button onclick="checkAll(${week.id})" class="w-[14px] h-[14px] rounded border border-green-200 text-green-500 flex items-center justify-center bg-green-50 hover:bg-green-100 transition"><i class="fa-solid fa-check text-[6px]"></i></button><button onclick="crossAll(${week.id})" class="w-[14px] h-[14px] rounded border border-red-200 text-red-500 flex items-center justify-center bg-red-50 hover:bg-red-100 transition"><i class="fa-solid fa-xmark text-[6px]"></i></button></div></th>`;
             });
             trHead.innerHTML = htmlHead;
             if(!checklistState[kelas]) { checklistState[kelas] = {}; (DB.siswa[kelas] || []).forEach((_, i) => { checklistState[kelas][i] = new Array(52).fill(0); }); }
@@ -1189,9 +1286,11 @@
                 let checkBoxesHtml = '';
                 academicWeeks.forEach(w => {
                     const state = checks[w.id] || 0;
-                    checkBoxesHtml += `<td class="py-2.5 px-0.5 text-center border-b border-r border-slate-100 bg-white"><div id="cell-${idx}-${w.id}" onclick="toggleCheckManual(${idx}, ${w.id})" class="mx-auto cursor-pointer transition-colors ${getCellClass(state)}">${getCellIcon(state)}</div></td>`;
+                    const bgClass = getMonthBg(w.monthKey);
+                    const borderClass = w.isLastWeek ? "border-r-2 border-r-slate-300" : "border-r border-r-slate-200";
+                    checkBoxesHtml += `<td class="py-2.5 px-0.5 text-center border-b ${borderClass} ${bgClass}"><div id="cell-${idx}-${w.id}" onclick="toggleCheckManual(${idx}, ${w.id})" class="mx-auto cursor-pointer transition-colors ${getCellClass(state)}">${getCellIcon(state)}</div></td>`;
                 });
-                html += `<tr class="walas-tr"><td class="py-2 px-1 text-center z-col pos-no text-slate-400 font-bold border-b border-slate-100 text-[9px]">${String(s.no || idx+1).padStart(2, '0')}</td><td class="py-2 px-1 z-col pos-nama text-slate-800 truncate border-b border-slate-100 text-[10px]">${s.nama || s.class}</td><td class="py-2 px-1 text-center ${totalColor} font-black z-col pos-total border-b border-slate-100 text-[10px]"><span id="total-siswa-${idx}">${formatRp(totalInfaq)}</span></td>${checkBoxesHtml}</tr>`;
+                html += `<tr class="walas-tr"><td class="py-2 px-1 text-center z-col pos-no text-slate-400 font-bold border-b border-slate-100 text-[9px]">${String(s.no || idx+1).padStart(2, '0')}</td><td class="py-2 px-1 z-col pos-nama text-slate-800 border-b border-slate-100 text-[10px]"><div class="truncate max-w-[95px]">${s.nama || s.class}</div></td><td class="py-2 px-1 text-center ${totalColor} font-black z-col pos-total border-b border-slate-100 text-[10px]"><span id="total-siswa-${idx}">${formatRp(totalInfaq)}</span></td>${checkBoxesHtml}</tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -1688,26 +1787,31 @@
 
             titleEl.innerText = title;
 
-            if (Array.isArray(msg)) { msgEl.innerText = msg[Math.floor(Math.random() * msg.length)]; } 
-            else { msgEl.innerText = msg; }
+            // Handle variasi pesan (Array)
+            if (Array.isArray(msg)) {
+                msgEl.innerText = msg[Math.floor(Math.random() * msg.length)];
+            } else {
+                msgEl.innerText = msg;
+            }
 
-            card.className = "bg-white rounded-[2rem] p-6 pt-10 max-w-[290px] w-full transform scale-75 opacity-0 transition-all duration-400 text-center relative border-[3px]";
-            
+            card.className = "bg-white rounded-3xl p-6 pt-8 max-w-[280px] w-full transform scale-75 opacity-0 transition-all duration-300 text-center relative mt-8 border-2";
+            icon.className = "absolute -top-8 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] z-10 whitespace-nowrap animate-bounce";
+
             const successPool = [
-                { emojis: "😎🔥", glow: "border-green-400 shadow-[0_0_40px_rgba(74,222,128,0.4)]", btnClass: "bg-gradient-to-r from-green-500 to-emerald-400 hover:shadow-green-500/40", btnText: "MANTAP BOSS! 🚀" },
-                { emojis: "🚀✨", glow: "border-blue-400 shadow-[0_0_40px_rgba(96,165,250,0.4)]", btnClass: "bg-gradient-to-r from-blue-500 to-cyan-400 hover:shadow-blue-500/40", btnText: "GACOR KANG! ⚡" },
-                { emojis: "🏆🎉", glow: "border-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.4)]", btnClass: "bg-gradient-to-r from-yellow-500 to-amber-400 hover:shadow-yellow-500/40", btnText: "GOKIL PARAH! 🤘" }
+                { emojis: "😎🔥", glow: "border-green-400 shadow-[0_0_40px_rgba(74,222,128,0.5)]", btnClass: "bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 shadow-[0_4px_15px_rgba(34,197,94,0.4)]", btnText: "MENYALA ABANGKU! 🚀" },
+                { emojis: "🚀✨", glow: "border-blue-400 shadow-[0_0_40px_rgba(96,165,250,0.5)]", btnClass: "bg-gradient-to-r from-blue-400 to-blue-600 hover:from-blue-500 hover:to-blue-700 shadow-[0_4px_15px_rgba(59,130,246,0.4)]", btnText: "GACOR KANG! ⚡" },
+                { emojis: "🏆🎉", glow: "border-yellow-400 shadow-[0_0_40px_rgba(250,204,21,0.5)]", btnClass: "bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 shadow-[0_4px_15px_rgba(234,179,8,0.4)]", btnText: "GOKIL PARAH! 🤘" }
             ];
 
             const errorPool = [
-                { emojis: "🫵🤣", glow: "border-red-400 shadow-[0_0_40px_rgba(248,113,113,0.4)]", btnClass: "bg-gradient-to-r from-red-500 to-rose-400 hover:shadow-red-500/40", btnText: "YAHAHAHA LAWAK LU!" },
-                { emojis: "🙈💦", glow: "border-rose-400 shadow-[0_0_40px_rgba(251,113,133,0.4)]", btnClass: "bg-gradient-to-r from-rose-500 to-pink-400 hover:shadow-rose-500/40", btnText: "YAH KELESET BOS! 😅" },
-                { emojis: "😅🔧", glow: "border-slate-400 shadow-[0_0_40px_rgba(148,163,184,0.4)]", btnClass: "bg-gradient-to-r from-slate-600 to-gray-500 hover:shadow-slate-500/40", btnText: "CEK LAGI DONG! 🛠️" }
+                { emojis: "🫵🤣", glow: "border-red-400 shadow-[0_0_40px_rgba(248,113,113,0.5)]", btnClass: "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-[0_4px_15px_rgba(239,68,68,0.4)]", btnText: "YAHAHAHA LAWAK LU! 🤡" },
+                { emojis: "🙈💦", glow: "border-rose-400 shadow-[0_0_40px_rgba(251,113,133,0.5)]", btnClass: "bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 shadow-[0_4px_15px_rgba(244,63,94,0.4)]", btnText: "YAH KELESET BOS! 😅" },
+                { emojis: "😅🔧", glow: "border-slate-400 shadow-[0_0_40px_rgba(148,163,184,0.5)]", btnClass: "bg-gradient-to-r from-slate-500 to-slate-700 hover:from-slate-600 hover:to-slate-800 shadow-[0_4px_15px_rgba(100,116,139,0.4)]", btnText: "CEK LAGI DONG! 🛠️" }
             ];
 
             const warningPool = [
-                { emojis: "🧐🚩", glow: "border-orange-400 shadow-[0_0_40px_rgba(251,146,60,0.4)]", btnClass: "bg-gradient-to-r from-orange-500 to-amber-400 hover:shadow-orange-500/40", btnText: "SIAP LAKSANAKAN!" },
-                { emojis: "🤔🚨", glow: "border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.4)]", btnClass: "bg-gradient-to-r from-amber-500 to-yellow-400 hover:shadow-amber-500/40", btnText: "NGEREM DULU MANG!" }
+                { emojis: "🧐🚩", glow: "border-orange-400 shadow-[0_0_40px_rgba(251,146,60,0.5)]", btnClass: "bg-gradient-to-r from-orange-400 to-orange-600 hover:from-orange-500 hover:to-orange-700 shadow-[0_4px_15px_rgba(249,115,22,0.4)]", btnText: "SIAP LAKSANAKAN! 🫡" },
+                { emojis: "🤔🚨", glow: "border-amber-400 shadow-[0_0_40px_rgba(251,191,36,0.5)]", btnClass: "bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 shadow-[0_4px_15px_rgba(245,158,11,0.4)]", btnText: "NGEREM DULU MANG! 🛑" }
             ];
 
             let selectedTheme;
@@ -1716,11 +1820,9 @@
             else selectedTheme = warningPool[Math.floor(Math.random() * warningPool.length)];
 
             icon.innerText = selectedTheme.emojis;
-            icon.className = "absolute -top-10 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] animate-bounce flex gap-1 z-10 whitespace-nowrap";
-            
             card.classList.add(...selectedTheme.glow.split(' '));
             
-            btn.className = `w-full py-3.5 rounded-xl font-black text-[12px] tracking-wider text-white shadow-lg transition transform active:scale-95 ${selectedTheme.btnClass}`;
+            btn.className = `w-full py-3.5 rounded-xl font-black text-[12px] text-white transition transform active:scale-95 ${selectedTheme.btnClass}`;
             btn.innerText = selectedTheme.btnText;
 
             overlay.classList.remove('opacity-0', 'pointer-events-none');
@@ -1798,6 +1900,7 @@
             }
 
             if (isSuccess) {
+                // EKSEKUSI LANGSUNG KECEPATAN CAHAYA (NO DELAY!)
                 btn.innerHTML = originalContent; btn.disabled = false;
                 if (roleName === 'Wali Kelas') DB.guru[selectedKelasWalas] = namaGuru;
 
@@ -1832,6 +1935,7 @@
         }
 
         function logoutApp(viewId) {
+            // LOGOUT LANGSUNG (NO DELAY!)
             const loginView = document.getElementById('view-login'); const dashView = document.getElementById(viewId); const btnRefresh = document.getElementById('btn-global-refresh');
             dashView.classList.add('hidden'); loginView.classList.remove('hidden'); btnRefresh.classList.add('hidden');
             document.body.style.backgroundColor = '#f8fafc';
