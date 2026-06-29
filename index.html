@@ -66,7 +66,7 @@
         /* KUNCI LEBAR KOLOM ANTI-BOCOR (STICKY SCROLL SEMPURNA) */
         .pos-no { left: 0; width: 25px; min-width: 25px; max-width: 25px; }
         .pos-nama { left: 25px; width: 140px; min-width: 140px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .pos-total { left: 165px; width: 60px; min-width: 60px; max-width: 60px; box-shadow: inset -1px 0 0 #e2e8f0, 2px 0 4px -2px rgba(0,0,0,0.08); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pos-total { left: 165px; width: 50px; min-width: 50px; max-width: 50px; box-shadow: inset -1px 0 0 #e2e8f0, 2px 0 4px -2px rgba(0,0,0,0.08); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .walas-tr .z-col { transition: background-color 0.2s; }
         .walas-tr .z-col.pos-total { background-color: #f4f7fb; }
@@ -75,7 +75,7 @@
         
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 999; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; padding: 1.5rem; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content { background: white; width: 100%; max-width: 380px; border-radius: 1.5rem; padding: 24px; transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 15px 35px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: hidden; display: flex; flex-direction: column; position: relative; }
+        .modal-content { background: white; width: 100%; max-width: 420px; border-radius: 1.5rem; padding: 24px; transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 15px 35px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: hidden; display: flex; flex-direction: column; position: relative; }
         .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
         
         .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #ea580c; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
@@ -135,24 +135,24 @@
             
             /* Table Rekap Kelas (Admin) */
             .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 7.5px; text-align: center; border: 1px solid #e2e8f0; }
-            .table-admin th { padding: 4px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 2px; font-size: 8px; }
-            .table-admin td { padding: 2px 1px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; height: 13px; }
+            .table-admin th { padding: 4px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 2px; font-size: 7px; }
+            .table-admin td { padding: 2px 1px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; height: 13px; font-size: 7px; }
             .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
             .table-admin tbody tr:nth-child(odd) td { background-color: white !important; }
             .text-left { text-align: left !important; padding-left: 6px !important; }
             .val-zero { color: #cbd5e1 !important; }
             .val-bold { font-weight: 800; color: #1e3a8a; }
             
-            /* Table Persiswa (Walas) 2 KOLOM RAPI */
+            /* Table Persiswa (Walas) 2 KOLOM RAPI - DIPADATKAN */
             .table-siswa { width: 100%; border-collapse: collapse; font-size: 7.5px; text-align: center; }
             .table-siswa th { padding: 4px 1px; color: #475569; font-weight: 800; border-bottom: 1px solid #e2e8f0; font-size: 7.5px; text-align: center; }
-            .table-siswa td { padding: 3px 1px; color: #334155; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+            .table-siswa td { padding: 3.5px 1px; color: #334155; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
             .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
             .table-siswa tbody tr:nth-child(odd) td { background-color: #ffffff !important; }
             
-            .pill-lunas { background-color: #22c55e; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-            .pill-libur { background-color: #ef4444; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
-            .pill-empty { background-color: #f1f5f9; color: #cbd5e1; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #e2e8f0; text-align: center; width: 36px; }
+            .pill-lunas { background-color: #22c55e; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 32px; }
+            .pill-libur { background-color: #ef4444; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 32px; }
+            .pill-empty { background-color: #f1f5f9; color: #cbd5e1; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #e2e8f0; text-align: center; width: 32px; }
             .row-total td { background-color: #f8fafc !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; font-size: 8px; padding: 6px 2px; }
         }
     </style>
@@ -951,17 +951,18 @@
 
             body.innerHTML = `
                 <div class="flex flex-col h-full max-h-[70vh]">
-                    <div class="mb-3 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <div class="mb-4 text-center">
+                        <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3 rounded-xl font-black text-[11px] md:text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2 cursor-pointer mb-3"><i class="fa-solid fa-table text-[15px]"></i> 1. CETAK REKAP SELURUH KELAS</button>
+                        <div class="border-t border-slate-200 w-full relative"><span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">ATAU CETAK PERSISWA</span></div>
+                    </div>
+                    <div class="mb-3 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200 mt-2">
                         <span class="text-[11px] md:text-[12px] font-black text-slate-700">PILIH SEMUA SISWA</span>
                         <input type="checkbox" class="w-5 h-5 accent-orange-600 rounded cursor-pointer" id="cb-walas-all" onchange="toggleAllWalasPrint(this.checked)">
                     </div>
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-4 border-b border-slate-100 pb-2">
                         ${listSiswa || '<p class="text-center text-[10px] font-bold text-slate-400">Belum ada siswa</p>'}
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="prosesCetakWalasRekap()" class="flex-1 bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[10px] md:text-[11px] shadow-md hover:bg-blue-900 transition flex flex-col items-center justify-center gap-1.5 leading-tight cursor-pointer"><i class="fa-solid fa-table text-[15px]"></i> 1. CETAK REKAP SELURUH KELAS</button>
-                        <button onclick="prosesCetakWalasSiswa()" class="flex-1 bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[10px] md:text-[11px] shadow-md hover:bg-orange-700 transition flex flex-col items-center justify-center gap-1.5 leading-tight cursor-pointer"><i class="fa-solid fa-file-pdf text-[15px]"></i> 2. CETAK LAPORAN SISWA</button>
-                    </div>
+                    <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[11px] md:text-[12px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2 cursor-pointer"><i class="fa-solid fa-file-pdf text-[15px]"></i> 2. CETAK LAPORAN SISWA</button>
                 </div>
             `;
             modal.classList.add('active');
@@ -1536,14 +1537,33 @@
             const nominal = DB.nominalDefault[kelas] || 0; const checks = checklistState[kelas]?.[idxSiswa] || {}; const totalInfaq = Object.values(checks).filter(v => v === 1).length * nominal; document.getElementById('warid-total-infaq').innerText = "Rp " + formatRp(totalInfaq);
             document.getElementById('teks-total-ananda').innerText = `Total Infaq Ananda ${student.nama}`;
             const groupedWeeks = {}; academicWeeks.forEach(w => { if(!groupedWeeks[w.monthLong]) groupedWeeks[w.monthLong] = []; groupedWeeks[w.monthLong].push(w); });
+            
             const calendarContainer = document.getElementById('warid-calendar-container'); let htmlCalendar = '';
             for (let month in groupedWeeks) {
                 const weeksInMonth = groupedWeeks[month]; let boxesHtml = '';
+                
+                // MENGUBAH TAMPILAN BOX TANGGAL MENJADI MINIMALIS PREMIUM BERDASARKAN STATUS
                 weeksInMonth.forEach(w => {
-                    const state = checks[w.id] || 0; let iconHtml = '<span class="text-slate-300 font-bold">-</span>';
-                    if (state === 1) iconHtml = `<i class="fa-solid fa-check text-green-500 text-[14px]"></i>`; else if (state === 2) iconHtml = `<i class="fa-solid fa-xmark text-red-400 text-[14px]"></i>`;
-                    boxesHtml += `<div class="w-[56px] min-w-[56px] bg-white border border-slate-100 rounded-xl flex flex-col items-center justify-center p-2 h-[70px] shadow-sm"><span class="text-[13px] font-black text-slate-700">${w.dateNum}</span><div class="mt-1 flex items-center justify-center h-[18px]">${iconHtml}</div></div>`;
+                    const state = checks[w.id] || 0; 
+                    let boxClass, textClass, iconHtml;
+                    
+                    if (state === 1) { // Lunas (Hijau Pastel)
+                        boxClass = "bg-green-50 border-green-200 shadow-sm";
+                        textClass = "text-green-700";
+                        iconHtml = `<i class="fa-solid fa-check text-green-500 text-[14px]"></i>`;
+                    } else if (state === 2) { // Libur (Merah Pastel)
+                        boxClass = "bg-red-50 border-red-200 shadow-sm";
+                        textClass = "text-red-700";
+                        iconHtml = `<i class="fa-solid fa-xmark text-red-500 text-[14px]"></i>`;
+                    } else { // Belum (Abu-abu / Transparan)
+                        boxClass = "bg-slate-50 border-slate-200 shadow-sm opacity-70";
+                        textClass = "text-slate-400";
+                        iconHtml = '<span class="text-slate-300 font-bold">-</span>';
+                    }
+                    
+                    boxesHtml += `<div class="w-[56px] min-w-[56px] ${boxClass} border rounded-xl flex flex-col items-center justify-center p-2 h-[70px] transition-all hover:scale-105"><span class="text-[14px] font-black ${textClass}">${w.dateNum}</span><div class="mt-1 flex items-center justify-center h-[18px]">${iconHtml}</div></div>`;
                 });
+                
                 htmlCalendar += `<div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 md:p-5 shadow-sm relative"><div class="bg-[#1e3a8a] text-white text-[10px] md:text-[11px] font-black uppercase px-3.5 py-2 rounded-lg inline-block mb-3.5 shadow-md">${month}</div><div class="flex gap-2.5 overflow-x-auto custom-scrollbar pb-1 md:flex-wrap md:overflow-visible">${boxesHtml}</div></div>`;
             }
             calendarContainer.innerHTML = htmlCalendar;
