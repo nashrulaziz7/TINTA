@@ -18,6 +18,10 @@
         .bg-clean-lines { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; pointer-events: none; background-image: radial-gradient(circle at 15% 50%, rgba(249, 115, 22, 0.03), transparent 25%), radial-gradient(circle at 85% 30%, rgba(30, 58, 138, 0.03), transparent 25%); }
         .fine-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-image: linear-gradient(rgba(203, 213, 225, 0.25) 1px, transparent 1px), linear-gradient(90deg, rgba(203, 213, 225, 0.25) 1px, transparent 1px); background-size: 30px 30px; z-index: 0; opacity: 0.6; }
 
+        /* ANIMASI SPLASH SCREEN */
+        @keyframes floatLogo { 0% { transform: translateY(30px) scale(0.85); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+        .animate-float-logo { animation: floatLogo 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
         .global-header-wrapper { position: fixed; top: 0; left: 0; width: 100%; z-index: 100; display: flex; justify-content: center; pointer-events: none; padding-top: 14px; }
         
         .sec-ticker { display: inline-block; width: 14px; text-align: center; color: #1e3a8a; font-weight: 900; }
@@ -150,14 +154,24 @@
             .table-siswa tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
             .table-siswa tbody tr:nth-child(odd) td { background-color: #ffffff !important; }
             
-            .pill-lunas { background-color: #22c55e; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 32px; }
-            .pill-libur { background-color: #ef4444; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 32px; }
-            .pill-empty { background-color: #f1f5f9; color: #cbd5e1; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #e2e8f0; text-align: center; width: 32px; }
+            .pill-lunas { background-color: #22c55e; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-libur { background-color: #ef4444; color: white; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; text-align: center; width: 36px; }
+            .pill-empty { background-color: #f1f5f9; color: #cbd5e1; padding: 2.5px 0; border-radius: 3px; font-size: 7px; font-weight: 800; display: inline-block; border: 1px solid #e2e8f0; text-align: center; width: 36px; }
             .row-total td { background-color: #f8fafc !important; font-weight: 800; color: #0f172a; border-top: 1px solid #cbd5e1; border-bottom: none; font-size: 8px; padding: 6px 2px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- SPLASH SCREEN LOADING AWAL -->
+    <div id="splash-screen" class="fixed inset-0 bg-[#f8fafc] z-[9999999] flex flex-col justify-center items-center transition-opacity duration-700">
+        <img src="TINTA.png" class="w-[200px] md:w-[250px] h-auto object-contain animate-float-logo drop-shadow-xl" onerror="this.src='https://placehold.co/200x60/ffffff/1e3a8a?text=TINTA'">
+        <div class="mt-8 flex items-center gap-2">
+            <div class="w-2.5 h-2.5 bg-[#ea580c] rounded-full animate-bounce" style="animation-delay: 0s"></div>
+            <div class="w-2.5 h-2.5 bg-[#ea580c] rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+            <div class="w-2.5 h-2.5 bg-[#ea580c] rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+        </div>
+    </div>
 
     <!-- HEADER GLOBAL -->
     <div class="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm flex items-center justify-center h-[60px]">
@@ -561,7 +575,7 @@
         <div class="bg-white rounded-3xl p-6 max-w-[360px] w-full transform scale-95 transition-transform duration-500 relative overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-[#ea580c]"></div>
             <div class="text-center mb-5 mt-2">
-                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner border border-blue-100"><i class="fa-solid fa-rocket"></i></div>
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner border border-blue-100"><img src="TINTA.png" class="w-12 h-auto" onerror="this.src='https://placehold.co/100x30/ffffff/1e3a8a?text=LOGO'"></div>
                 <h2 class="text-[18px] md:text-[20px] font-black text-slate-800">Selamat Datang di TINTA!</h2>
                 <p class="text-[11px] md:text-[12px] font-bold text-slate-500 mt-1">Sistem Tabungan Infaq Terpadu Level Dewa 🚀</p>
             </div>
@@ -583,18 +597,17 @@
         </div>
     </div>
 
-    <!-- POPUP INSTALL INSTAN (PWA) -->
-    <div id="install-popup-overlay" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[999998] flex justify-center items-end sm:items-center opacity-0 pointer-events-none transition-opacity duration-300 sm:px-4 pb-4 sm:pb-0">
-        <div class="bg-white rounded-[2rem] sm:rounded-3xl p-6 w-full max-w-[360px] transform translate-y-10 sm:translate-y-0 sm:scale-95 transition-all duration-300 relative shadow-2xl">
-            <button onclick="closeInstallPopup()" class="absolute top-4 right-4 w-7 h-7 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center hover:bg-slate-200 transition cursor-pointer"><i class="fa-solid fa-xmark text-[11px]"></i></button>
+    <!-- POPUP INSTALL INSTAN (PWA) - WAJIB INSTALL (TIDAK BISA DITUTUP) -->
+    <div id="install-popup-overlay" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[999998] flex justify-center items-end sm:items-center opacity-0 pointer-events-none transition-opacity duration-300 sm:px-4 pb-4 sm:pb-0">
+        <div class="bg-white rounded-[2rem] sm:rounded-3xl p-6 w-full max-w-[360px] transform translate-y-10 sm:translate-y-0 sm:scale-95 transition-all duration-300 relative shadow-2xl border-2 border-slate-200">
             <div class="flex items-center gap-4 mb-4 mt-2">
                 <img src="TINTA.png" class="w-14 md:w-16 h-14 md:h-16 object-contain drop-shadow" onerror="this.src='https://placehold.co/100x100/ffffff/1e3a8a?text=TINTA'">
                 <div>
-                    <h3 class="text-[16px] md:text-[18px] font-black text-slate-800 leading-tight">Install TINTA App</h3>
-                    <p class="text-[10px] md:text-[11px] font-bold text-slate-500 mt-0.5">Akses secepat kilat (Fullscreen)</p>
+                    <h3 class="text-[16px] md:text-[18px] font-black text-slate-800 leading-tight uppercase text-red-600">AKSES DITOLAK!</h3>
+                    <p class="text-[10px] md:text-[11px] font-bold text-slate-500 mt-0.5">Wajib Install Aplikasi 🚀</p>
                 </div>
             </div>
-            <p class="text-[11px] md:text-[12px] text-slate-600 mb-5 font-medium leading-relaxed">Pasang aplikasi TINTA di layar utama perangkat Anda untuk pengalaman super cepat tanpa gangguan browser!</p>
+            <p class="text-[11px] md:text-[12px] text-slate-600 mb-5 font-medium leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">Untuk keamanan dan kecepatan maksimal, aplikasi TINTA <b>HARUS DIINSTAL</b> terlebih dahulu di layar utama HP/Laptop Anda. Tidak ada tawar-menawar! 😎</p>
             <button onclick="triggerNativeInstall()" class="w-full py-3.5 bg-gradient-to-r from-[#10b981] to-[#059669] text-white rounded-xl font-black text-[12px] md:text-[13px] shadow-[0_4px_15px_rgba(16,185,129,0.3)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.4)] transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"><i class="fa-solid fa-download"></i> INSTALL SEKARANG (INSTAN)</button>
         </div>
     </div>
@@ -631,6 +644,8 @@
     <script>
         // --- MESIN PWA INSTAN INSTALL (INJECTOR BAYANGAN) ---
         let deferredPrompt;
+        let isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
         try {
             const manifestJSON = {
                 "name": "TINTA - Master Vision", "short_name": "TINTA",
@@ -651,16 +666,57 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-        });
-
-        // --- SISTEM PENYAMBUTAN (ONBOARDING) & INSTALL ---
-        window.addEventListener('DOMContentLoaded', () => {
-            if(!sessionStorage.getItem('tinta_welcomed')) {
-                showWelcomePopup();
-            } else {
-                checkAndShowInstall();
+            // Jika belum diinstal dan splash screen sudah hilang, paksa popup muncul
+            if(!isAppInstalled && document.getElementById('splash-screen').style.display === 'none') {
+                showMandatoryInstall();
             }
         });
+
+        // --- SISTEM PENYAMBUTAN & SPLASH SCREEN LOGIC ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // 1. Jalankan Splash Screen (Logo Melayang & Bouncing Dots)
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.classList.add('opacity-0', 'pointer-events-none');
+                
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    
+                    // 2. Evaluasi: Sudah Install (Standalone) atau Belum?
+                    if (!isAppInstalled) {
+                        // WAJIB INSTALL (Blokir layar total)
+                        showMandatoryInstall();
+                    } else {
+                        // SUDAH INSTALL: Lanjut Onboarding atau Login Biasa
+                        if(!sessionStorage.getItem('tinta_welcomed')) {
+                            showWelcomePopup();
+                        }
+                    }
+                }, 700); // Waktu memudar (fade out)
+            }, 1800); // Tahan Splash Screen selama 1.8 detik
+        });
+
+        function showMandatoryInstall() {
+            const overlay = document.getElementById('install-popup-overlay');
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            overlay.classList.add('pointer-events-auto');
+            overlay.querySelector('div').classList.remove('translate-y-10', 'scale-95');
+        }
+
+        function triggerNativeInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        sweetPop('success', 'Sedang Diinstal!', 'Mantap Bos! Tunggu sebentar, aplikasi akan otomatis muncul di layar utama Anda. Silakan buka dari sana!');
+                    } else {
+                        sweetPop('error', 'Wajib Bos!', 'Tidak ada kompromi! Aplikasi harus diinstal biar kecepatannya maksimal. 😤');
+                    }
+                });
+            } else {
+                sweetPop('warning', 'Peringatan Browser', 'Perangkat Anda belum siap otomatis. Silakan klik Titik 3 di pojok kanan atas browser lalu pilih "Tambahkan ke Layar Utama / Install".');
+            }
+        }
 
         function showWelcomePopup() {
             const overlay = document.getElementById('welcome-popup-overlay');
@@ -673,32 +729,8 @@
             const overlay = document.getElementById('welcome-popup-overlay');
             overlay.querySelector('div').classList.add('scale-95');
             overlay.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(checkAndShowInstall, 500); 
         }
 
-        function checkAndShowInstall() {
-            if (deferredPrompt) {
-                const overlay = document.getElementById('install-popup-overlay');
-                overlay.classList.remove('opacity-0', 'pointer-events-none');
-                overlay.querySelector('div').classList.remove('translate-y-10', 'scale-95');
-            }
-        }
-
-        function triggerNativeInstall() {
-            closeInstallPopup();
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
-            }
-        }
-
-        function closeInstallPopup() {
-            const overlay = document.getElementById('install-popup-overlay');
-            overlay.querySelector('div').classList.add('translate-y-10', 'scale-95');
-            overlay.classList.add('opacity-0', 'pointer-events-none');
-        }
 
         // ==========================================
         // SISTEM DATABASE MASTER
@@ -743,26 +775,19 @@
         generateAcademicWeeks();
 
         const pastelColors = {
-            "Jul": { bg: "bg-[#fdf4ff]", border: "border-[#f0abfc]", hexBg: "#fdf4ff", hexBorder: "#f0abfc", bgBase: "#fdf4ff" }, 
-            "Agt": { bg: "bg-[#fff7ed]", border: "border-[#fdba74]", hexBg: "#fff7ed", hexBorder: "#fdba74", bgBase: "#fff7ed" }, 
-            "Sep": { bg: "bg-[#f0fdf4]", border: "border-[#86efac]", hexBg: "#f0fdf4", hexBorder: "#86efac", bgBase: "#f0fdf4" }, 
-            "Okt": { bg: "bg-[#fef2f2]", border: "border-[#fca5a5]", hexBg: "#fef2f2", hexBorder: "#fca5a5", bgBase: "#fef2f2" }, 
-            "Nov": { bg: "bg-[#f0f9ff]", border: "border-[#7dd3fc]", hexBg: "#f0f9ff", hexBorder: "#7dd3fc", bgBase: "#f0f9ff" }, 
-            "Des": { bg: "bg-[#fefce8]", border: "border-[#fde047]", hexBg: "#fefce8", hexBorder: "#fde047", bgBase: "#fefce8" }, 
-            "Jan": { bg: "bg-[#faf5ff]", border: "border-[#d8b4fe]", hexBg: "#faf5ff", hexBorder: "#d8b4fe", bgBase: "#faf5ff" }, 
-            "Feb": { bg: "bg-[#f0fdfa]", border: "border-[#5eead4]", hexBg: "#f0fdfa", hexBorder: "#5eead4", bgBase: "#f0fdfa" }, 
-            "Mar": { bg: "bg-[#fff1f2]", border: "border-[#fda4af]", hexBg: "#fff1f2", hexBorder: "#fda4af", bgBase: "#fff1f2" }, 
-            "Apr": { bg: "bg-[#eff6ff]", border: "border-[#93c5fd]", hexBg: "#eff6ff", hexBorder: "#93c5fd", bgBase: "#eff6ff" }, 
-            "Mei": { bg: "bg-[#ecfdf5]", border: "border-[#6ee7b7]", hexBg: "#ecfdf5", hexBorder: "#6ee7b7", bgBase: "#ecfdf5" }, 
-            "Jun": { bg: "bg-[#f5f3ff]", border: "border-[#c4b5fd]", hexBg: "#f5f3ff", hexBorder: "#c4b5fd", bgBase: "#f5f3ff" }  
+            "Jul": { bg: "bg-[#fdf4ff]", border: "border-[#f0abfc]", hexBg: "#fdf4ff", hexBorder: "#f0abfc", bgBase: "#fdf4ff", borderTebal: "#e879f9" }, 
+            "Agt": { bg: "bg-[#fff7ed]", border: "border-[#fdba74]", hexBg: "#fff7ed", hexBorder: "#fdba74", bgBase: "#fff7ed", borderTebal: "#fb923c" }, 
+            "Sep": { bg: "bg-[#f0fdf4]", border: "border-[#86efac]", hexBg: "#f0fdf4", hexBorder: "#86efac", bgBase: "#f0fdf4", borderTebal: "#4ade80" }, 
+            "Okt": { bg: "bg-[#fef2f2]", border: "border-[#fca5a5]", hexBg: "#fef2f2", hexBorder: "#fca5a5", bgBase: "#fef2f2", borderTebal: "#f87171" }, 
+            "Nov": { bg: "bg-[#f0f9ff]", border: "border-[#7dd3fc]", hexBg: "#f0f9ff", hexBorder: "#7dd3fc", bgBase: "#f0f9ff", borderTebal: "#38bdf8" }, 
+            "Des": { bg: "bg-[#fefce8]", border: "border-[#fde047]", hexBg: "#fefce8", hexBorder: "#fde047", bgBase: "#fefce8", borderTebal: "#facc15" }, 
+            "Jan": { bg: "bg-[#faf5ff]", border: "border-[#d8b4fe]", hexBg: "#faf5ff", hexBorder: "#d8b4fe", bgBase: "#faf5ff", borderTebal: "#c084fc" }, 
+            "Feb": { bg: "bg-[#f0fdfa]", border: "border-[#5eead4]", hexBg: "#f0fdfa", hexBorder: "#5eead4", bgBase: "#f0fdfa", borderTebal: "#2dd4bf" }, 
+            "Mar": { bg: "bg-[#fff1f2]", border: "border-[#fda4af]", hexBg: "#fff1f2", hexBorder: "#fda4af", bgBase: "#fff1f2", borderTebal: "#fb7185" }, 
+            "Apr": { bg: "bg-[#eff6ff]", border: "border-[#93c5fd]", hexBg: "#eff6ff", hexBorder: "#93c5fd", bgBase: "#eff6ff", borderTebal: "#60a5fa" }, 
+            "Mei": { bg: "bg-[#ecfdf5]", border: "border-[#6ee7b7]", hexBg: "#ecfdf5", hexBorder: "#6ee7b7", bgBase: "#ecfdf5", borderTebal: "#34d399" }, 
+            "Jun": { bg: "bg-[#f5f3ff]", border: "border-[#c4b5fd]", hexBg: "#f5f3ff", hexBorder: "#c4b5fd", bgBase: "#f5f3ff", borderTebal: "#a78bfa" }  
         };
-
-        // Fungsi Belang-Belang Background PDF
-        function getMonthBg(mKey) {
-            const arr = ["Jul", "Agt", "Sep", "Okt", "Nov", "Des", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun"];
-            const idx = arr.indexOf(mKey);
-            return idx % 2 === 0 ? "#ffffff" : "#f8fafc";
-        }
 
         let kelasWalasAktif = ""; let kelasWaridAktif = ""; let siswaWaridIdx = -1; let checklistState = {}; let tempPengeluaranRows = []; let excelPayload = null; 
         let onConfirmAction = null;
@@ -788,7 +813,7 @@
             let htmlSelect = '<option value="">Pilih Kelas</option>'; DAFTAR_KELAS.forEach(k => htmlSelect += `<option value="${k}">${k}</option>`);
             selectSummary.innerHTML = htmlSelect;
             
-            await loadMasterDataInBackground();
+            loadMasterDataInBackground(); // Dijalankan asinkron tanpa menunggu agar tidak delay
         }
 
         async function loadMasterDataInBackground() {
@@ -951,10 +976,6 @@
 
             body.innerHTML = `
                 <div class="flex flex-col h-full max-h-[70vh]">
-                    <div class="mb-4 text-center">
-                        <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3 rounded-xl font-black text-[11px] md:text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-2 cursor-pointer mb-3"><i class="fa-solid fa-table text-[15px]"></i> 1. CETAK REKAP SELURUH KELAS</button>
-                        <div class="border-t border-slate-200 w-full relative"><span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white px-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">ATAU CETAK PERSISWA</span></div>
-                    </div>
                     <div class="mb-3 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200 mt-2">
                         <span class="text-[11px] md:text-[12px] font-black text-slate-700">PILIH SEMUA SISWA</span>
                         <input type="checkbox" class="w-5 h-5 accent-orange-600 rounded cursor-pointer" id="cb-walas-all" onchange="toggleAllWalasPrint(this.checked)">
@@ -962,7 +983,10 @@
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-4 border-b border-slate-100 pb-2">
                         ${listSiswa || '<p class="text-center text-[10px] font-bold text-slate-400">Belum ada siswa</p>'}
                     </div>
-                    <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[11px] md:text-[12px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-2 cursor-pointer"><i class="fa-solid fa-file-pdf text-[15px]"></i> 2. CETAK LAPORAN SISWA</button>
+                    <div class="grid grid-cols-2 gap-2 mt-auto">
+                        <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[10px] md:text-[11px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-table text-[14px]"></i> 1. CETAK REKAP</button>
+                        <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[10px] md:text-[11px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-file-pdf text-[14px]"></i> 2. CETAK INDIVIDU</button>
+                    </div>
                 </div>
             `;
             modal.classList.add('active');
@@ -1029,7 +1053,7 @@
 
         async function prosesCetakWalasSiswa() {
             const cbs = document.querySelectorAll('.cb-walas-print:checked');
-            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Gimana mau cetak laporan kalau siswanya belum dicentang bos? 🖨️']);
+            if (cbs.length === 0) return sweetPop('warning', 'Pilih Siswa Dulu!', ['Gimana mau cetak laporan individu kalau siswanya belum dicentang bos? 🖨️']);
             
             let studentNameClean = DB.siswa[kelasWalasAktif][parseInt(cbs[0].value)].nama.replace(/[^a-zA-Z0-9]/g, '_');
             let filename = cbs.length > 1 
@@ -1070,7 +1094,7 @@
                 for(let i=0; i<dataSiswa.length; i++) indicesToPrint.push(i);
             }
             
-            // PADATKAN MUTLAK: 35 Baris untuk Halaman 1
+            // PADATKAN MUTLAK: 35 Baris untuk Halaman 1 Tanpa Nabrak
             const maxRowsPage1 = 35; 
             for(let i=0; i<maxRowsPage1; i++) {
                 if(i < indicesToPrint.length) {
@@ -1131,27 +1155,24 @@
                         monthTotal += r.amount;
                         let bgRow = i % 2 === 0 ? '#ffffff' : '#f8fafc';
                         rowsHtml += `<tr style="background-color: ${bgRow};">
-                            <td style="width: 20%; text-align: left; padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600;">${r.fullDate || r.date}</td>
-                            <td style="text-align: left; padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 10px;">${r.ket}</td>
-                            <td style="width: 25%; text-align: right; padding: 8px 12px; border-bottom: 1px solid #f1f5f9; color: #dc2626; font-weight: 800; font-size: 10px;">${formatRp(r.amount)}</td>
+                            <td style="width: 20%; text-align: left; padding: 6px 12px; border-bottom: 1px solid #f1f5f9; color: #64748b; font-weight: 600;">${r.fullDate || r.date}</td>
+                            <td style="text-align: left; padding: 6px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 10px;">${r.ket}</td>
+                            <td style="width: 25%; text-align: right; padding: 6px 12px; border-bottom: 1px solid #f1f5f9; color: #dc2626; font-weight: 800; font-size: 10px;">${formatRp(r.amount)}</td>
                         </tr>`;
                     });
                     
                     let mKey = mYear.substring(0, 3);
-                    let monthColors = {"Jul":"#fdf4ff", "Agt":"#fff7ed", "Sep":"#f0fdf4", "Okt":"#fef2f2", "Nov":"#f0f9ff", "Des":"#fefce8", "Jan":"#faf5ff", "Feb":"#f0fdfa", "Mar":"#fff1f2", "Apr":"#eff6ff", "Mei":"#ecfdf5", "Jun":"#f5f3ff"};
-                    let borderColors = {"Jul":"#f0abfc", "Agt":"#fdba74", "Sep":"#86efac", "Okt":"#fca5a5", "Nov":"#7dd3fc", "Des":"#fde047", "Jan":"#d8b4fe", "Feb":"#5eead4", "Mar":"#fda4af", "Apr":"#93c5fd", "Mei":"#6ee7b7", "Jun":"#c4b5fd"};
-                    
-                    let bgC = monthColors[mKey] || "#f1f5f9";
-                    let bdC = borderColors[mKey] || "#cbd5e1";
+                    let bgC = pastelColors[mKey]?.hexBg || "#f1f5f9";
+                    let bdC = pastelColors[mKey]?.hexBorder || "#cbd5e1";
 
                     expRowsHTML += `
-                    <div style="margin-bottom: 15px; border: 2px solid ${bdC}; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); page-break-inside: avoid;">
-                        <div style="background-color: ${bgC}; color: #334155; padding: 10px 15px; font-size: 12px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid ${bdC};">
+                    <div style="margin-bottom: 12px; border: 1.5px solid ${bdC}; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02); page-break-inside: avoid;">
+                        <div style="background-color: ${bgC}; color: #334155; padding: 8px 15px; font-size: 11px; font-weight: 900; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid ${bdC};">
                             <span style="text-transform: uppercase; display: flex; align-items: center; gap: 8px;">
-                                <div style="width: 14px; height: 14px; background-color: ${bdC}; border-radius: 4px;"></div>
+                                <div style="width: 12px; height: 12px; background-color: ${bdC}; border-radius: 4px;"></div>
                                 BULAN ${mYear}
                             </span>
-                            <span style="color: #ea580c; font-size: 13px;">Total: Rp ${formatRp(monthTotal)}</span>
+                            <span style="color: #ea580c; font-size: 12px;">Total: Rp ${formatRp(monthTotal)}</span>
                         </div>
                         <table style="width: 100%; border-collapse: collapse; font-size: 9px;">
                             <tbody>${rowsHtml}</tbody>
@@ -1168,7 +1189,7 @@
                     <h2 class="title-h2">LAPORAN REKAP ADMINISTRATOR INFAQ - KELAS ${kelas}</h2>
                     <p class="title-date">Dicetak Oleh Administrator Sekolah pada: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} WIB</p>
                     
-                    <div class="summary-flex" style="margin-bottom: 5px;">
+                    <div class="summary-flex" style="margin-bottom: 4px;">
                         <div class="sum-box sum-box-masuk">
                             <span class="sum-label">TOTAL MASUK KELAS</span>
                             <span class="sum-value">Rp ${formatRp(totalMasukKelasKeseluruhan)}</span>
@@ -1183,7 +1204,7 @@
                         </div>
                     </div>
 
-                    <div class="legend-container" style="margin-bottom: 5px;">
+                    <div class="legend-container" style="margin-bottom: 4px; padding: 3px 8px;">
                         <span style="font-size: 8px; font-weight: 900; color: #1e293b; margin-right: 4px;">KETERANGAN STATUS:</span>
                         <div class="legend-item"><div class="legend-box" style="background-color: #22c55e;"></div> Infaq (Masuk)</div>
                         <div class="legend-item"><div class="legend-box" style="background-color: #ef4444;"></div> Libur</div>
@@ -1194,7 +1215,7 @@
                         <thead>
                             <tr>
                                 <th style="width: 3%;">No</th>
-                                <th style="width: 25%; text-align: left; padding-left: 8px;">Nama Siswa</th>
+                                <th style="width: 25%; text-align: left; padding-left: 6px;">Nama Siswa</th>
                                 ${monthHeaders.map(m => `<th>${m}</th>`).join('')}
                                 <th style="width: 8%;">Total</th>
                             </tr>
@@ -1212,7 +1233,7 @@
                     <h2 class="title-h2">RINCIAN PENGELUARAN KAS - KELAS ${kelas}</h2>
                     <p class="title-date">Dicetak Oleh Administrator Sekolah pada: ${new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'})} WIB</p>
                     
-                    <div style="font-size: 13px; font-weight: 800; margin-bottom: 12px; color: #0f172a; margin-top: 15px; border-left: 4px solid #ea580c; padding-left: 8px;">Daftar Pengeluaran Kelas:</div>
+                    <div style="font-size: 12px; font-weight: 800; margin-bottom: 10px; color: #0f172a; margin-top: 15px; border-left: 4px solid #ea580c; padding-left: 8px;">Daftar Pengeluaran Kelas:</div>
                     ${expRowsHTML}
                 </div>
                 <img src="KOP TINTA BAWAH.png" class="kop-footer">
@@ -1258,7 +1279,8 @@
                 const d = monthData[m];
                 let yearLabel = academicWeeks.find(w => w.monthKey === m)?.fullYear || "2025";
                 let totalRowStr = d.total === 0 ? `<span style="color:#2563eb; font-weight:800;">0</span>` : `<span style="color:#2563eb; font-weight:800;">${formatRp(d.total)}</span>`;
-                let bgBulan = getMonthBg(m);
+                let bgBulan = pastelColors[m]?.hexBg || "#ffffff";
+                
                 return `<tr style="background-color: ${bgBulan};">
                     <td style="text-align: left; font-weight: 800; color: #0f172a; padding: 4px 6px;">${m} <br><span style="font-size:6px; color:#64748b;">${yearLabel}</span></td>
                     <td>${d.weeks[0]||`<span class="pill-empty">-</span>`}</td>
@@ -1354,17 +1376,17 @@
                         No: ${String(s.no || siswaIdx+1).padStart(2, '0')} &nbsp;|&nbsp; Nama Siswa: ${s.nama}
                     </div>
                     
-                    <!-- TABEL 2 KOLOM RAPI DENGAN GARIS TENGAH -->
-                    <div style="display: flex; justify-content: space-between; position: relative; gap: 8px;">
+                    <!-- TABEL 2 KOLOM RAPI DENGAN GARIS TENGAH LEGA -->
+                    <div style="display: flex; justify-content: space-between; position: relative; gap: 15px;">
                         <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px; background-color: #cbd5e1; transform: translateX(-50%); z-index: 0;"></div>
                         
-                        <div style="width: 48.5%; position: relative; z-index: 1;">
+                        <div style="width: 48%; position: relative; z-index: 1;">
                             <table class="table-siswa" style="background: white;">
                                 ${tableHeaderInfaq}
                                 <tbody>${sem1Rows}</tbody>
                             </table>
                         </div>
-                        <div style="width: 48.5%; position: relative; z-index: 1;">
+                        <div style="width: 48%; position: relative; z-index: 1;">
                             <table class="table-siswa" style="background: white;">
                                 ${tableHeaderInfaq}
                                 <tbody>${sem2Rows}</tbody>
@@ -1404,13 +1426,13 @@
             kelasWalasAktif = kelas;
             document.getElementById('walas-nama-guru').innerText = "Wali Kelas: " + (DB.guru[kelas] || "Guru"); document.getElementById('walas-nama-kelas').innerText = `KELAS ${kelas.toUpperCase()}`;
             const trHead = document.getElementById('walas-table-header-row');
-            let htmlHead = `<th class="py-2.5 px-1 text-center z-intersect pos-no bg-[#f8fafc]">NO</th><th class="py-2.5 px-1 z-intersect pos-nama bg-[#f8fafc] uppercase text-left">NAMA LENGKAP</th><th class="py-2.5 px-0 text-center text-[#1e3a8a] z-intersect pos-total bg-[#eff6ff] uppercase">TOT</th>`;
+            let htmlHead = `<th class="py-2.5 px-1 text-center z-intersect pos-no bg-[#f8fafc]">NO</th><th class="py-2.5 px-1 z-intersect pos-nama bg-[#f8fafc] uppercase text-left">NAMA LENGKAP</th><th class="py-2.5 px-0 text-center text-[#1e3a8a] z-intersect pos-total bg-[#eff6ff] uppercase border-r-2 border-r-slate-200">TOT</th>`;
             academicWeeks.forEach(week => {
-                const pastel = pastelColors[week.monthKey] || {bgBase: '#ffffff'};
+                const pastel = pastelColors[week.monthKey] || {bgBase: '#ffffff', borderTebal: '#94a3b8'};
                 const isEndOfMonth = (week.dateNum >= 22 && week.id < 51 && academicWeeks[week.id + 1].monthKey !== week.monthKey);
-                const borderClass = isEndOfMonth ? "border-r-[3px] border-r-[#94a3b8]" : `border-r border-r-slate-200`;
+                const borderClass = isEndOfMonth ? `border-r-[3px] border-r-[${pastel.borderTebal}]` : `border-r border-r-white/50`;
                 
-                htmlHead += `<th class="py-2 px-0.5 text-center ${borderClass} border-b border-t-0 min-w-[46px] align-top z-head" style="background-color: ${pastel.bgBase};"><div class="text-[7.5px] font-black text-slate-400 uppercase mb-0.5">${week.monthStr}</div><div class="text-[8.5px] font-bold text-slate-800 mb-2">${week.dateStr}</div><div class="flex justify-center gap-1"><button onclick="checkAll(${week.id})" class="w-[16px] h-[16px] rounded border border-green-200 text-green-500 flex items-center justify-center bg-green-50 hover:bg-green-100 transition"><i class="fa-solid fa-check text-[7px]"></i></button><button onclick="crossAll(${week.id})" class="w-[16px] h-[16px] rounded border border-red-200 text-red-500 flex items-center justify-center bg-red-50 hover:bg-red-100 transition"><i class="fa-solid fa-xmark text-[7px]"></i></button></div></th>`;
+                htmlHead += `<th class="py-2 px-0.5 text-center ${borderClass} border-b border-t-0 min-w-[46px] align-top z-head" style="background-color: ${pastel.bgBase}; border-right-color: ${isEndOfMonth ? pastel.borderTebal : 'rgba(255,255,255,0.5)'}"><div class="text-[7.5px] font-black text-slate-500 uppercase mb-0.5">${week.monthStr}</div><div class="text-[8.5px] font-bold text-slate-800 mb-2">${week.dateStr}</div><div class="flex justify-center gap-1"><button onclick="checkAll(${week.id})" class="w-[16px] h-[16px] rounded border border-green-200 text-green-500 flex items-center justify-center bg-white/70 hover:bg-green-100 transition shadow-sm"><i class="fa-solid fa-check text-[7px]"></i></button><button onclick="crossAll(${week.id})" class="w-[16px] h-[16px] rounded border border-red-200 text-red-500 flex items-center justify-center bg-white/70 hover:bg-red-100 transition shadow-sm"><i class="fa-solid fa-xmark text-[7px]"></i></button></div></th>`;
             });
             trHead.innerHTML = htmlHead;
             if(!checklistState[kelas]) { checklistState[kelas] = {}; (DB.siswa[kelas] || []).forEach((_, i) => { checklistState[kelas][i] = new Array(52).fill(0); }); }
@@ -1428,13 +1450,13 @@
                 let checkBoxesHtml = '';
                 academicWeeks.forEach(w => {
                     const state = checks[w.id] || 0;
-                    const pastel = pastelColors[w.monthKey] || {bgBase: '#ffffff'};
+                    const pastel = pastelColors[w.monthKey] || {bgBase: '#ffffff', borderTebal: '#94a3b8'};
                     const isEndOfMonth = (w.dateNum >= 22 && w.id < 51 && academicWeeks[w.id + 1].monthKey !== w.monthKey);
-                    const borderClass = isEndOfMonth ? "border-r-[3px] border-r-[#94a3b8]" : "border-r border-r-white";
+                    const borderClass = isEndOfMonth ? `border-r-[3px]` : `border-r border-r-white/50`;
 
-                    checkBoxesHtml += `<td class="py-2.5 px-0.5 text-center border-b border-white ${borderClass}" style="background-color: ${pastel.bgBase};"><div id="cell-${idx}-${w.id}" onclick="toggleCheckManual(${idx}, ${w.id})" class="mx-auto cursor-pointer transition-colors ${getCellClass(state)}">${getCellIcon(state)}</div></td>`;
+                    checkBoxesHtml += `<td class="py-2.5 px-0.5 text-center border-b border-white ${borderClass}" style="background-color: ${pastel.bgBase}; border-right-color: ${isEndOfMonth ? pastel.borderTebal : 'rgba(255,255,255,0.5)'}"><div id="cell-${idx}-${w.id}" onclick="toggleCheckManual(${idx}, ${w.id})" class="mx-auto cursor-pointer transition-colors shadow-sm ${getCellClass(state)}">${getCellIcon(state)}</div></td>`;
                 });
-                html += `<tr class="walas-tr"><td class="py-2 px-1 text-center z-col pos-no text-slate-400 font-bold border-b border-slate-100 text-[10px] md:text-[11px]">${String(s.no || idx+1).padStart(2, '0')}</td><td class="py-2 px-1 z-col pos-nama text-slate-800 border-b border-slate-100 text-[11px] md:text-[12px]">${s.nama || s.class}</td><td class="py-2 px-1 text-center ${totalColor} font-black z-col pos-total border-b border-slate-100 text-[11px] md:text-[12px]"><span id="total-siswa-${idx}">${formatRp(totalInfaq)}</span></td>${checkBoxesHtml}</tr>`;
+                html += `<tr class="walas-tr"><td class="py-2 px-1 text-center z-col pos-no text-slate-400 font-bold border-b border-slate-100 text-[10px] md:text-[11px]">${String(s.no || idx+1).padStart(2, '0')}</td><td class="py-2 px-1 z-col pos-nama text-slate-800 border-b border-slate-100 text-[11px] md:text-[12px]" title="${s.nama || s.class}">${s.nama || s.class}</td><td class="py-2 px-1 text-center ${totalColor} font-black z-col pos-total border-b border-slate-100 border-r-2 border-r-slate-200 text-[11px] md:text-[12px]" title="${formatRp(totalInfaq)}"><span id="total-siswa-${idx}">${formatRp(totalInfaq)}</span></td>${checkBoxesHtml}</tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -1442,7 +1464,7 @@
         function getCellClass(state) {
             if(state === 1) return "w-[20px] h-[20px] rounded border border-green-500 bg-green-100 text-green-600 flex items-center justify-center";
             if(state === 2) return "w-[20px] h-[20px] rounded border border-red-500 bg-red-100 text-red-600 flex items-center justify-center";
-            return "w-[20px] h-[20px] rounded border border-slate-300 bg-white/70 hover:bg-white flex items-center justify-center";
+            return "w-[20px] h-[20px] rounded border border-slate-300 bg-white/80 hover:bg-white flex items-center justify-center opacity-80";
         }
         function getCellIcon(state) {
             if(state === 1) return '<i class="fa-solid fa-check text-[11px]"></i>';
@@ -1454,7 +1476,7 @@
             let currentState = checklistState[kelasWalasAktif][siswaIdx][weekIdx] || 0;
             let nextState = (currentState === 1) ? 0 : 1; 
             checklistState[kelasWalasAktif][siswaIdx][weekIdx] = nextState;
-            const cell = document.getElementById(`cell-${siswaIdx}-${weekIdx}`); cell.className = `mx-auto cursor-pointer transition-colors ${getCellClass(nextState)}`; cell.innerHTML = getCellIcon(nextState);
+            const cell = document.getElementById(`cell-${siswaIdx}-${weekIdx}`); cell.className = `mx-auto cursor-pointer transition-colors shadow-sm ${getCellClass(nextState)}`; cell.innerHTML = getCellIcon(nextState);
             updateTotalSiswa(siswaIdx);
         }
 
@@ -1462,7 +1484,7 @@
             const dataSiswa = DB.siswa[kelasWalasAktif] || []; let allAreOne = true;
             dataSiswa.forEach((_, i) => { if(checklistState[kelasWalasAktif][i][weekIdx] !== 1) allAreOne = false; });
             let newState = allAreOne ? 0 : 1;
-            dataSiswa.forEach((_, i) => { checklistState[kelasWalasAktif][i][weekIdx] = newState; const cell = document.getElementById(`cell-${i}-${weekIdx}`); cell.className = `mx-auto cursor-pointer transition-colors ${getCellClass(newState)}`; cell.innerHTML = getCellIcon(newState); updateTotalSiswa(i, false); });
+            dataSiswa.forEach((_, i) => { checklistState[kelasWalasAktif][i][weekIdx] = newState; const cell = document.getElementById(`cell-${i}-${weekIdx}`); cell.className = `mx-auto cursor-pointer transition-colors shadow-sm ${getCellClass(newState)}`; cell.innerHTML = getCellIcon(newState); updateTotalSiswa(i, false); });
             calcStatsWalas();
         }
 
@@ -1470,7 +1492,7 @@
             const dataSiswa = DB.siswa[kelasWalasAktif] || []; let allAreTwo = true;
             dataSiswa.forEach((_, i) => { if(checklistState[kelasWalasAktif][i][weekIdx] !== 2) allAreTwo = false; });
             let newState = allAreTwo ? 0 : 2;
-            dataSiswa.forEach((_, i) => { checklistState[kelasWalasAktif][i][weekIdx] = newState; const cell = document.getElementById(`cell-${i}-${weekIdx}`); cell.className = `mx-auto cursor-pointer transition-colors ${getCellClass(newState)}`; cell.innerHTML = getCellIcon(newState); updateTotalSiswa(i, false); });
+            dataSiswa.forEach((_, i) => { checklistState[kelasWalasAktif][i][weekIdx] = newState; const cell = document.getElementById(`cell-${i}-${weekIdx}`); cell.className = `mx-auto cursor-pointer transition-colors shadow-sm ${getCellClass(newState)}`; cell.innerHTML = getCellIcon(newState); updateTotalSiswa(i, false); });
             calcStatsWalas();
         }
 
@@ -1481,6 +1503,7 @@
             
             const cell = document.getElementById(`total-siswa-${siswaIdx}`);
             cell.innerText = formatRp(totalInfaq);
+            cell.parentElement.title = formatRp(totalInfaq);
             const parentTd = cell.parentElement;
             if(totalInfaq > 0) { parentTd.classList.remove('text-blue-300'); parentTd.classList.add('text-[#1e3a8a]'); } 
             else { parentTd.classList.remove('text-[#1e3a8a]'); parentTd.classList.add('text-blue-300'); }
@@ -1561,10 +1584,10 @@
                         iconHtml = '<span class="text-slate-300 font-bold">-</span>';
                     }
                     
-                    boxesHtml += `<div class="w-[56px] min-w-[56px] ${boxClass} border rounded-xl flex flex-col items-center justify-center p-2 h-[70px] transition-all hover:scale-105"><span class="text-[14px] font-black ${textClass}">${w.dateNum}</span><div class="mt-1 flex items-center justify-center h-[18px]">${iconHtml}</div></div>`;
+                    boxesHtml += `<div class="w-[56px] min-w-[56px] ${boxClass} border rounded-xl flex flex-col items-center justify-center p-2 h-[70px] transition-transform hover:scale-105 cursor-default"><span class="text-[14px] font-black ${textClass}">${w.dateNum}</span><div class="mt-1 flex items-center justify-center h-[18px]">${iconHtml}</div></div>`;
                 });
                 
-                htmlCalendar += `<div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 md:p-5 shadow-sm relative"><div class="bg-[#1e3a8a] text-white text-[10px] md:text-[11px] font-black uppercase px-3.5 py-2 rounded-lg inline-block mb-3.5 shadow-md">${month}</div><div class="flex gap-2.5 overflow-x-auto custom-scrollbar pb-1 md:flex-wrap md:overflow-visible">${boxesHtml}</div></div>`;
+                htmlCalendar += `<div class="bg-white border border-slate-100 rounded-2xl p-4 md:p-5 shadow-sm relative"><div class="bg-[#1e3a8a] text-white text-[10px] md:text-[11px] font-black uppercase px-3.5 py-2 rounded-lg inline-block mb-3.5 shadow-md">${month}</div><div class="flex gap-2.5 overflow-x-auto custom-scrollbar pb-2 md:flex-wrap md:overflow-visible">${boxesHtml}</div></div>`;
             }
             calendarContainer.innerHTML = htmlCalendar;
         }
@@ -1956,7 +1979,7 @@
                 msgEl.innerText = msg;
             }
 
-            card.className = "bg-white rounded-3xl p-6 pt-8 max-w-[300px] w-full transform scale-75 opacity-0 transition-all duration-300 text-center relative mt-8 border-2";
+            card.className = "bg-white rounded-3xl p-6 pt-8 max-w-[300px] w-full transform scale-75 opacity-0 transition-all duration-300 text-center relative mt-8 border-2 shadow-2xl";
             icon.className = "absolute -top-8 left-1/2 transform -translate-x-1/2 text-[55px] drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)] z-10 whitespace-nowrap animate-bounce";
 
             const successPool = [
@@ -1966,8 +1989,8 @@
             ];
 
             const errorPool = [
-                { emojis: "🙈💦", glow: "border-rose-400 shadow-[0_0_40px_rgba(251,113,133,0.5)]", btnClass: "bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 shadow-[0_4px_15px_rgba(244,63,94,0.4)]", btnText: "YAH KELESET BOS! 😅" },
-                { emojis: "😅🔧", glow: "border-slate-400 shadow-[0_0_40px_rgba(148,163,184,0.5)]", btnClass: "bg-gradient-to-r from-slate-500 to-slate-700 hover:from-slate-600 hover:to-slate-800 shadow-[0_4px_15px_rgba(100,116,139,0.4)]", btnText: "CEK LAGI DONG! 🛠️" },
+                { emojis: "😅💦", glow: "border-rose-400 shadow-[0_0_40px_rgba(251,113,133,0.5)]", btnClass: "bg-gradient-to-r from-rose-400 to-rose-600 hover:from-rose-500 hover:to-rose-700 shadow-[0_4px_15px_rgba(244,63,94,0.4)]", btnText: "YAH KELESET BOS! 😅" },
+                { emojis: "😤🔧", glow: "border-slate-400 shadow-[0_0_40px_rgba(148,163,184,0.5)]", btnClass: "bg-gradient-to-r from-slate-500 to-slate-700 hover:from-slate-600 hover:to-slate-800 shadow-[0_4px_15px_rgba(100,116,139,0.4)]", btnText: "CEK LAGI DONG! 🛠️" },
                 { emojis: "🤔✨", glow: "border-indigo-400 shadow-[0_0_40px_rgba(129,140,248,0.5)]", btnClass: "bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 shadow-[0_4px_15px_rgba(99,102,241,0.4)]", btnText: "WADUH KELIRU BOS! 🧐" }
             ];
 
