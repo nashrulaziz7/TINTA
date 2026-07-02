@@ -617,20 +617,17 @@
         let isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
         try {
-            const manifestJSON = {
+            const manifestStr = JSON.stringify({
                 "name": "TINTA - Master Vision", "short_name": "TINTA",
-                "start_url": window.location.href, "display": "standalone",
+                "start_url": window.location.pathname || "/", "display": "standalone",
                 "background_color": "#f8fafc", "theme_color": "#1e3a8a",
                 "icons": [{"src": "TINTA.png", "sizes": "512x512", "type": "image/png"}]
-            };
-            const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/json'});
-            document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="${URL.createObjectURL(manifestBlob)}">`);
+            });
+            document.head.insertAdjacentHTML('beforeend', `<link rel="manifest" href="data:application/manifest+json;charset=utf-8,${encodeURIComponent(manifestStr)}">`);
 
             if ('serviceWorker' in navigator) {
-                const swCode = "self.addEventListener('install', e => self.skipWaiting()); self.addEventListener('fetch', e => {});";
-                const swBlob = new Blob([swCode], {type: 'application/javascript'});
-                // KONSOL BERSIH: Tambahkan .catch() untuk membungkam error dari browser security
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(e => console.log("PWA Engine Bypass Activated (Offline SW Ignored)"));
+                // TERHUBUNG OTOMATIS KE sw.js DI GITHUB ANDA AGAR LOLOS SYARAT PWA GOOGLE CHROME
+                navigator.serviceWorker.register('sw.js').catch(e => console.log("SW Offline"));
             }
         } catch(e) { console.log("PWA Setup Bypassed"); }
 
@@ -695,15 +692,8 @@
                     deferredPrompt = null;
                 });
             } else {
-                // FALLBACK CERDAS (Jika browser memblokir prompt atau di iPhone/iOS)
-                // SweetPop akan muncul PALING DEPAN karena Z-index sudah dinaikkan ke 9999999
-                sweetPop('warning', 'Install Instan Diblokir!', 'Browser Anda menolak install otomatis.\nSilakan klik tombol [Titik 3] atau [Share], lalu pilih "Tambahkan ke Layar Utama".\n\n(Akses sementara dibuka)');
-                
-                // Beri waktu 3 detik bagi user membaca, lalu sembunyikan overlay install dan izinkan masuk sementara
-                setTimeout(() => {
-                    document.getElementById('install-popup-overlay').classList.add('opacity-0', 'pointer-events-none');
-                    showWelcomePopup();
-                }, 3000);
+                // MODE OTORITER MUTLAK: TANPA OPSI TITIK TIGA!
+                sweetPop('error', 'Install Instan Diblokir Browser!', 'Browser Anda (Atau Mode Incognito) menolak perintah Install Otomatis.\n\nPastikan Anda menggunakan Google Chrome biasa agar instalasi instan bekerja!');
             }
         }
 
