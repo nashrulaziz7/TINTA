@@ -137,10 +137,10 @@
                 color: #1e3a8a; padding: 2px 0px; font-weight: 800; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; font-size: 8px; line-height: 1.2;
             }
             
-            /* Table Rekap Kelas (Admin) */
-            .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 7.5px; text-align: center; border: 1px solid #e2e8f0; }
-            .table-admin th { padding: 4px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 2px; font-size: 7px; }
-            .table-admin td { padding: 2px 1px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; height: 13px; font-size: 7px; }
+            /* Table Rekap Kelas (Admin) - DIPADATKAN MAX 35 BARIS */
+            .table-admin { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 7.5px; text-align: center; border: 1px solid #e2e8f0; margin-bottom: 0; }
+            .table-admin th { padding: 3px 2px; font-weight: 600; border: 1px solid white; background-color: #1e3a8a; color: white; border-radius: 2px; font-size: 7px; }
+            .table-admin td { padding: 1.5px 1px; color: #475569; border-bottom: 1px solid #f1f5f9; border-top: none; height: 11px; font-size: 7px; }
             .table-admin tbody tr:nth-child(even) td { background-color: #f8fafc !important; }
             .table-admin tbody tr:nth-child(odd) td { background-color: white !important; }
             .text-left { text-align: left !important; padding-left: 6px !important; }
@@ -575,7 +575,7 @@
         <div class="bg-white rounded-3xl p-6 max-w-[360px] w-full transform scale-95 transition-transform duration-500 relative overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 to-[#ea580c]"></div>
             <div class="text-center mb-5 mt-2">
-                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner border border-blue-100"><img src="TINTA.png" class="w-12 h-auto" onerror="this.src='https://placehold.co/100x30/ffffff/1e3a8a?text=LOGO'"></div>
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3 shadow-inner border border-blue-100"><img src="TINTA.png" class="w-12 h-auto object-contain" onerror="this.src='https://placehold.co/100x30/ffffff/1e3a8a?text=LOGO'"></div>
                 <h2 class="text-[18px] md:text-[20px] font-black text-slate-800">Selamat Datang di TINTA!</h2>
                 <p class="text-[11px] md:text-[12px] font-bold text-slate-500 mt-1">Sistem Tabungan Infaq Terpadu Level Dewa 🚀</p>
             </div>
@@ -672,6 +672,13 @@
             }
         });
 
+        // Deteksi otomatis jika user berhasil install dari PopUp
+        window.addEventListener('appinstalled', () => {
+            isAppInstalled = true;
+            document.getElementById('install-popup-overlay').classList.add('opacity-0', 'pointer-events-none');
+            showWelcomePopup();
+        });
+
         // --- SISTEM PENYAMBUTAN & SPLASH SCREEN LOGIC ---
         window.addEventListener('DOMContentLoaded', () => {
             // 1. Jalankan Splash Screen (Logo Melayang & Bouncing Dots)
@@ -697,6 +704,12 @@
         });
 
         function showMandatoryInstall() {
+            // Cek ulang untuk jaga-jaga kalau browser telat mendeteksi standalone
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                isAppInstalled = true;
+                if(!sessionStorage.getItem('tinta_welcomed')) showWelcomePopup();
+                return;
+            }
             const overlay = document.getElementById('install-popup-overlay');
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             overlay.classList.add('pointer-events-auto');
@@ -705,16 +718,19 @@
 
         function triggerNativeInstall() {
             if (deferredPrompt) {
+                // Trigger native prompt dari browser
                 deferredPrompt.prompt();
                 deferredPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        sweetPop('success', 'Sedang Diinstal!', 'Mantap Bos! Tunggu sebentar, aplikasi akan otomatis muncul di layar utama Anda. Silakan buka dari sana!');
+                        sweetPop('success', 'Sedang Diinstal!', 'Mantap Bos! Tunggu sebentar, aplikasi akan otomatis muncul di layar utama Anda.');
                     } else {
                         sweetPop('error', 'Wajib Bos!', 'Tidak ada kompromi! Aplikasi harus diinstal biar kecepatannya maksimal. 😤');
                     }
+                    deferredPrompt = null;
                 });
             } else {
-                sweetPop('warning', 'Peringatan Browser', 'Perangkat Anda belum siap otomatis. Silakan klik Titik 3 di pojok kanan atas browser lalu pilih "Tambahkan ke Layar Utama / Install".');
+                // FALLBACK CERDAS (Jika browser memblokir prompt atau di iPhone/iOS)
+                sweetPop('warning', 'Tinggal 1 Langkah Lagi!', 'Perangkat Anda memblokir install instan. Silakan klik tombol [Titik 3] atau [Share] di browser, lalu pilih "Tambahkan ke Layar Utama" (Add to Home Screen).');
             }
         }
 
@@ -976,17 +992,22 @@
 
             body.innerHTML = `
                 <div class="flex flex-col h-full max-h-[70vh]">
-                    <div class="mb-3 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200 mt-2">
+                    <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[11px] md:text-[12px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-1.5 cursor-pointer mb-5"><i class="fa-solid fa-table text-[14px]"></i> 1. CETAK REKAP KELAS</button>
+                    
+                    <div class="flex items-center justify-center mb-3">
+                        <div class="h-px bg-slate-200 w-full"></div>
+                        <span class="px-3 text-[9px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">Atau Cetak Persiswa</span>
+                        <div class="h-px bg-slate-200 w-full"></div>
+                    </div>
+
+                    <div class="mb-3 flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
                         <span class="text-[11px] md:text-[12px] font-black text-slate-700">PILIH SEMUA SISWA</span>
                         <input type="checkbox" class="w-5 h-5 accent-orange-600 rounded cursor-pointer" id="cb-walas-all" onchange="toggleAllWalasPrint(this.checked)">
                     </div>
                     <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 mb-4 border-b border-slate-100 pb-2">
                         ${listSiswa || '<p class="text-center text-[10px] font-bold text-slate-400">Belum ada siswa</p>'}
                     </div>
-                    <div class="grid grid-cols-2 gap-2 mt-auto">
-                        <button onclick="prosesCetakWalasRekap()" class="w-full bg-[#1e3a8a] text-white py-3.5 rounded-xl font-black text-[10px] md:text-[11px] shadow-md hover:bg-blue-900 transition flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-table text-[14px]"></i> 1. CETAK REKAP</button>
-                        <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[10px] md:text-[11px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-file-pdf text-[14px]"></i> 2. CETAK INDIVIDU</button>
-                    </div>
+                    <button onclick="prosesCetakWalasSiswa()" class="w-full bg-[#ea580c] text-white py-3.5 rounded-xl font-black text-[11px] md:text-[12px] shadow-md hover:bg-orange-700 transition flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-file-pdf text-[14px]"></i> 2. CETAK LAPORAN SISWA</button>
                 </div>
             `;
             modal.classList.add('active');
@@ -1038,16 +1059,11 @@
         }
 
         async function prosesCetakWalasRekap() {
-            const cbs = document.querySelectorAll('.cb-walas-print:checked');
-            // Jika untuk cetak rekap siswa pilihan saja
-            let indicesToPrint = null;
-            if (cbs.length > 0) {
-                indicesToPrint = Array.from(cbs).map(cb => parseInt(cb.value));
-            }
-
+            // Karena tombol Rekap Kelas sekarang independen dari kotak centang
+            // Sistem akan selalu mencetak seluruh kelas
             let filename = `Laporan_Rekap_Infaq_Kelas_${kelasWalasAktif}`;
             await fetchKelasData(kelasWalasAktif); 
-            let finalHTML = generateClassRecapHTML(kelasWalasAktif, indicesToPrint); 
+            let finalHTML = generateClassRecapHTML(kelasWalasAktif, null); // null berarti cetak semua
             executeNativePrint(filename, finalHTML);
         }
 
